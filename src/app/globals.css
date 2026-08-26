@@ -1,0 +1,161 @@
+@import "tailwindcss";
+@import "leaflet/dist/leaflet.css";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171412;
+  --foreground-muted: rgb(23 20 18 / 0.6);
+  --panel-bg: #ffffff;
+  --panel-text: #141414;
+  --panel-text-muted: rgb(20 20 20 / 0.75);
+  --border-subtle: rgb(0 0 0 / 0.1);
+  --edge-glass-bg: rgb(255 255 255 / 0.14);
+  --edge-glass-border: rgb(255 255 255 / 0.55);
+  --panel-elevation-shadow: rgb(0 0 0 / 0.32);
+}
+
+/* 深色模式：透過 <html data-theme="dark"> 手動切換（見 ThemeToggle 元件），
+   不是單純跟隨系統設定，使用者可以自己切換。 */
+:root[data-theme="dark"] {
+  --background: #111110;
+  --foreground: #f2f1ee;
+  --foreground-muted: rgb(242 241 238 / 0.6);
+  --panel-bg: #111110;
+  --panel-text: #f2f1ee;
+  --panel-text-muted: rgb(242 241 238 / 0.75);
+  --border-subtle: rgb(255 255 255 / 0.12);
+  --edge-glass-bg: rgb(17 17 16 / 0.14);
+  --edge-glass-border: rgb(255 255 255 / 0.18);
+  --panel-elevation-shadow: rgb(0 0 0 / 0.6);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-serif-tc: var(--font-serif-tc);
+  --font-sans-tc: var(--font-sans-tc);
+}
+
+body {
+  font-family: var(--font-sans-tc), "Noto Sans TC", sans-serif;
+}
+
+.font-serif-tc {
+  font-family: var(--font-serif-tc), "Noto Serif TC", serif;
+}
+
+/* 展覽感的細節：底線緩慢展開的連結 */
+.link-underline {
+  position: relative;
+  text-decoration: none;
+}
+
+.link-underline::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 100%;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.link-underline:hover::after {
+  transform: scaleX(1);
+}
+
+/* 隱藏捲軸視覺樣式，捲動功能不受影響（用在兩案各自獨立捲動的欄位上） */
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* 基地地圖：圖磚色調照 Internal-Pages（as-studio001/Internal-Pages 的 .map-full__canvas）加一層
+   輕微調色＋色疊，讓衛星圖看起來是特意調過的，不是套件預設的原始色彩；色疊改用這個站的螢光綠
+   點綴色，取代原本的藍色，跟全站單一點綴色的規則一致。 */
+.site-map-canvas {
+  position: relative;
+  overflow: hidden;
+}
+
+.site-map-canvas .leaflet-tile {
+  filter: saturate(0.95) contrast(1.12) brightness(0.85);
+}
+
+.site-map-canvas::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 500;
+  pointer-events: none;
+  background: rgba(57, 255, 20, 0.1);
+  mix-blend-mode: overlay;
+}
+
+.site-map-canvas .leaflet-control-attribution {
+  font-size: 0.62rem;
+  background: rgba(10, 10, 10, 0.55);
+  color: #ccc;
+}
+
+.site-map-canvas .leaflet-control-attribution a {
+  color: #fff;
+}
+
+/* 定位圖標：水滴形＋脈動白環，造型照 Internal-Pages 的 .site-pin，顏色透過 --pin-color
+   這個 inline CSS variable 帶入各案自己的點綴色。 */
+.site-pin {
+  position: relative;
+  width: 34px;
+  height: 46px;
+}
+
+.site-pin__drop {
+  position: absolute;
+  top: 0;
+  left: 5px;
+  width: 24px;
+  height: 24px;
+  background: var(--pin-color, #39ff14);
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.35);
+}
+
+.site-pin__shadow {
+  position: absolute;
+  bottom: 1px;
+  left: 11px;
+  width: 14px;
+  height: 5px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.3);
+  filter: blur(1.5px);
+}
+
+.site-pin__ring {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #fff;
+  animation: site-pin-pulse 2.2s ease-out infinite;
+}
+
+@keyframes site-pin-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(57, 255, 20, 0.5);
+  }
+  100% {
+    box-shadow: 0 0 0 18px rgba(57, 255, 20, 0);
+  }
+}

@@ -13,19 +13,23 @@ import type { ProjectImage } from "@/lib/projects";
 // 不加隨機抖動——原始碼裡「有機、不死板」的觀感全部來自圖片分組本身的不規則性，插入位置
 // 反而故意用最單純的等分公式，不需要另外調味。
 
-// 文字長度決定這個章節最多能顯示幾張照片——使用者訂的規則：前 200 字允許 3 張，
+// 文字長度決定這個章節最多能上傳／顯示幾張照片——使用者訂的規則：前 200 字允許 3 張，
 // 之後每多滿 100 字再多 2 張（未滿 100 字的零頭不計）。目的是避免圖片量跟論述文字的份量
 // 脫節——論述還很單薄卻塞十幾張照片，讀起來會像圖庫而不是有內容支撐的策展論述。
-// 這是唯一的判斷依據（見下方 visibleImages()），不用另外在後台或上傳流程各自實作一次。
+// 這是唯一的判斷依據，後台上傳流程（到了上限，上傳介面該擋下來、引導使用者改傳到
+// MORE IN DETAIL）跟這裡的顯示防呆（見下方 visibleImages()）都算同一個數字，不用各自
+// 實作一次、也不會兩邊講的上限對不上。
 export function maxPhotosForText(text: string | undefined): number {
   const length = [...(text ?? "")].length;
   if (length <= 200) return 3;
   return 3 + 2 * Math.floor((length - 200) / 100);
 }
 
-// 章節實際「會顯示」的照片——chapter.images 允許存得比這個上限多（例如文字之後改長了，
-// 想讓多出來的照片自動顯示，不用重新上傳），但畫面上（案例內頁的自動排版、首頁雙欄的
-// 照片索引）一律只取前 maxPhotosForText() 張，兩處共用同一個函式，不用各自算一次上限。
+// chapter.images 本來就只該存「文字撐得起」的張數——真的超過上限的部分，資料上應該直接
+// 搬去 moreImages，不是留在 images 裡等著被裁掉（見 projects.ts 的欄位說明）。這裡的
+// slice() 純粹是最後一道防呆：如果資料一時沒對齊規則（例如文字改短了、還沒來得及搬移
+// 照片），畫面上還是不會顯示出超過上限的張數。案例內頁的自動排版、首頁雙欄的照片索引都
+// 呼叫同一個函式，不用各自算一次上限。
 export function visibleImages(text: string | undefined, images: ProjectImage[] | undefined): ProjectImage[] {
   return (images ?? []).slice(0, maxPhotosForText(text));
 }

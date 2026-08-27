@@ -18,14 +18,15 @@ export type Chapter = {
   // 「基地」也用這個欄位，但排版方式不同（AssemblySection 只取第一段，「基地」目前沒有
   // 用到文字內容）。
   images?: ProjectImage[]; // 這章要用的照片，順序就是自動排版時的插入優先順序；首頁雙欄的
-  // 照片索引（PhotoStream.tsx）也直接讀這個欄位。實際會顯示幾張不是看陣列長度，是看
-  // chapter.text 的字數（見 lib/photoLayout.ts 的 maxPhotosForText／visibleImages）——
-  // 文字太少配太多圖，讀起來會像圖庫而不是有內容支撐的論述，所以這裡允許存得比上限多
-  // （之後文字寫長了，多出來的照片會自動開始顯示，不用重新上傳），畫面上一律自動裁到
-  // 文字份量撐得起的張數。
-  moreImages?: ProjectImage[]; // 「MORE IN DETAIL」可展開的設計過程圖庫（手稿／模型／圖面），
-  // 只有「建築設計／模矩／構造／施工」會用到（見 ProjectDetail.tsx 的 ReadMoreGallery）。
-  // 跟 images 分開存放——這批圖只在內頁展開後才看得到，不算進首頁雙欄的照片索引。
+  // 照片索引（PhotoStream.tsx）也直接讀這個欄位。張數上限由 chapter.text 的字數決定（見
+  // lib/photoLayout.ts 的 maxPhotosForText）——文字太少配太多圖，讀起來會像圖庫而不是有
+  // 內容支撐的論述。這個欄位本身就只該放「文字撐得起」的張數，不要存超過上限：上傳流程
+  // 到了上限之後，多出來的照片要放進 moreImages（MORE IN DETAIL），不是塞進這裡等著被
+  // 裁掉——visibleImages() 還是會在畫面上防呆裁一次，但那是保險，不是預期的用法。
+  moreImages?: ProjectImage[]; // 「MORE IN DETAIL」可展開的設計過程圖庫（手稿／模型／圖面，
+  // 也是 images 超過上限時多出來的照片該去的地方），只有「建築設計／模矩／構造／施工」會
+  // 用到（見 ProjectDetail.tsx 的 ReadMoreGallery）。跟 images 分開存放——這批圖只在內頁
+  // 展開後才看得到，不算進首頁雙欄的照片索引。
   video?: string; // 影片路徑（可選，每個章節都能放）
   pdf?: { url: string; label: string }; // 可下載檔案（目前只有「組裝說明書」會用到）
 };
@@ -96,23 +97,23 @@ export const projects: Project[] = [
         key: "design",
         title: "建築設計",
         text: "〔佔位文字，抓版面用〕常民竹小屋回應的是「常民」與「構造」之間的距離——不是為了展示工法而蓋，而是回到最基本的生活尺度，思考人如何在竹構造的空間裡靜下來、待下來、慢慢住進去。整體配置刻意保留低矮、貼近地面的姿態，讓建築物退居成背景，把使用者的日常動作留在畫面中央，也呼應基地周邊聚落原有的生活紋理與尺度感，避免用一棟過於張揚的量體打斷既有的地景關係。\n\n空間的開放程度、遮蔽與穿透的比例，都在設計初期反覆推敲，希望呈現一種介於室內與戶外之間、隨天氣與時間而變化的曖昧邊界。屋簷深淺、開口大小、動線轉折，每一個決定背後都對應著一段關於「怎麼住」的具體想像，而不只是造型上的考量，也希望觀者走進這個空間時能感受到細節的體貼。\n\n這裡先以現場影像鋪陳整體氛圍，設計圖說與正式論述文字之後會陸續補上，讓讀者可以從照片本身感受空間的尺度與光影變化。",
-        // 這批照片先重複借用工地現場的 10 張真實照片＋幾張網路免版權風景照湊出「5～10 張」的
-        // 展示份量（見下方各章節同樣的作法），純粹是為了讓自動排版演算法（lib/photoLayout.ts）
-        // 有足夠多樣的形狀可以排——之後有正式素材要替換時，直接改這裡的 images 陣列即可，
-        // 排版會自動跟著新照片的形狀重算，不用動排版邏輯本身。
+        // 照片張數上限由文字份量決定（見 lib/photoLayout.ts 的 maxPhotosForText）——這裡的
+        // images 陣列本身就只放「這篇文字撐得起」的張數，不會存超過上限；超過的部分不是留在
+        // 這裡等著「之後自動顯示」，是直接歸到 moreImages（MORE IN DETAIL 收合圖庫）——上傳
+        // 照片時如果已經到上限，多的只能傳進 more in detail，不會進到這裡。
         images: [
           { id: "a-design-1", tone: "bg-neutral-300", caption: "〔照片說明待補〕", src: "/images/project-one/1786700848131-_______2026-08-14_173851.png" },
           { id: "a-design-2", tone: "bg-neutral-400", caption: "〔照片說明待補〕", src: "/images/project-one/1786700851881-_______2026-08-14_173939.png" },
           { id: "a-design-3", tone: "bg-neutral-300", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/portrait-1.jpg" },
           { id: "a-design-4", tone: "bg-neutral-400", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/portrait-2.jpg" },
           { id: "a-design-5", tone: "bg-neutral-300", caption: "〔照片說明待補〕", src: "/images/project-one/1786701211986-_______2026-08-14_175147.png" },
-          { id: "a-design-6", tone: "bg-neutral-400", caption: "〔照片說明待補〕", src: "/images/project-one/1786700856939-_______2026-08-14_174017.png" },
-          { id: "a-design-7", tone: "bg-neutral-300", caption: "〔照片說明待補〕", src: "/images/project-one/1786701229749-_______2026-08-14_175009.png" },
         ],
         moreImages: [
           { id: "a-design-more-1", tone: "bg-neutral-300", caption: "基地紋理分析圖" },
           { id: "a-design-more-2", tone: "bg-neutral-400", caption: "空間量體推演手稿" },
           { id: "a-design-more-3", tone: "bg-neutral-300", caption: "動線與開口研究模型" },
+          { id: "a-design-more-4", tone: "bg-neutral-400", caption: "〔照片說明待補〕", src: "/images/project-one/1786700856939-_______2026-08-14_174017.png" },
+          { id: "a-design-more-5", tone: "bg-neutral-300", caption: "〔照片說明待補〕", src: "/images/project-one/1786701229749-_______2026-08-14_175009.png" },
         ],
       },
       {
@@ -125,12 +126,12 @@ export const projects: Project[] = [
           { id: "a-module-3", tone: "bg-neutral-300", caption: "〔照片說明待補〕", src: "/images/project-one/1786701820696-_______2026-08-14_180258.png" },
           { id: "a-module-4", tone: "bg-neutral-400", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/portrait-3.jpg" },
           { id: "a-module-5", tone: "bg-neutral-300", caption: "〔照片說明待補〕", src: "/images/project-one/1786700848131-_______2026-08-14_173851.png" },
-          { id: "a-module-6", tone: "bg-neutral-400", caption: "〔照片說明待補〕", src: "/images/project-one/1786700856939-_______2026-08-14_174017.png" },
         ],
         moreImages: [
           { id: "a-module-more-1", tone: "bg-neutral-300", caption: "模矩尺寸推演草圖" },
           { id: "a-module-more-2", tone: "bg-neutral-400", caption: "單元接合方式測試" },
           { id: "a-module-more-3", tone: "bg-neutral-300", caption: "模矩網格對應立面圖" },
+          { id: "a-module-more-4", tone: "bg-neutral-400", caption: "〔照片說明待補〕", src: "/images/project-one/1786700856939-_______2026-08-14_174017.png" },
         ],
       },
       {
@@ -143,14 +144,14 @@ export const projects: Project[] = [
           { id: "a-structure-3", tone: "bg-neutral-300", caption: "〔照片說明待補〕", src: "/images/project-one/1786701229749-_______2026-08-14_175009.png" },
           { id: "a-structure-4", tone: "bg-neutral-400", caption: "〔照片說明待補〕", src: "/images/project-one/1786701824261-_______2026-08-14_180200.png" },
           { id: "a-structure-5", tone: "bg-neutral-300", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/portrait-4.jpg" },
-          { id: "a-structure-6", tone: "bg-neutral-400", caption: "〔照片說明待補〕", src: "/images/project-one/cover-01.png" },
-          { id: "a-structure-7", tone: "bg-neutral-300", caption: "〔照片說明待補〕", src: "/images/project-one/1786701209422-_______2026-08-14_175239.png" },
-          { id: "a-structure-8", tone: "bg-neutral-400", caption: "〔照片說明待補〕", src: "/images/project-one/1786700851881-_______2026-08-14_173939.png" },
         ],
         moreImages: [
           { id: "a-structure-more-1", tone: "bg-neutral-300", caption: "桁架系統受力分析圖" },
           { id: "a-structure-more-2", tone: "bg-neutral-400", caption: "接點細部大樣圖" },
           { id: "a-structure-more-3", tone: "bg-neutral-300", caption: "結構模型局部" },
+          { id: "a-structure-more-4", tone: "bg-neutral-400", caption: "〔照片說明待補〕", src: "/images/project-one/cover-01.png" },
+          { id: "a-structure-more-5", tone: "bg-neutral-300", caption: "〔照片說明待補〕", src: "/images/project-one/1786701209422-_______2026-08-14_175239.png" },
+          { id: "a-structure-more-6", tone: "bg-neutral-400", caption: "〔照片說明待補〕", src: "/images/project-one/1786700851881-_______2026-08-14_173939.png" },
         ],
       },
       {
@@ -163,12 +164,12 @@ export const projects: Project[] = [
           { id: "a-construction-3", tone: "bg-neutral-300", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/portrait-5.jpg" },
           { id: "a-construction-4", tone: "bg-neutral-400", caption: "〔照片說明待補〕", src: "/images/project-one/1786700848131-_______2026-08-14_173851.png" },
           { id: "a-construction-5", tone: "bg-neutral-300", caption: "〔照片說明待補〕", src: "/images/project-one/1786701824261-_______2026-08-14_180200.png" },
-          { id: "a-construction-6", tone: "bg-neutral-400", caption: "〔照片說明待補〕", src: "/images/project-one/1786701229749-_______2026-08-14_175009.png" },
         ],
         moreImages: [
           { id: "a-construction-more-1", tone: "bg-neutral-300", caption: "施工放樣過程紀錄" },
           { id: "a-construction-more-2", tone: "bg-neutral-400", caption: "現場組裝步驟紀錄" },
           { id: "a-construction-more-3", tone: "bg-neutral-300", caption: "收尾細節紀錄" },
+          { id: "a-construction-more-4", tone: "bg-neutral-400", caption: "〔照片說明待補〕", src: "/images/project-one/1786701229749-_______2026-08-14_175009.png" },
         ],
       },
       {
@@ -207,22 +208,22 @@ export const projects: Project[] = [
         key: "design",
         title: "建築設計",
         text: "〔佔位文字，抓版面用〕一籌的設計命題與常民竹小屋不同，它更像是一次對「臨時性」構造的重新詮釋——不追求恆久留存，而是思考一個構造物如何在短暫的使用週期裡，依然給人足夠的空間品質與情感重量。量體刻意輕盈、通透，讓光線與周邊環境自由穿越，也讓觀者不會把它誤認成一棟「正式的建築」，而是更接近一個暫時搭起的場景。\n\n整體造型語彙走向更抽象、更幾何的方向，減少裝飾性的細節，讓竹材本身的紋理與結構邏輯成為唯一的表情。這種克制的態度，也是一籌與常民竹小屋在同一個展覽裡相互對話、彼此襯托的方式——一個貼地生根、一個輕盈暫留，兩種對「住」的想像並置出現，讓觀眾來回走動時能感受到語氣落差。\n\n這裡先用現場影像鋪陳整體氛圍，正式論述文字與圖說之後會補上，讓讀者先從畫面感受空間的輕盈感。",
-        // project-two 目前只有一張真實照片（cover-01.png），其餘先用網路免版權風景照湊出
-        // 「5～10 張」的展示份量——跟 project-one 一樣，純粹是為了讓排版演算法有形狀可以排，
-        // 之後補上正式空拍／現場照片時直接替換這裡的 src 即可。
+        // project-two 目前只有一張真實照片（cover-01.png），其餘先用網路免版權風景照補上；
+        // images 陣列只放「這篇文字撐得起」的張數（見 lib/photoLayout.ts 的
+        // maxPhotosForText），超過上限的部分歸到 moreImages，不會存進這裡。
         images: [
           { id: "b-design-1", tone: "bg-neutral-300", caption: "〔照片說明待補〕", src: "/images/project-two/cover-01.png" },
           { id: "b-design-2", tone: "bg-neutral-400", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/landscape-1.jpg" },
           { id: "b-design-3", tone: "bg-neutral-300", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/landscape-2.jpg" },
           { id: "b-design-4", tone: "bg-neutral-400", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/portrait-1.jpg" },
           { id: "b-design-5", tone: "bg-neutral-300", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/portrait-2.jpg" },
-          { id: "b-design-6", tone: "bg-neutral-400", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/square-1.jpg" },
-          { id: "b-design-7", tone: "bg-neutral-300", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/landscape-3.jpg" },
         ],
         moreImages: [
           { id: "b-design-more-1", tone: "bg-neutral-300", caption: "基地紋理分析圖" },
           { id: "b-design-more-2", tone: "bg-neutral-400", caption: "空間量體推演手稿" },
           { id: "b-design-more-3", tone: "bg-neutral-300", caption: "動線與開口研究模型" },
+          { id: "b-design-more-4", tone: "bg-neutral-400", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/square-1.jpg" },
+          { id: "b-design-more-5", tone: "bg-neutral-300", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/landscape-3.jpg" },
         ],
       },
       {
@@ -235,12 +236,12 @@ export const projects: Project[] = [
           { id: "b-module-3", tone: "bg-neutral-300", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/landscape-4.jpg" },
           { id: "b-module-4", tone: "bg-neutral-400", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/square-2.jpg" },
           { id: "b-module-5", tone: "bg-neutral-300", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/portrait-4.jpg" },
-          { id: "b-module-6", tone: "bg-neutral-400", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/landscape-5.jpg" },
         ],
         moreImages: [
           { id: "b-module-more-1", tone: "bg-neutral-300", caption: "模矩尺寸推演草圖" },
           { id: "b-module-more-2", tone: "bg-neutral-400", caption: "快拆構件測試" },
           { id: "b-module-more-3", tone: "bg-neutral-300", caption: "模矩網格對應立面圖" },
+          { id: "b-module-more-4", tone: "bg-neutral-400", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/landscape-5.jpg" },
         ],
       },
       {
@@ -253,14 +254,14 @@ export const projects: Project[] = [
           { id: "b-structure-3", tone: "bg-neutral-300", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/pano-2.jpg" },
           { id: "b-structure-4", tone: "bg-neutral-400", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/landscape-1.jpg" },
           { id: "b-structure-5", tone: "bg-neutral-300", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/square-1.jpg" },
-          { id: "b-structure-6", tone: "bg-neutral-400", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/portrait-6.jpg" },
-          { id: "b-structure-7", tone: "bg-neutral-300", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/landscape-2.jpg" },
-          { id: "b-structure-8", tone: "bg-neutral-400", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/portrait-1.jpg" },
         ],
         moreImages: [
           { id: "b-structure-more-1", tone: "bg-neutral-300", caption: "輕構造受力分析圖" },
           { id: "b-structure-more-2", tone: "bg-neutral-400", caption: "夾具接點細部大樣圖" },
           { id: "b-structure-more-3", tone: "bg-neutral-300", caption: "結構模型局部" },
+          { id: "b-structure-more-4", tone: "bg-neutral-400", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/portrait-6.jpg" },
+          { id: "b-structure-more-5", tone: "bg-neutral-300", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/landscape-2.jpg" },
+          { id: "b-structure-more-6", tone: "bg-neutral-400", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/portrait-1.jpg" },
         ],
       },
       {
@@ -273,12 +274,12 @@ export const projects: Project[] = [
           { id: "b-construction-3", tone: "bg-neutral-300", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/pano-1.jpg" },
           { id: "b-construction-4", tone: "bg-neutral-400", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/square-2.jpg" },
           { id: "b-construction-5", tone: "bg-neutral-300", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/landscape-4.jpg" },
-          { id: "b-construction-6", tone: "bg-neutral-400", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/portrait-3.jpg" },
         ],
         moreImages: [
           { id: "b-construction-more-1", tone: "bg-neutral-300", caption: "動作序列教學拆解" },
           { id: "b-construction-more-2", tone: "bg-neutral-400", caption: "快拆組裝步驟紀錄" },
           { id: "b-construction-more-3", tone: "bg-neutral-300", caption: "巡迴搭建現場紀錄" },
+          { id: "b-construction-more-4", tone: "bg-neutral-400", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/portrait-3.jpg" },
         ],
       },
       {

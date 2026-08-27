@@ -218,11 +218,17 @@ function NarrativeSection({
         // 算出來，不是固定對半分；每張照片本身不裁切，寬度照 fr 權重分配、高度由瀏覽器照
         // 該照片真實比例自動算（ImagePlaceholder 的 natural 模式），這就是「形狀決定主次」
         // 具體會畫出來的樣子。
+        //
+        // items-end——（已修正）真實照片各自的高度不一定相同（例如直幅照片配全景照，高度
+        // 差很多），沒有指定 align-items 的話，grid 預設會把每個格子「撐」到跟這排最高的
+        // 照片一樣高，矮的那張下面就會留一大塊空白（曾經真的長這樣）。改成 items-end 讓這排
+        // 照片統一「底部切齊」——矮的那張貼齊高的那張下緣，不會有懸空的留白，跟下一排內容
+        // 銜接時也不會中間卡一段空白。
         const { row } = block;
         return (
           <div
             key={i}
-            className={`${topGap} grid gap-3 sm:gap-4`}
+            className={`${topGap} grid items-end gap-3 sm:gap-4`}
             style={{ gridTemplateColumns: row.columns.map((c) => `${c}fr`).join(" ") }}
           >
             {row.photos.map((photo) => (

@@ -643,16 +643,6 @@ function renderCaseEditor(){
         ${renderPhotoList("coverImages", item.coverImages)}
       </div>
 
-      <div class="field-block">
-        <label>基地座標（coordinates，選填——有填才會在「基地」章節顯示地圖）</label>
-        <div class="four-col">
-          <input type="text" id="f_coord_lat" placeholder="緯度 lat" value="${item.coordinates ? esc(item.coordinates.lat) : ""}">
-          <input type="text" id="f_coord_lng" placeholder="經度 lng" value="${item.coordinates ? esc(item.coordinates.lng) : ""}">
-          <input type="text" id="f_coord_address" placeholder="地址（選填）" value="${item.coordinates ? esc(item.coordinates.address || "") : ""}">
-          <input type="text" id="f_coord_zoom" placeholder="地圖縮放（選填，例如 16）" value="${item.coordinates && item.coordinates.zoom != null ? esc(item.coordinates.zoom) : ""}">
-        </div>
-      </div>
-
       ${CHAPTER_DEFS.map((def, i) => {
         const chapter = item.chapters[i];
         return `
@@ -681,7 +671,20 @@ function renderCaseEditor(){
             </div>` : ""}
             ${renderPhotoList(`chapterImages_${def.key}`, chapter.images)}
           </div>
-          ` : `<div class="field-hint">「基地」章節不使用照片，畫面上用上面填的座標顯示地圖。</div>`}
+          ` : `
+          <div class="field-block">
+            <div class="label">基地座標（coordinates）</div>
+            <div class="field-hint" style="margin-top:0; margin-bottom:10px;">「基地」章節不使用照片——只要填地址、經緯度，畫面上就會顯示地圖；三個都留空的話會顯示「地圖待補」。</div>
+            <div class="two-col">
+              <input type="text" id="f_coord_address" placeholder="地址" value="${item.coordinates ? esc(item.coordinates.address || "") : ""}">
+              <input type="text" id="f_coord_zoom" placeholder="地圖縮放（選填，例如 16，預設 15）" value="${item.coordinates && item.coordinates.zoom != null ? esc(item.coordinates.zoom) : ""}">
+            </div>
+            <div class="two-col" style="margin-top:10px;">
+              <input type="text" id="f_coord_lat" placeholder="緯度 lat（例如 25.0330）" value="${item.coordinates ? esc(item.coordinates.lat) : ""}">
+              <input type="text" id="f_coord_lng" placeholder="經度 lng（例如 121.5654）" value="${item.coordinates ? esc(item.coordinates.lng) : ""}">
+            </div>
+          </div>
+          `}
 
           ${def.kind === "narrative" ? `
           <div class="field-block">

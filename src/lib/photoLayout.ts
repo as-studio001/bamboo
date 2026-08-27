@@ -13,18 +13,15 @@ import type { ProjectImage } from "@/lib/projects";
 // 不加隨機抖動——原始碼裡「有機、不死板」的觀感全部來自圖片分組本身的不規則性，插入位置
 // 反而故意用最單純的等分公式，不需要另外調味。
 
-// 文字長度決定這個章節最多能上傳／顯示幾張照片。數字重新校準過——直接比照參考案例
-// Internal-Pages 的「老古石芳宅」實際案例（as-studio001/Internal-Pages，
-// content/projects/laogu-fang.json）：整篇論述約 1800 字（8 段），全篇只用 7 張照片、
-// 分 4 組（2＋2＋1＋2），插入位置也故意留了好幾段完全沒有照片，不是每段文字後面都塞圖。
-// 換算下來大概每 250～300 字才多一張，比之前「前 200 字 3 張、之後每 100 字加 2 張」
-// 寬鬆非常多，之前那組數字換算出來的密度是參考案例的好幾倍，圖片量跟文字份量脫節，
-// 讀起來像圖庫而不是有內容支撐的論述——這是這次重新校準的直接原因。
-// 前 300 字給 2 張（一組並排的基本份量），之後每多滿 250 字再加 1 張。
+// 文字長度決定這個章節最多能上傳／顯示幾張照片。基準比照參考案例 Internal-Pages 的
+// 「老古石芳宅」實際案例（as-studio001/Internal-Pages，content/projects/laogu-fang.json）：
+// 整篇論述約 1800 字（8 段），全篇只用 7 張照片、分 4 組（2＋2＋1＋2），插入位置也故意留了
+// 好幾段完全沒有照片，不是每段文字後面都塞圖——圖片量要跟文字份量成比例，不能塞得比論述
+// 撐得起的還多。前 300 字給 2 張（一組並排的基本份量），之後每多滿 100 字再加 1 張。
 export function maxPhotosForText(text: string | undefined): number {
   const length = [...(text ?? "")].length;
   if (length <= 300) return 2;
-  return 2 + Math.floor((length - 300) / 250);
+  return 2 + Math.floor((length - 300) / 100);
 }
 
 // chapter.images 本來就只該存「文字撐得起」的張數——真的超過上限的部分，資料上應該直接

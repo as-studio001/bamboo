@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import type { Chapter, Project, ProjectImage } from "@/lib/projects";
 import { usePdfCover } from "@/lib/usePdfCover";
 import { pdfCoverId } from "@/lib/pdfPages";
-import { TEXT_BODY } from "@/components/theme";
+import { TEXT_BODY, SHARED_ELEMENT_TRANSITION } from "@/components/theme";
 
 // 首頁雙欄的「圖片＋簡短說明」索引：一張一列、原始比例顯示（直式就直式、橫式就橫式），
 // 不套用統一形狀的裁切遮罩，風格參考 herzogdemeuron.com 的 process 頁面。
@@ -42,6 +42,13 @@ import { TEXT_BODY } from "@/components/theme";
 // 會反過來找內文裡目前捲到哪張照片、拿它的 id 來查首頁這裡對應的元素，把首頁這個欄位捲過去
 // ——不管使用者關閉前在內文裡看的是不是原本點進來那張，回到首頁都會停在同一張圖，不會跳回
 // 封面。data-photo-anchor 是給「找內文目前最靠近頂端的是哪張照片」用的查詢標記。
+//
+// （已修正）prefetch={false}——正式環境（next build/start，Vercel 上也是同一套）預設會在
+// 連結進入視窗範圍時預先抓取目標路由，這會讓 framer-motion 的 layoutId 轉場失效：目標路由
+// 的內容一被預抓，Next.js 點擊當下直接整批換上已經準備好的內容，不會走「新元素掛載、
+// framer-motion 偵測到既有 layoutId、補一段從舊位置到新位置的動畫」這個正常流程，畫面上
+// 看起來就是「直接跳過去」，沒有放大轉場——只有這個開發環境的 next dev 沒有這層預抓機制，
+// 才會沒發現。關掉預抓，強制每次點擊都真的走一次完整的路由轉換，轉場動畫才會確實觸發。
 export function PhotoStream({ project }: { project: Project }) {
   // 「基地」章節不算進照片索引——那個章節在首頁跟內頁都是用地圖代表（見 ChapterMap），
   // 地圖自己的外層已經有 id={`${slug}-site`} 錨點，這裡再放一組同 id 的照片群組會撞成
@@ -86,13 +93,14 @@ function PhotoItem({
     <Link
       id={photo.id}
       href={`/projects/${project.slug}#${photo.id}`}
+      prefetch={false}
       data-snap
       data-photo-anchor
       className={`group block px-14 sm:px-20 lg:px-24 ${isFirst ? "pt-0" : "pt-8 sm:pt-12"}`}
     >
       {photo.src ? (
         <>
-          <motion.div layoutId={photo.id} className="overflow-hidden">
+          <motion.div layoutId={photo.id} transition={SHARED_ELEMENT_TRANSITION} className="overflow-hidden">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={photo.src}
@@ -107,6 +115,7 @@ function PhotoItem({
       ) : (
         <motion.div
           layoutId={photo.id}
+          transition={SHARED_ELEMENT_TRANSITION}
           className={`flex aspect-[4/3] w-full items-center justify-center overflow-hidden ${photo.tone}`}
         >
           <span className="font-mono text-[11px] tracking-widest text-black/40 uppercase transition-transform duration-700 ease-out group-hover:scale-[1.02]">
@@ -130,11 +139,12 @@ function AssemblyCoverItem({ project, chapter, isFirst }: { project: Project; ch
     <Link
       id={id}
       href={`/projects/${project.slug}#${id}`}
+      prefetch={false}
       data-snap
       data-photo-anchor
       className={`group block px-14 sm:px-20 lg:px-24 ${isFirst ? "pt-0" : "pt-8 sm:pt-12"}`}
     >
-      <motion.div layoutId={id} className="aspect-[3/4] w-full overflow-hidden">
+      <motion.div layoutId={id} transition={SHARED_ELEMENT_TRANSITION} className="aspect-[3/4] w-full overflow-hidden">
         {coverSrc && (
           // PDF 頁面是完整版面，用 object-cover 會裁掉四周——改 object-contain，圖不裁切、
           // 按長寬比縮放置中（跟 AssemblyBook.tsx 內文放大版同一個處理方式）。

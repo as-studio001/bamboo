@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { motion } from "framer-motion";
 import type { ProjectImage } from "@/lib/projects";
+import { SHARED_ELEMENT_TRANSITION } from "@/components/theme";
 
 // 有 image.src 就顯示真實照片，沒有的話用色塊佔位（之後補圖再換掉）。
 //
@@ -24,6 +25,7 @@ export function ImagePlaceholder({
   return (
     <motion.div
       layoutId={layoutId}
+      transition={SHARED_ELEMENT_TRANSITION}
       className={`group relative w-full overflow-hidden ${image.src ? "" : image.tone} ${fill ? "h-full" : aspect} ${className}`}
     >
       {image.src ? (

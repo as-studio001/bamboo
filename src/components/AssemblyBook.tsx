@@ -6,7 +6,7 @@ import type { Project } from "@/lib/projects";
 import { PdfFlipbook } from "@/components/PdfFlipbook";
 import { pdfCoverId } from "@/lib/pdfPages";
 import { usePdfCover } from "@/lib/usePdfCover";
-import { TEXT_BODY } from "@/components/theme";
+import { TEXT_BODY, SHARED_ELEMENT_TRANSITION } from "@/components/theme";
 
 // 「組裝說明書」的 PDF 上架元件：封面圖放大成跟其他章節（NarrativeSection 的 leadImage）
 // 同一個尺寸級別（h-64/h-96/28rem），不是縮圖——這一章的封面本身就是主要視覺，不用縮小處理。
@@ -25,6 +25,7 @@ export function AssemblyBook({ project, pdf, accent }: { project: Project; pdf: 
     <div className="mt-6 sm:mt-8">
       <motion.button
         layoutId={id}
+        transition={SHARED_ELEMENT_TRANSITION}
         id={id}
         data-photo-anchor
         onClick={() => setOpen(true)}

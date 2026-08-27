@@ -335,9 +335,12 @@ function Panel({
                 hover 縮放效果 ImagePlaceholder 自己內建（group-hover），這裡不用再包一層。
                 layoutId={finalImage?.id} 讓這張封面跟 ProjectDetail.tsx 的 DetailHero（同一張
                 封面照片、同一個 id）接上 shared element 放大轉場，點封面進內頁時是「這張照片
-                自己長大」，不是單純蓋一個無關的視窗。 */}
+                自己長大」，不是單純蓋一個無關的視窗。prefetch={false}——正式環境預抓連結會讓
+                framer-motion 的 layoutId 轉場失效（詳見 PhotoStream.tsx 同樣的修正說明），
+                關掉才能確保每次點擊都真的觸發轉場動畫。 */}
             <Link
               href={`/projects/${project.slug}`}
+              prefetch={false}
               data-snap
               className="relative flex min-h-full w-full shrink-0 flex-col justify-end"
             >

@@ -24,8 +24,11 @@ export async function POST(request: Request) {
   if (!(file instanceof File)) {
     return NextResponse.json({ error: "missing file" }, { status: 400 });
   }
-  if (!file.type.startsWith("image/")) {
-    return NextResponse.json({ error: "only image files are accepted" }, { status: 400 });
+  // 圖片／GIF／影片都收——image/* 本來就涵蓋 image/gif，不用特別另外判斷；影片是新增的，
+  // 對應資料模型裡 chapter.video（見 lib/projects.ts）或未來想直接把動態素材當「照片」用
+  // 的情境（例如 ProjectImage.src 指到一支短片）。
+  if (!file.type.startsWith("image/") && !file.type.startsWith("video/")) {
+    return NextResponse.json({ error: "only image or video files are accepted" }, { status: 400 });
   }
 
   const dir = path.join(process.cwd(), "public", "images", slug);

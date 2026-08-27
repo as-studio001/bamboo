@@ -52,10 +52,11 @@ export default function AdminPage() {
 
       <section className="mt-14">
         <h2 className="text-sm font-medium tracking-wide text-black/80 uppercase">
-          圖片上傳
+          圖片／影片上傳
         </h2>
         <p className="mt-2 text-xs leading-relaxed text-black/50">
-          目前是開發用的本機上傳（存進專案的 public/images/ 資料夾），正式部署後要換成雲端儲存。
+          支援一般圖片、GIF 動圖、影片檔（mp4／webm／mov 等）。目前是開發用的本機上傳（存進專案的
+          public/images/ 資料夾），正式部署後要換成雲端儲存。
         </p>
         <div className="mt-4 space-y-8">
           {initialProjects.map((p) => (

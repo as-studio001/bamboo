@@ -2,7 +2,17 @@
 
 import { useEffect, useRef, useState, type DragEvent } from "react";
 
-// 拖拉上傳圖片到本機 public/images/{slug}/ 資料夾（見 src/app/api/upload/route.ts）。
+// 副檔名判斷是不是影片——GET /api/upload 回傳的是純網址字串，沒有連 MIME type 一起帶回來
+// （上傳當下的 File 物件才有 file.type，清單重新整理／再次進到這頁時已經拿不到），只能用
+// 副檔名猜，涵蓋常見的網頁可播放格式就夠用。GIF 不用特別判斷——瀏覽器原生 <img> 本來就會
+// 播放 GIF 動畫，跟一般圖片同一套渲染邏輯，不需要例外處理。
+const VIDEO_EXTENSIONS = [".mp4", ".webm", ".mov", ".ogg", ".ogv"];
+function isVideoUrl(url: string) {
+  const lower = url.toLowerCase();
+  return VIDEO_EXTENSIONS.some((ext) => lower.endsWith(ext));
+}
+
+// 拖拉上傳圖片／GIF／影片到本機 public/images/{slug}/ 資料夾（見 src/app/api/upload/route.ts）。
 // 這是開發階段的暫時做法，正式部署後要換成 Supabase Storage。
 export function ImageDropzone({ slug, label }: { slug: string; label: string }) {
   const [images, setImages] = useState<string[]>([]);
@@ -35,7 +45,7 @@ export function ImageDropzone({ slug, label }: { slug: string; label: string }) 
   }, []);
 
   async function uploadFiles(files: FileList | File[]) {
-    const list = Array.from(files).filter((f) => f.type.startsWith("image/"));
+    const list = Array.from(files).filter((f) => f.type.startsWith("image/") || f.type.startsWith("video/"));
     if (list.length === 0) return;
 
     setStatus(`上傳中… 0 / ${list.length}`);
@@ -79,7 +89,7 @@ export function ImageDropzone({ slug, label }: { slug: string; label: string }) 
         <input
           ref={inputRef}
           type="file"
-          accept="image/*"
+          accept="image/*,video/*"
           multiple
           className="hidden"
           onChange={(e) => e.target.files && uploadFiles(e.target.files)}
@@ -88,15 +98,24 @@ export function ImageDropzone({ slug, label }: { slug: string; label: string }) 
 
       {images.length > 0 && (
         <div className="mt-3 grid grid-cols-4 gap-2 sm:grid-cols-6">
-          {images.map((url) => (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              key={url}
-              src={url}
-              alt=""
-              className="aspect-square w-full rounded object-cover"
-            />
-          ))}
+          {images.map((url) =>
+            isVideoUrl(url) ? (
+              // 影片縮圖：靜音、循環、自動播放當動態縮圖，沒有播放控制列——這裡只是預覽格，
+              // 不是正式播放介面，跟旁邊的圖片縮圖維持一樣的視覺份量（object-cover 填滿方格）。
+              <video
+                key={url}
+                src={url}
+                muted
+                loop
+                autoPlay
+                playsInline
+                className="aspect-square w-full rounded object-cover"
+              />
+            ) : (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img key={url} src={url} alt="" className="aspect-square w-full rounded object-cover" />
+            ),
+          )}
         </div>
       )}
     </div>

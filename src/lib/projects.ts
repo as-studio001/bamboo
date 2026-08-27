@@ -3,27 +3,20 @@ export type ProjectImage = {
   caption?: string;
   tone: string;
   src?: string;
+  ratio?: number; // 手動指定寬高比（width/height）——通常不用填，交錯排版演算法
+  // （lib/photoLayout.ts）預設會在瀏覽器端量測真實照片的 naturalWidth/naturalHeight
+  // 自動算出來；只有沒有 src 的示意色塊，或想強制覆蓋量測結果時才需要手動填這個欄位。
 };
 
 export type ChapterKey = "design" | "module" | "structure" | "construction" | "assembly" | "site";
-
-// 圖文編輯區塊——渲染端（NarrativeSection）用這個型別描述「段落—圖片—段落—圖片…」的
-// 交錯序列。這串序列不是手動排的：內容資料只需要提供 text（純文字）＋images（一組照片），
-// 實際怎麼交錯是 autoLayout.ts 的 autoLayoutBlocks() 在渲染當下自動算出來的，比照
-// Internal-Pages（as-studio001/Internal-Pages，
-// https://as-studio001.github.io/Internal-Pages/?case=laogu-fang）的圖文編輯節奏——圖片
-// 區塊可以是 1 張（單張大圖）或 2 張（並排顯示），用章節 key 當隨機種子，同一章節每次
-// 算出來的結果都一樣（不會重新整理就跳動），不同章節彼此節奏不同，做出「篇章差異」。
-export type ContentBlock =
-  | { type: "paragraph"; text: string }
-  | { type: "images"; images: ProjectImage[] };
 
 export type Chapter = {
   key: ChapterKey;
   title: string;
   text?: string; // 段落文字，用 \n\n 分段——「建築設計／模矩／構造／施工」這四章會自動排版
-  // （見 autoLayoutBlocks），不用自己決定圖片插在哪裡；「組裝說明書」「基地」也用這個欄位，
-  // 但排版方式不同（AssemblySection 只取第一段，「基地」目前沒有用到文字內容）。
+  // （見 lib/photoLayout.ts 的 layoutChapter），不用自己決定圖片插在哪裡；「組裝說明書」
+  // 「基地」也用這個欄位，但排版方式不同（AssemblySection 只取第一段，「基地」目前沒有
+  // 用到文字內容）。
   images?: ProjectImage[]; // 這章要用的照片，順序就是自動排版時的插入優先順序；首頁雙欄的
   // 照片索引（PhotoStream.tsx）也直接讀這個欄位。
   moreImages?: ProjectImage[]; // 「MORE IN DETAIL」可展開的設計過程圖庫（手稿／模型／圖面），

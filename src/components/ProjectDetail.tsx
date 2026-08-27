@@ -2,7 +2,8 @@
 
 import { useMemo, useState } from "react";
 import type { Chapter, Project } from "@/lib/projects";
-import { autoLayoutBlocks } from "@/lib/autoLayout";
+import { layoutChapter, createRatioState, type RatioState } from "@/lib/photoLayout";
+import { usePhotosWithRatio } from "@/lib/usePhotosWithRatio";
 import { ImagePlaceholder } from "@/components/ImagePlaceholder";
 import { ChapterMap, ChapterVideo } from "@/components/ChapterExtras";
 import { AssemblyBook } from "@/components/AssemblyBook";
@@ -47,6 +48,9 @@ export function ProjectDetail({
   );
   const assembly = project.chapters.find((c) => c.key === "assembly");
   const insetX = variant === "modal" ? "px-8 sm:px-12 lg:px-16" : "px-4 sm:px-8 lg:px-12";
+  // 整個案例頁共用一份橫幅配對輪替狀態，見 photoLayout.ts 的 RatioState 說明。
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const ratioState = useMemo(() => createRatioState(), [project.slug]);
 
   return (
     <div className={`flex min-h-full w-full flex-col ${PANEL_BG} ${TEXT_PRIMARY}`}>
@@ -55,7 +59,7 @@ export function ProjectDetail({
 
       <div className={`pt-10 pb-24 sm:pt-16 ${insetX}`}>
         <div className="min-w-0">
-          {design && <NarrativeSection chapter={design} accent={project.accent} seedPrefix={project.slug} />}
+          {design && <NarrativeSection chapter={design} accent={project.accent} ratioState={ratioState} />}
 
           {narrativeChapters.map((chapter) => (
             <NarrativeSection
@@ -63,7 +67,7 @@ export function ProjectDetail({
               chapter={chapter}
               title={chapter.title}
               accent={project.accent}
-              seedPrefix={project.slug}
+              ratioState={ratioState}
             />
           ))}
 
@@ -139,13 +143,16 @@ function ChapterEdgeNav({ chapters, accent }: { chapters: Chapter[]; accent: str
   );
 }
 
-// 「建築設計」「模矩」「構造」「施工」四個章節共用同一套圖文編輯模式——比照 Internal-Pages
-// （as-studio001/Internal-Pages，https://as-studio001.github.io/Internal-Pages/?case=laogu-fang）
-// 內文的排法：一段論述是「段落區塊」跟「圖片區塊」交錯而成的一串序列，不是固定「大圖—文—
-// 圖—文」模板。這串序列不是手動排的——資料只需要提供 text（純文字）＋images（一組照片），
-// autoLayoutBlocks（lib/autoLayout.ts）在渲染當下自動決定圖片要單張還是兩張並排、要插在
-// 哪兩段文字中間；用章節 key 當隨機種子，同一章節每次算出來的結果都一樣（不會重新整理就
-// 跳動），不同章節彼此節奏不同，做出「篇章差異、有呼吸感」的效果，不用逐章手動排版。
+// 「建築設計」「模矩」「構造」「施工」四個章節共用同一套圖文編輯模式——直接照抄
+// Internal-Pages（as-studio001/Internal-Pages）js/render.js 的 renderContent()／
+// makePhotoChunks()，不是重新發明或用隨機數字模擬：一段論述是「段落區塊」跟「圖片區塊」
+// 交錯而成的一串序列，圖片區塊要單張大圖、還是兩張不對稱並排、還是多張直幅等寬並排，
+// 全部由這組照片「真實的寬高比」決定（見 lib/photoLayout.ts 的 layoutChapter／
+// lib/usePhotosWithRatio.ts）——直幅照片自然收成一組、橫幅照片兩張一組但寬窄不對稱、
+// 特別寬的全景照獨立佔一整排，「主次關係」是圖片真實形狀本身撐出來的，不是套版型。
+// 資料只需要提供 text（純文字）＋images（一組照片），怎麼交錯完全自動算出來；同一組照片、
+// 同一段文字，每次算出來的結果都一樣（不會重新整理就跳動），不同章節因為圖片形狀、張數
+// 不同，節奏自然不同，「篇章差異、有呼吸感」的來源就是這個，不需要額外加隨機種子。
 // 「建築設計」是開頭主要論述、緊接在 hero 之後，不重複顯示自己的標題；其餘三章有 title 就
 // 加一條分隔線＋小標，作為子章節之間的視覺斷點，圖文編輯邏輯完全相同。「組裝說明書」不用
 // 這套（見下面的 AssemblySection）——它的主要內容是可翻閱的 PDF，不是穿插圖片的論述文字。
@@ -154,28 +161,23 @@ function ChapterEdgeNav({ chapters, accent }: { chapters: Chapter[]; accent: str
 // 區塊——放設計過程的手稿、模型、圖面這類輔助素材，預設收合、不會一開始就佔掉版面，讀者
 // 想深入才點開。這批圖是 chapter.moreImages，跟 chapter.images 分開存放，不會混進自動排版
 // 或首頁的照片索引。
-//
-// seedPrefix（傳 project.slug）跟 chapter.key 一起組成隨機種子——只用 chapter.key 當種子的話，
-// 兩案「同名」章節（例如都是 design）會排出一模一樣的節奏，兩個案子的同一種章節看起來會像
-// 複製貼上；加上 project.slug 以後，兩案各自獨立算種子，同一種章節在不同案子裡也會有不同
-// 的圖文節奏，「篇章差異」不只發生在同一案的不同章節之間，也發生在兩案之間。
 function NarrativeSection({
   chapter,
   title,
   accent,
-  seedPrefix,
+  ratioState,
 }: {
   chapter: Chapter;
   title?: string;
   accent: string;
-  seedPrefix: string;
+  ratioState: RatioState;
 }) {
   const paragraphs = useMemo(() => (chapter.text ?? "").split("\n\n"), [chapter.text]);
-  const images = chapter.images ?? [];
+  const photosWithRatio = usePhotosWithRatio(chapter.images ?? []);
   const blocks = useMemo(
-    () => autoLayoutBlocks(`${seedPrefix}-${chapter.key}`, paragraphs, images),
+    () => layoutChapter(paragraphs, photosWithRatio, ratioState),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [seedPrefix, chapter.key, chapter.text, chapter.images],
+    [paragraphs, photosWithRatio],
   );
 
   return (
@@ -203,22 +205,34 @@ function NarrativeSection({
           );
         }
 
-        if (block.images.length <= 1) {
-          const image = block.images[0];
-          if (!image) return null;
+        if (block.type === "photo-solo") {
+          const { photo } = block;
           return (
-            <div key={i} id={image.id} data-photo-anchor className={`${topGap} h-64 scroll-mt-4 sm:h-96 lg:h-[28rem]`}>
-              <ImagePlaceholder image={image} fill layoutId={image.id} />
+            <div key={i} id={photo.id} data-photo-anchor className={`${topGap} scroll-mt-4`}>
+              <ImagePlaceholder image={photo} layoutId={photo.id} natural aspect="aspect-[16/9]" />
             </div>
           );
         }
 
-        // 2 張並排——比照 Internal-Pages 常見的雙圖區塊。
+        // 一組（2 張以上）並排——欄寬（columns，fr 權重）由 layoutChapter 依每張照片的方向
+        // 算出來，不是固定對半分；每張照片本身不裁切，寬度照 fr 權重分配、高度由瀏覽器照
+        // 該照片真實比例自動算（ImagePlaceholder 的 natural 模式），這就是「形狀決定主次」
+        // 具體會畫出來的樣子。
+        const { row } = block;
         return (
-          <div key={i} className={`${topGap} grid grid-cols-2 gap-3 sm:gap-4`}>
-            {block.images.map((image) => (
-              <div key={image.id} id={image.id} data-photo-anchor className="h-40 scroll-mt-4 sm:h-64 lg:h-80">
-                <ImagePlaceholder image={image} fill layoutId={image.id} />
+          <div
+            key={i}
+            className={`${topGap} grid gap-3 sm:gap-4`}
+            style={{ gridTemplateColumns: row.columns.map((c) => `${c}fr`).join(" ") }}
+          >
+            {row.photos.map((photo) => (
+              <div key={photo.id} id={photo.id} data-photo-anchor className="scroll-mt-4">
+                <ImagePlaceholder
+                  image={photo}
+                  layoutId={photo.id}
+                  natural
+                  aspect={row.portrait ? "aspect-[3/4]" : "aspect-[4/3]"}
+                />
               </div>
             ))}
           </div>

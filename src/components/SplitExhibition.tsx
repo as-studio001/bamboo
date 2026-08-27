@@ -6,6 +6,7 @@ import type { Project } from "@/lib/projects";
 import { ImagePlaceholder } from "@/components/ImagePlaceholder";
 import { PhotoStream } from "@/components/PhotoStream";
 import { ChapterMap } from "@/components/ChapterExtras";
+import { AdminAccessLink } from "@/components/AdminAccessLink";
 import { useImageTextColor } from "@/lib/useImageTextColor";
 import { PANEL_BG, TEXT_PRIMARY, TEXT_PAD } from "@/components/theme";
 
@@ -74,6 +75,7 @@ export function SplitExhibition({ projects }: { projects: [Project, Project] }) 
 
   return (
     <div className="flex h-full w-full flex-col">
+      <AdminAccessLink />
       <TopChapterNav projects={projects} />
       <div
         ref={containerRef}

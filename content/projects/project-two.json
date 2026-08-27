@@ -1,0 +1,301 @@
+{
+  "slug": "project-two",
+  "shortLabel": "作品 B",
+  "name": "一籌",
+  "location": "地點待補",
+  "year": "年份待補",
+  "type": "類型待補",
+  "intro": "〔佔位文字，約150字，抓版面用〕一籌是這次展覽的第二件作品，展現與常民竹小屋不同的語氣與空間態度。這段文字作為整體概述，說明作品的設計思考、構造精神與施工方式，之後會替換成正式的策展論述文字。",
+  "accent": "#39FF14",
+  "titleAlign": "right",
+  "coverImages": [
+    {
+      "id": "b-cover-1",
+      "tone": "bg-neutral-300",
+      "caption": "封面 01",
+      "src": "/images/project-two/cover-01.png"
+    },
+    {
+      "id": "b-cover-2",
+      "tone": "bg-neutral-400",
+      "caption": "封面 02"
+    }
+  ],
+  "chapters": [
+    {
+      "key": "design",
+      "title": "建築設計",
+      "text": "〔佔位文字，抓版面用〕一籌的設計命題與常民竹小屋不同，它更像是一次對「臨時性」構造的重新詮釋——不追求恆久留存，而是思考一個構造物如何在短暫的使用週期裡，依然給人足夠的空間品質與情感重量。量體刻意輕盈、通透，讓光線與周邊環境自由穿越，也讓觀者不會把它誤認成一棟「正式的建築」，而是更接近一個暫時搭起的場景。\n\n整體造型語彙走向更抽象、更幾何的方向，減少裝飾性的細節，讓竹材本身的紋理與結構邏輯成為唯一的表情。這種克制的態度，也是一籌與常民竹小屋在同一個展覽裡相互對話、彼此襯托的方式——一個貼地生根、一個輕盈暫留，兩種對「住」的想像並置出現，讓觀眾來回走動時能感受到語氣落差。\n\n這裡先用現場影像鋪陳整體氛圍，正式論述文字與圖說之後會補上，讓讀者先從畫面感受空間的輕盈感。",
+      "images": [
+        {
+          "id": "b-design-1",
+          "tone": "bg-neutral-300",
+          "caption": "〔照片說明待補〕",
+          "src": "/images/project-two/cover-01.png"
+        },
+        {
+          "id": "b-design-2",
+          "tone": "bg-neutral-400",
+          "caption": "〔網路免版權風景照，待替換〕",
+          "src": "/images/stock/landscape-1.jpg"
+        }
+      ],
+      "moreImages": [
+        {
+          "id": "b-design-more-1",
+          "tone": "bg-neutral-300",
+          "caption": "基地紋理分析圖"
+        },
+        {
+          "id": "b-design-more-2",
+          "tone": "bg-neutral-400",
+          "caption": "空間量體推演手稿"
+        },
+        {
+          "id": "b-design-more-3",
+          "tone": "bg-neutral-300",
+          "caption": "動線與開口研究模型"
+        },
+        {
+          "id": "b-design-more-4",
+          "tone": "bg-neutral-400",
+          "caption": "〔網路免版權風景照，待替換〕",
+          "src": "/images/stock/square-1.jpg"
+        },
+        {
+          "id": "b-design-more-5",
+          "tone": "bg-neutral-300",
+          "caption": "〔網路免版權風景照，待替換〕",
+          "src": "/images/stock/landscape-3.jpg"
+        },
+        {
+          "id": "b-design-more-6",
+          "tone": "bg-neutral-400",
+          "caption": "〔網路免版權風景照，待替換〕",
+          "src": "/images/stock/landscape-2.jpg"
+        },
+        {
+          "id": "b-design-more-7",
+          "tone": "bg-neutral-300",
+          "caption": "〔網路免版權風景照，待替換〕",
+          "src": "/images/stock/portrait-1.jpg"
+        },
+        {
+          "id": "b-design-more-8",
+          "tone": "bg-neutral-400",
+          "caption": "〔網路免版權風景照，待替換〕",
+          "src": "/images/stock/portrait-2.jpg"
+        }
+      ]
+    },
+    {
+      "key": "module",
+      "title": "模矩",
+      "text": "〔佔位文字，抓版面用〕一籌的模矩系統採用比常民竹小屋更小、更密的單元尺寸，讓構造在視覺上呈現細膩的紋理感，也更貼近臨時構造需要快速搭拆的操作邏輯。每個模矩單元的重量與尺寸都控制在單人可搬運的範圍內，讓搭建過程不需要依賴大型機具，也讓非專業人員能獨立完成部分組裝工作，降低參與的門檻。\n\n小尺度模矩帶來的代價是接點數量大幅增加，因此設計團隊另外發展了一套快拆式的連接構件，讓組裝與拆卸都能在短時間內完成，同時維持結構的穩定性，也讓一籌具備在不同場地間反覆巡迴展出的可能性，這套取捨是整個設計過程反覆測試最多次的環節，前後修改了好幾個版本才定案。\n\n這批照片先呈現模矩單元與快拆構件的實際樣貌，細部圖說與構件清單之後會整理進這個章節。",
+      "images": [
+        {
+          "id": "b-module-1",
+          "tone": "bg-neutral-300",
+          "caption": "〔網路免版權風景照，待替換〕",
+          "src": "/images/stock/pano-1.jpg"
+        },
+        {
+          "id": "b-module-2",
+          "tone": "bg-neutral-400",
+          "caption": "〔網路免版權風景照，待替換〕",
+          "src": "/images/stock/portrait-3.jpg"
+        }
+      ],
+      "moreImages": [
+        {
+          "id": "b-module-more-1",
+          "tone": "bg-neutral-300",
+          "caption": "模矩尺寸推演草圖"
+        },
+        {
+          "id": "b-module-more-2",
+          "tone": "bg-neutral-400",
+          "caption": "快拆構件測試"
+        },
+        {
+          "id": "b-module-more-3",
+          "tone": "bg-neutral-300",
+          "caption": "模矩網格對應立面圖"
+        },
+        {
+          "id": "b-module-more-4",
+          "tone": "bg-neutral-400",
+          "caption": "〔網路免版權風景照，待替換〕",
+          "src": "/images/stock/landscape-5.jpg"
+        },
+        {
+          "id": "b-module-more-5",
+          "tone": "bg-neutral-300",
+          "caption": "〔網路免版權風景照，待替換〕",
+          "src": "/images/stock/landscape-4.jpg"
+        },
+        {
+          "id": "b-module-more-6",
+          "tone": "bg-neutral-400",
+          "caption": "〔網路免版權風景照，待替換〕",
+          "src": "/images/stock/square-2.jpg"
+        },
+        {
+          "id": "b-module-more-7",
+          "tone": "bg-neutral-300",
+          "caption": "〔網路免版權風景照，待替換〕",
+          "src": "/images/stock/portrait-4.jpg"
+        }
+      ]
+    },
+    {
+      "key": "structure",
+      "title": "構造",
+      "text": "〔佔位文字，抓版面用〕一籌的結構邏輯偏向輕構造（light structure）的思路，用大量小斷面的竹材互相支撐，取代少數幾根粗大構件的傳統做法，整體重量因此大幅降低，也讓構造本身帶有一種輕盈、幾乎懸浮的視覺效果，與常民竹小屋厚實穩重的量體形成對比，成為兩件作品結構性格的直接對照。\n\n為了因應快速搭拆的需求，結構系統刻意避免使用不可逆的接合方式，改以夾具與繩索張力共同維持整體穩定，這也讓一籌得以在不同基地之間重複搭建、成為一個可移動的展示構造，而不是綁定在單一地點的固定建物，每一次搭建與拆卸都會對構件進行檢查與微調，確保重複使用不影響安全。\n\n這裡先用現場照片呈現夾具與張力構件的樣貌，結構驗算資料與接點測試紀錄之後會補上。",
+      "images": [
+        {
+          "id": "b-structure-1",
+          "tone": "bg-neutral-300",
+          "caption": "〔網路免版權風景照，待替換〕",
+          "src": "/images/stock/landscape-6.jpg"
+        },
+        {
+          "id": "b-structure-2",
+          "tone": "bg-neutral-400",
+          "caption": "〔網路免版權風景照，待替換〕",
+          "src": "/images/stock/portrait-5.jpg"
+        }
+      ],
+      "moreImages": [
+        {
+          "id": "b-structure-more-1",
+          "tone": "bg-neutral-300",
+          "caption": "輕構造受力分析圖"
+        },
+        {
+          "id": "b-structure-more-2",
+          "tone": "bg-neutral-400",
+          "caption": "夾具接點細部大樣圖"
+        },
+        {
+          "id": "b-structure-more-3",
+          "tone": "bg-neutral-300",
+          "caption": "結構模型局部"
+        },
+        {
+          "id": "b-structure-more-4",
+          "tone": "bg-neutral-400",
+          "caption": "〔網路免版權風景照，待替換〕",
+          "src": "/images/stock/portrait-6.jpg"
+        },
+        {
+          "id": "b-structure-more-5",
+          "tone": "bg-neutral-300",
+          "caption": "〔網路免版權風景照，待替換〕",
+          "src": "/images/stock/landscape-2.jpg"
+        },
+        {
+          "id": "b-structure-more-6",
+          "tone": "bg-neutral-400",
+          "caption": "〔網路免版權風景照，待替換〕",
+          "src": "/images/stock/portrait-1.jpg"
+        },
+        {
+          "id": "b-structure-more-7",
+          "tone": "bg-neutral-300",
+          "caption": "〔網路免版權風景照，待替換〕",
+          "src": "/images/stock/pano-2.jpg"
+        },
+        {
+          "id": "b-structure-more-8",
+          "tone": "bg-neutral-400",
+          "caption": "〔網路免版權風景照，待替換〕",
+          "src": "/images/stock/landscape-1.jpg"
+        },
+        {
+          "id": "b-structure-more-9",
+          "tone": "bg-neutral-300",
+          "caption": "〔網路免版權風景照，待替換〕",
+          "src": "/images/stock/square-1.jpg"
+        }
+      ]
+    },
+    {
+      "key": "construction",
+      "title": "施工",
+      "text": "〔佔位文字，抓版面用〕一籌的施工強調「速度」與「可重複」——整個搭建過程被拆解成標準化的動作序列，讓不熟悉竹構造的人員也能在短時間的教學後加入搭建工作，這也是這件作品作為教育示範的重要部分，希望降低一般人對竹構造「很難、很專業」的距離感，讓更多人願意親手嘗試、參與這套系統的運作。\n\n現場施工分成基座定位、模組組裝、整體校正、收邊固定四個階段，每個階段都控制在明確的時間範圍內，作為未來巡迴展示時工班排程的參考依據，每次搭建也會邀請幾位第一次接觸的參與者，藉此驗證教學流程是否真的容易上手，並蒐集他們的操作回饋來修正教學步驟。\n\n這批照片先記錄幾次巡迴搭建的現場片段，詳細的施工時間紀錄之後會補齊放入這個章節。",
+      "images": [
+        {
+          "id": "b-construction-1",
+          "tone": "bg-neutral-300",
+          "caption": "〔網路免版權風景照，待替換〕",
+          "src": "/images/stock/portrait-2.jpg"
+        },
+        {
+          "id": "b-construction-2",
+          "tone": "bg-neutral-400",
+          "caption": "〔網路免版權風景照，待替換〕",
+          "src": "/images/stock/landscape-3.jpg"
+        }
+      ],
+      "moreImages": [
+        {
+          "id": "b-construction-more-1",
+          "tone": "bg-neutral-300",
+          "caption": "動作序列教學拆解"
+        },
+        {
+          "id": "b-construction-more-2",
+          "tone": "bg-neutral-400",
+          "caption": "快拆組裝步驟紀錄"
+        },
+        {
+          "id": "b-construction-more-3",
+          "tone": "bg-neutral-300",
+          "caption": "巡迴搭建現場紀錄"
+        },
+        {
+          "id": "b-construction-more-4",
+          "tone": "bg-neutral-400",
+          "caption": "〔網路免版權風景照，待替換〕",
+          "src": "/images/stock/portrait-3.jpg"
+        },
+        {
+          "id": "b-construction-more-5",
+          "tone": "bg-neutral-300",
+          "caption": "〔網路免版權風景照，待替換〕",
+          "src": "/images/stock/pano-1.jpg"
+        },
+        {
+          "id": "b-construction-more-6",
+          "tone": "bg-neutral-400",
+          "caption": "〔網路免版權風景照，待替換〕",
+          "src": "/images/stock/square-2.jpg"
+        },
+        {
+          "id": "b-construction-more-7",
+          "tone": "bg-neutral-300",
+          "caption": "〔網路免版權風景照，待替換〕",
+          "src": "/images/stock/landscape-4.jpg"
+        }
+      ]
+    },
+    {
+      "key": "assembly",
+      "title": "組裝說明書",
+      "text": "〔佔位文字，抓版面用〕由於一籌的快拆設計，組裝說明書的角色比常民竹小屋更吃重——它不只是紀錄用的圖說，而是實際搭建時工班會隨身攜帶、逐步對照的操作手冊，內容以清楚的步驟編號與簡化圖示為主，減少現場判斷錯誤的機會，也讓不同批次的工班都能維持一致的搭建品質，即使換了一批完全沒經驗的人手也能照著操作。",
+      "images": [],
+      "pdf": {
+        "url": "/files/project-two/assembly.pdf",
+        "label": "組裝說明書 PDF（範例檔案，待替換成正式版本）"
+      }
+    },
+    {
+      "key": "site",
+      "title": "基地",
+      "text": "〔佔位文字，抓版面用〕一籌設計為可移動、可重複搭建的構造，因此「基地」對它而言不是單一固定的地點，而是一系列曾經或即將停留的場所。本次展覽選定的基地是林鐵沿線一處開闊的空地，視野開放、便於觀眾從各個角度接近作品，也方便未來拆卸移動到下一個展出地點，延續這件作品「四處暫留」的展示邏輯。\n\n基地的臨時性格也回應了一籌本身「暫留」的設計命題——構造與土地之間不是永久佔有的關係，而是短暫借用之後再歸還，這種關係本身也是這件作品想要傳達的核心價值之一。每一次移動到新的場地，團隊都會重新評估地形與人流動線，微調搭建的方向與配置，讓同一套構造也能長出不同的樣貌。實際地址與座標尚未提供，下方地圖會在資料到位後標示出精確位置。",
+      "images": []
+    }
+  ],
+  "published": true
+}

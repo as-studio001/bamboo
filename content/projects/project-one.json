@@ -1,0 +1,349 @@
+{
+  "slug": "project-one",
+  "shortLabel": "作品 A",
+  "name": "常民竹小屋",
+  "location": "地點待補",
+  "year": "年份待補",
+  "type": "類型待補",
+  "intro": "〔佔位文字，約150字，抓版面用〕常民竹小屋回應的是常民生活與竹材構造之間的關係——如何用最普及、最貼近土地的材料，搭建出屬於日常使用的輕構造空間。這裡作為整體概述，說明設計思考、構造邏輯與施工方式的整體脈絡，細節則留待後面各章節逐一展開，之後會替換成正式的策展論述文字。",
+  "accent": "#39FF14",
+  "coverImages": [
+    {
+      "id": "a-cover-2",
+      "tone": "bg-neutral-300",
+      "caption": "封面 02",
+      "src": "/images/project-one/1786700848131-_______2026-08-14_173851.png"
+    },
+    {
+      "id": "a-cover-3",
+      "tone": "bg-neutral-300",
+      "caption": "封面 03",
+      "src": "/images/project-one/1786700851881-_______2026-08-14_173939.png"
+    },
+    {
+      "id": "a-cover-4",
+      "tone": "bg-neutral-300",
+      "caption": "封面 04",
+      "src": "/images/project-one/1786700856939-_______2026-08-14_174017.png"
+    },
+    {
+      "id": "a-cover-5",
+      "tone": "bg-neutral-300",
+      "caption": "封面 05",
+      "src": "/images/project-one/1786701209422-_______2026-08-14_175239.png"
+    },
+    {
+      "id": "a-cover-6",
+      "tone": "bg-neutral-300",
+      "caption": "封面 06",
+      "src": "/images/project-one/1786701211986-_______2026-08-14_175147.png"
+    },
+    {
+      "id": "a-cover-7",
+      "tone": "bg-neutral-300",
+      "caption": "封面 07",
+      "src": "/images/project-one/1786701216631-_______2026-08-14_175056.png"
+    },
+    {
+      "id": "a-cover-8",
+      "tone": "bg-neutral-300",
+      "caption": "封面 08",
+      "src": "/images/project-one/1786701229749-_______2026-08-14_175009.png"
+    },
+    {
+      "id": "a-cover-9",
+      "tone": "bg-neutral-300",
+      "caption": "封面 09",
+      "src": "/images/project-one/1786701820696-_______2026-08-14_180258.png"
+    },
+    {
+      "id": "a-cover-10",
+      "tone": "bg-neutral-300",
+      "caption": "封面 10",
+      "src": "/images/project-one/1786701824261-_______2026-08-14_180200.png"
+    },
+    {
+      "id": "a-cover-1",
+      "tone": "bg-neutral-300",
+      "caption": "封面 01",
+      "src": "/images/project-one/cover-01.png"
+    }
+  ],
+  "chapters": [
+    {
+      "key": "design",
+      "title": "建築設計",
+      "text": "〔佔位文字，抓版面用〕常民竹小屋回應的是「常民」與「構造」之間的距離——不是為了展示工法而蓋，而是回到最基本的生活尺度，思考人如何在竹構造的空間裡靜下來、待下來、慢慢住進去。整體配置刻意保留低矮、貼近地面的姿態，讓建築物退居成背景，把使用者的日常動作留在畫面中央，也呼應基地周邊聚落原有的生活紋理與尺度感，避免用一棟過於張揚的量體打斷既有的地景關係。\n\n空間的開放程度、遮蔽與穿透的比例，都在設計初期反覆推敲，希望呈現一種介於室內與戶外之間、隨天氣與時間而變化的曖昧邊界。屋簷深淺、開口大小、動線轉折，每一個決定背後都對應著一段關於「怎麼住」的具體想像，而不只是造型上的考量，也希望觀者走進這個空間時能感受到細節的體貼。\n\n這裡先以現場影像鋪陳整體氛圍，設計圖說與正式論述文字之後會陸續補上，讓讀者可以從照片本身感受空間的尺度與光影變化。",
+      "images": [
+        {
+          "id": "a-design-1",
+          "tone": "bg-neutral-300",
+          "caption": "〔照片說明待補〕",
+          "src": "/images/project-one/1786700848131-_______2026-08-14_173851.png"
+        },
+        {
+          "id": "a-design-2",
+          "tone": "bg-neutral-400",
+          "caption": "〔照片說明待補〕",
+          "src": "/images/project-one/1786700851881-_______2026-08-14_173939.png"
+        }
+      ],
+      "moreImages": [
+        {
+          "id": "a-design-more-1",
+          "tone": "bg-neutral-300",
+          "caption": "基地紋理分析圖"
+        },
+        {
+          "id": "a-design-more-2",
+          "tone": "bg-neutral-400",
+          "caption": "空間量體推演手稿"
+        },
+        {
+          "id": "a-design-more-3",
+          "tone": "bg-neutral-300",
+          "caption": "動線與開口研究模型"
+        },
+        {
+          "id": "a-design-more-4",
+          "tone": "bg-neutral-400",
+          "caption": "〔照片說明待補〕",
+          "src": "/images/project-one/1786700856939-_______2026-08-14_174017.png"
+        },
+        {
+          "id": "a-design-more-5",
+          "tone": "bg-neutral-300",
+          "caption": "〔照片說明待補〕",
+          "src": "/images/project-one/1786701229749-_______2026-08-14_175009.png"
+        },
+        {
+          "id": "a-design-more-6",
+          "tone": "bg-neutral-400",
+          "caption": "〔網路免版權風景照，待替換〕",
+          "src": "/images/stock/portrait-1.jpg"
+        },
+        {
+          "id": "a-design-more-7",
+          "tone": "bg-neutral-300",
+          "caption": "〔網路免版權風景照，待替換〕",
+          "src": "/images/stock/portrait-2.jpg"
+        },
+        {
+          "id": "a-design-more-8",
+          "tone": "bg-neutral-400",
+          "caption": "〔照片說明待補〕",
+          "src": "/images/project-one/1786701211986-_______2026-08-14_175147.png"
+        }
+      ]
+    },
+    {
+      "key": "module",
+      "title": "模矩",
+      "text": "〔佔位文字，抓版面用〕模矩系統是整個構造邏輯的起點：以單根竹材的常見長度與直徑為基準，反推出一套可重複、可搭接的單元尺寸，讓每一個構件都能在不同的位置上互換使用，降低現場裁切與浪費，也讓非專業的參與者更容易理解整個系統的組成方式，這套模矩同時也決定了立面的節奏與比例。\n\n從平面到剖面，模矩的網格貫穿整個設計，也成為施工階段溝通的共同語言——工班不需要逐一讀圖，只要理解模矩邏輯，就能判斷構件該落在哪裡，大幅降低溝通成本與現場出錯的機率，這種「先定規則、再長出形狀」的做法，是竹構造回應手工與效率之間拉扯的具體嘗試。\n\n這批照片先呈現模矩單元在不同位置重複出現的樣子，實際尺寸表與詳細圖說之後會補上，讓論述更精確、更可被驗證。",
+      "images": [
+        {
+          "id": "a-module-1",
+          "tone": "bg-neutral-300",
+          "caption": "〔照片說明待補〕",
+          "src": "/images/project-one/1786700856939-_______2026-08-14_174017.png"
+        },
+        {
+          "id": "a-module-2",
+          "tone": "bg-neutral-400",
+          "caption": "〔照片說明待補〕",
+          "src": "/images/project-one/1786701209422-_______2026-08-14_175239.png"
+        }
+      ],
+      "moreImages": [
+        {
+          "id": "a-module-more-1",
+          "tone": "bg-neutral-300",
+          "caption": "模矩尺寸推演草圖"
+        },
+        {
+          "id": "a-module-more-2",
+          "tone": "bg-neutral-400",
+          "caption": "單元接合方式測試"
+        },
+        {
+          "id": "a-module-more-3",
+          "tone": "bg-neutral-300",
+          "caption": "模矩網格對應立面圖"
+        },
+        {
+          "id": "a-module-more-4",
+          "tone": "bg-neutral-400",
+          "caption": "〔照片說明待補〕",
+          "src": "/images/project-one/1786700856939-_______2026-08-14_174017.png"
+        },
+        {
+          "id": "a-module-more-5",
+          "tone": "bg-neutral-300",
+          "caption": "〔照片說明待補〕",
+          "src": "/images/project-one/1786701820696-_______2026-08-14_180258.png"
+        },
+        {
+          "id": "a-module-more-6",
+          "tone": "bg-neutral-400",
+          "caption": "〔網路免版權風景照，待替換〕",
+          "src": "/images/stock/portrait-3.jpg"
+        },
+        {
+          "id": "a-module-more-7",
+          "tone": "bg-neutral-300",
+          "caption": "〔照片說明待補〕",
+          "src": "/images/project-one/1786700848131-_______2026-08-14_173851.png"
+        }
+      ]
+    },
+    {
+      "key": "structure",
+      "title": "構造",
+      "text": "〔佔位文字，抓版面用〕構造系統採用竹材本身的彈性與韌性作為設計出發點，主結構以桁架式的組合方式，將荷重層層分散到地面基礎，減少對單一構件強度的依賴，也讓整體結構在面對不規則外力時，能有一定程度的彈性緩衝而不至於瞬間破壞，這也是竹構造回應環境不確定性的方式之一。\n\n接點的處理是整個構造裡最關鍵的一環，既要傳遞力量，也要保留竹材熱脹冷縮與含水率變化的空間，多數接點採用綁紮與栓接混合的方式，而非單一膠合固定，讓未來的維護、替換單一構件成為可能，也呼應「常民構造」該有的可修復性格——壞掉的地方可以局部處理，不用整棟拆除重建。\n\n這裡先用現場照片呈現桁架與接點的實際樣貌，完整結構計算報告與細部接點圖說之後會補齊，讓論述更貼近實際施作。",
+      "images": [
+        {
+          "id": "a-structure-1",
+          "tone": "bg-neutral-300",
+          "caption": "〔照片說明待補〕",
+          "src": "/images/project-one/1786701211986-_______2026-08-14_175147.png"
+        },
+        {
+          "id": "a-structure-2",
+          "tone": "bg-neutral-400",
+          "caption": "〔照片說明待補〕",
+          "src": "/images/project-one/1786701216631-_______2026-08-14_175056.png"
+        }
+      ],
+      "moreImages": [
+        {
+          "id": "a-structure-more-1",
+          "tone": "bg-neutral-300",
+          "caption": "桁架系統受力分析圖"
+        },
+        {
+          "id": "a-structure-more-2",
+          "tone": "bg-neutral-400",
+          "caption": "接點細部大樣圖"
+        },
+        {
+          "id": "a-structure-more-3",
+          "tone": "bg-neutral-300",
+          "caption": "結構模型局部"
+        },
+        {
+          "id": "a-structure-more-4",
+          "tone": "bg-neutral-400",
+          "caption": "〔照片說明待補〕",
+          "src": "/images/project-one/cover-01.png"
+        },
+        {
+          "id": "a-structure-more-5",
+          "tone": "bg-neutral-300",
+          "caption": "〔照片說明待補〕",
+          "src": "/images/project-one/1786701209422-_______2026-08-14_175239.png"
+        },
+        {
+          "id": "a-structure-more-6",
+          "tone": "bg-neutral-400",
+          "caption": "〔照片說明待補〕",
+          "src": "/images/project-one/1786700851881-_______2026-08-14_173939.png"
+        },
+        {
+          "id": "a-structure-more-7",
+          "tone": "bg-neutral-300",
+          "caption": "〔照片說明待補〕",
+          "src": "/images/project-one/1786701229749-_______2026-08-14_175009.png"
+        },
+        {
+          "id": "a-structure-more-8",
+          "tone": "bg-neutral-400",
+          "caption": "〔照片說明待補〕",
+          "src": "/images/project-one/1786701824261-_______2026-08-14_180200.png"
+        },
+        {
+          "id": "a-structure-more-9",
+          "tone": "bg-neutral-300",
+          "caption": "〔網路免版權風景照，待替換〕",
+          "src": "/images/stock/portrait-4.jpg"
+        }
+      ]
+    },
+    {
+      "key": "construction",
+      "title": "施工",
+      "text": "〔佔位文字，抓版面用〕施工過程刻意保留了手工參與的比例，從竹材的選料、防腐處理，到現場組裝，都邀請在地工班與志工共同完成，而不是全部交給機具與預製構件。這個決定讓整體工期拉長，卻也讓構造本身多了一層「這裡的人親手蓋起來」的重量，也讓參與者對這個空間產生更深的認同與情感連結，這種參與感也是「常民構造」想傳遞的核心精神之一。\n\n現場搭建分成基礎放樣、主結構立起、次結構填充、屋面收頭四個階段，每個階段都留下影像與圖說紀錄，作為未來其他基地複製這套工法的參考。施工過程中遇到的天氣延誤、材料調度、人力調配等實際狀況，之後也會整理成完整的施工紀錄放進這個章節，讓經驗可以被傳承。\n\n這批照片先記錄搭建現場的幾個關鍵時刻，讓經驗可以被傳承，而不只是留在少數人的記憶裡。",
+      "images": [
+        {
+          "id": "a-construction-1",
+          "tone": "bg-neutral-300",
+          "caption": "〔照片說明待補〕",
+          "src": "/images/project-one/1786701229749-_______2026-08-14_175009.png"
+        },
+        {
+          "id": "a-construction-2",
+          "tone": "bg-neutral-400",
+          "caption": "〔照片說明待補〕",
+          "src": "/images/project-one/1786701820696-_______2026-08-14_180258.png"
+        }
+      ],
+      "moreImages": [
+        {
+          "id": "a-construction-more-1",
+          "tone": "bg-neutral-300",
+          "caption": "施工放樣過程紀錄"
+        },
+        {
+          "id": "a-construction-more-2",
+          "tone": "bg-neutral-400",
+          "caption": "現場組裝步驟紀錄"
+        },
+        {
+          "id": "a-construction-more-3",
+          "tone": "bg-neutral-300",
+          "caption": "收尾細節紀錄"
+        },
+        {
+          "id": "a-construction-more-4",
+          "tone": "bg-neutral-400",
+          "caption": "〔照片說明待補〕",
+          "src": "/images/project-one/1786701229749-_______2026-08-14_175009.png"
+        },
+        {
+          "id": "a-construction-more-5",
+          "tone": "bg-neutral-300",
+          "caption": "〔網路免版權風景照，待替換〕",
+          "src": "/images/stock/portrait-5.jpg"
+        },
+        {
+          "id": "a-construction-more-6",
+          "tone": "bg-neutral-400",
+          "caption": "〔照片說明待補〕",
+          "src": "/images/project-one/1786700848131-_______2026-08-14_173851.png"
+        },
+        {
+          "id": "a-construction-more-7",
+          "tone": "bg-neutral-300",
+          "caption": "〔照片說明待補〕",
+          "src": "/images/project-one/1786701824261-_______2026-08-14_180200.png"
+        }
+      ]
+    },
+    {
+      "key": "assembly",
+      "title": "組裝說明書",
+      "text": "〔佔位文字，抓版面用〕組裝說明書把整個搭建過程拆解成可依序執行的步驟，從構件編號、接點對應，到工具與人力需求，都以圖解方式呈現，目標是讓沒有專業背景的人也能參與部分組裝作業，延續「常民構造」的精神，也讓這套工法有機會被複製到其他地方使用，而不是只存在於這一次的搭建現場。",
+      "images": [],
+      "pdf": {
+        "url": "/files/project-one/assembly.pdf",
+        "label": "組裝說明書 PDF（範例檔案，待替換成正式版本）"
+      }
+    },
+    {
+      "key": "site",
+      "title": "基地",
+      "text": "〔佔位文字，抓版面用〕基地位於林鐵沿線的一處緩坡地，周邊仍保留部分原始植被與早期聚落的動線紋理，鐵道的存在讓這塊土地帶有一種介於自然與人為建設之間的曖昧性格。建築量體刻意退讓在坡地的角落，把最好的視野留給穿越基地的既有步道，也盡量減少對原有地表植被的擾動，讓新的構造物像是從既有紋理裡長出來的，而不是外來的植入。\n\n基地環境的日照角度、風向與雨水排放路徑，都直接影響了竹構造的方位與屋簷出挑的深度，設計並非憑空而來，而是先讀懂基地、再回應基地，這也是整個團隊在動工前花最多時間反覆現勘與測繪的階段。周邊居民對這塊土地的記憶與使用習慣，也是設計過程中重要的參考依據。實際地址與座標尚未提供，下方地圖會在資料到位後標示出精確位置。",
+      "images": []
+    }
+  ],
+  "published": true
+}

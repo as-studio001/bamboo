@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>後台管理 — 林鐵構竹展</title>
+<style>
+:root{
+  --paper:   #fbfaf8;
+  --ink:     #201f1d;
+  --muted:   #8a8781;
+  --line:    #eae7e1;
+  --accent:  #6b6355;
+  --danger:  #b23b3b;
+  --f-heading: 'Trebuchet MS', 'Yu Gothic', 'Meiryo', sans-serif;
+  --f-body:    'Yu Gothic Light', 'Yu Gothic', 'Meiryo', sans-serif;
+}
+*,*::before,*::after{ box-sizing:border-box; }
+body{
+  margin:0; background:var(--paper); color:var(--ink);
+  font-family:var(--f-body); font-size:15px; line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+img{ max-width:100%; display:block; }
+a{ color:inherit; }
+button{ font-family:inherit; cursor:pointer; }
+h1,h2,h3{ font-family:var(--f-heading); font-weight:700; letter-spacing:-0.01em; margin:0; }
+input,textarea,select{ font-family:inherit; font-size:14px; }
+
+.wrap{ max-width:1000px; margin:0 auto; padding:0 24px; }
+.top-bar{ border-bottom:1px solid var(--line); padding:18px 0; margin-bottom:28px; }
+.top-bar .wrap{ display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; }
+.top-bar .site-title{ font-family:var(--f-heading); font-weight:700; font-size:18px; }
+.top-bar .site-title a{ text-decoration:none; color:var(--muted); font-weight:400; font-size:13px; margin-left:10px; }
+.top-bar .user-box{ display:flex; align-items:center; gap:10px; font-size:13px; color:var(--muted); }
+
+.btn{
+  display:inline-flex; align-items:center; gap:8px;
+  padding:9px 16px; border-radius:5px; border:1px solid var(--line);
+  background:#fff; color:var(--ink); font-size:13.5px; font-weight:600;
+  transition:all .15s ease;
+}
+.btn:hover{ border-color:var(--ink); }
+.btn.primary{ background:var(--ink); color:#fff; border-color:var(--ink); }
+.btn.primary:hover{ background:#000; }
+.btn.danger{ color:var(--danger); border-color:#e6c9c9; }
+.btn.danger:hover{ background:#fdf1f1; border-color:var(--danger); }
+.btn.ghost{ border-color:transparent; background:none; color:var(--muted); padding:9px 10px; }
+.btn.ghost:hover{ color:var(--ink); }
+.btn.small{ padding:6px 12px; font-size:12.5px; }
+.btn:disabled{ opacity:.5; cursor:default; }
+
+.login-screen{
+  min-height:70vh; display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:22px; text-align:center; padding:40px 20px;
+}
+.login-screen h1{ font-size:24px; }
+.login-screen p{ color:var(--muted); max-width:360px; font-size:14px; line-height:1.7; }
+.login-screen input{
+  width:260px; padding:10px 12px; border:1px solid var(--line); border-radius:5px;
+  background:#fff; color:var(--ink); font-size:14px;
+}
+.login-screen input:focus{ outline:none; border-color:var(--ink); }
+
+.item-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(190px, 1fr)); gap:20px; padding-bottom:60px; }
+.item-card{
+  border:1px solid var(--line); border-radius:8px; overflow:hidden; cursor:pointer;
+  background:#fff; transition:box-shadow .15s ease, transform .15s ease;
+}
+.item-card:hover{ box-shadow:0 6px 18px rgba(32,31,29,0.1); transform:translateY(-2px); }
+.item-card .thumb{ position:relative; aspect-ratio:4/3; background:#efece5; overflow:hidden; }
+.item-card .thumb img{ width:100%; height:100%; object-fit:cover; }
+.item-card .thumb.empty{ display:flex; align-items:center; justify-content:center; color:var(--muted); font-size:12px; }
+.item-card .info{ padding:12px 14px; }
+.item-card .info .t{ font-size:14px; font-weight:600; margin-bottom:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.item-card .info .m{ font-size:12px; color:var(--muted); display:flex; justify-content:space-between; align-items:center; gap:6px; }
+.pill{ display:inline-flex; padding:2px 8px; border-radius:20px; font-size:11px; font-weight:600; }
+.pill.on{ background:rgba(57,255,20,0.15); color:#1f7a10; }
+.pill.off{ background:rgba(178,59,59,0.1); color:var(--danger); }
+
+.editor{ padding-bottom:80px; }
+.editor-head{ display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; gap:12px; flex-wrap:wrap; }
+.back-link{ display:inline-flex; align-items:center; gap:6px; color:var(--muted); font-size:13.5px; background:none; border:none; padding:0; }
+.back-link:hover{ color:var(--ink); }
+
+.field-block{ margin-bottom:26px; }
+.field-block > label, .field-block > .label{
+  display:block; font-family:var(--f-heading); font-weight:700; font-size:13px;
+  letter-spacing:.02em; margin-bottom:8px; color:var(--ink);
+}
+.field-hint{ font-size:12px; color:var(--muted); margin-top:6px; line-height:1.6; }
+.field-block input[type=text], .field-block input[type=number], .field-block input[type=color], .field-block textarea, .field-block select{
+  width:100%; padding:10px 12px; border:1px solid var(--line); border-radius:5px;
+  background:#fff; color:var(--ink); resize:vertical;
+}
+.field-block input:focus, .field-block textarea:focus, .field-block select:focus{ outline:none; border-color:var(--ink); }
+.field-block textarea{ min-height:90px; line-height:1.7; }
+.field-block textarea.tall{ min-height:220px; }
+.two-col{ display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+.three-col{ display:grid; grid-template-columns:repeat(3,1fr); gap:18px; }
+.four-col{ display:grid; grid-template-columns:repeat(4,1fr); gap:18px; }
+@media (max-width:640px){ .two-col, .three-col, .four-col{ grid-template-columns:1fr; } }
+.checkbox-row{ display:flex; align-items:center; gap:8px; font-size:13.5px; }
+
+.chapter-section{ border:1px solid var(--line); border-radius:8px; padding:18px 20px; margin-bottom:20px; background:#fff; }
+.chapter-section-head{ display:flex; align-items:center; gap:10px; margin-bottom:16px; }
+.chapter-section-head .num{
+  display:inline-flex; align-items:center; justify-content:center; width:22px; height:22px; border-radius:50%;
+  background:var(--ink); color:#fff; font-size:12px; font-weight:700; flex-shrink:0;
+}
+.chapter-section-head .key{ font-size:11px; color:var(--muted); font-family:monospace; }
+.photo-cap-hint{ font-size:12px; color:var(--muted); margin-bottom:10px; }
+.photo-cap-hint.over{ color:var(--danger); }
+
+.photo-list{ display:flex; flex-direction:column; gap:10px; margin-bottom:10px; }
+.photo-row{ display:flex; gap:12px; align-items:center; }
+.photo-row .thumb{ width:84px; height:63px; flex-shrink:0; border-radius:5px; overflow:hidden; background:#efece5; border:1px solid var(--line); display:flex; align-items:center; justify-content:center; font-size:10px; color:var(--muted); text-align:center; }
+.photo-row .thumb img{ width:100%; height:100%; object-fit:cover; }
+.photo-row .fields{ flex:1; min-width:0; display:flex; flex-direction:column; gap:6px; }
+.photo-row .fields input{ width:100%; padding:7px 10px; border:1px solid var(--line); border-radius:5px; font-size:12.5px; }
+.row-remove-btn{
+  flex-shrink:0; width:32px; height:32px; border-radius:50%; border:1px solid var(--line);
+  background:#fff; color:var(--muted); font-size:16px; line-height:1;
+}
+.row-remove-btn:hover{ color:var(--danger); border-color:var(--danger); }
+.add-photo-btn{
+  align-self:flex-start; display:inline-flex; align-items:center; gap:8px;
+  padding:9px 14px; border-radius:6px; border:1.5px dashed var(--line); background:none; color:var(--muted); font-size:13px; font-weight:600;
+}
+.add-photo-btn:hover{ border-color:var(--ink); color:var(--ink); }
+.add-card{
+  border:1.5px dashed var(--line); border-radius:8px; aspect-ratio:4/3;
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px;
+  color:var(--muted); cursor:pointer; background:none;
+}
+.add-card:hover{ border-color:var(--ink); color:var(--ink); }
+.add-card span{ font-size:13px; font-weight:600; }
+
+.save-bar{
+  position:sticky; bottom:0; margin-top:32px; padding:16px 0; background:var(--paper);
+  border-top:1px solid var(--line); display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;
+}
+.save-status{ font-size:12.5px; color:var(--muted); }
+.save-status.err{ color:var(--danger); }
+
+#toast{
+  position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(20px);
+  background:var(--ink); color:#fff; padding:12px 20px; border-radius:6px; font-size:13.5px;
+  opacity:0; pointer-events:none; transition:all .25s ease; z-index:999; max-width:90vw; text-align:center;
+}
+#toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+#toast.err{ background:var(--danger); }
+
+#loadingOverlay{
+  position:fixed; inset:0; background:rgba(251,250,248,0.85); backdrop-filter:blur(2px);
+  display:none; align-items:center; justify-content:center; z-index:998; font-size:14px; color:var(--muted);
+}
+#loadingOverlay.show{ display:flex; }
+.spinner{
+  width:16px; height:16px; border-radius:50%; border:2px solid var(--line); border-top-color:var(--ink);
+  animation:spin .7s linear infinite; display:inline-block; margin-right:8px; vertical-align:-3px;
+}
+@keyframes spin{ to{ transform:rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<div id="loadingOverlay"><span class="spinner"></span><span id="loadingText">處理中…</span></div>
+<div id="toast"></div>
+<div id="app"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+/* ============================================================
+   設定
+   ============================================================
+   這支後台跟 as-studio001/Internal-Pages 的 admin/index.html 共用同一套
+   後端基礎設施——同一個 Supabase 專案（同一批登入使用者／同一套 Auth）、
+   同一組 Netlify Functions（github-proxy／invite-user／list-users／
+   remove-user），不重新申請、不重新建置。這裡只是另外一支獨立的前端
+   操作介面（獨立的 HTML／網址），寫回的目標 repo 換成這個專案自己
+   （as-studio001/bamboo），不是 Internal-Pages 那個 repo。
+   SUPABASE_URL／SUPABASE_ANON_KEY 是公開用的值（Supabase 官方設計上
+   anon key 本來就會放在前端程式碼裡，不是密鑰，這兩個值直接照抄
+   Internal-Pages 那邊目前線上真正在用的值）。FUNCTIONS_BASE 一樣。
+   要讓這支後台真的能寫回 bamboo 這個 repo，Internal-Pages 那支共用的
+   netlify/functions/github-proxy.js 的 ALLOWED_REPOS 白名單需要加上
+   "bamboo"（已經在 Internal-Pages repo 那邊處理，不是這個檔案的事）。
+*/
+let AUTH_LINK_TYPE = (/type=(invite|recovery)/.exec(location.hash) || [])[1] || null;
+
+const REPO_OWNER = "as-studio001";
+const REPO_NAME = "bamboo";
+const REPO_BRANCH = "main";
+
+const SUPABASE_URL = "https://enjbqfgepvkpwlfqbldi.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVuamJxZmdlcHZrcHdsZnFibGRpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODcyOTUyODQsImV4cCI6MjEwMjg3MTI4NH0.7YAlMUGocaXenA6RPdDPNu60g48GgW0Nq8xAwxThilo";
+const FUNCTIONS_BASE = "https://zingy-bonbon-36e6c9.netlify.app/.netlify/functions";
+
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+function esc(str){
+  return String(str == null ? "" : str).replace(/[&<>"']/g, s => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  }[s]));
+}
+function uid(){ return Math.random().toString(36).slice(2, 9); }
+
+/* ============================================================
+   Toast / loading
+   ============================================================ */
+let toastTimer = null;
+function toast(msg, isErr){
+  const el = document.getElementById("toast");
+  el.textContent = msg;
+  el.classList.toggle("err", !!isErr);
+  el.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove("show"), isErr ? 15000 : 3200);
+}
+function setLoading(on, text){
+  document.getElementById("loadingText").textContent = text || "處理中…";
+  document.getElementById("loadingOverlay").classList.toggle("show", !!on);
+}
+
+/* ============================================================
+   Auth（跟 Internal-Pages 共用同一個 Supabase 專案／同一批使用者，
+   邀請新人／重設密碼一律在 Internal-Pages 那邊的「使用者管理」分頁做，
+   這裡不重複做一份使用者管理介面）
+   ============================================================ */
+let authSession = null;
+sb.auth.onAuthStateChange((_event, session) => { authSession = session; });
+
+async function callFunction(name, payload){
+  const res = await fetch(`${FUNCTIONS_BASE}/${name}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + (authSession ? authSession.access_token : ""),
+    },
+    body: JSON.stringify(payload || {}),
+  });
+  let data = {};
+  try{ data = await res.json(); }catch(e){}
+  if(!res.ok){
+    const ctxParts = [];
+    if(payload && payload.action) ctxParts.push(payload.action);
+    if(payload && payload.path) ctxParts.push(payload.path);
+    const ctx = ctxParts.length ? `[${ctxParts.join(" ")}] ` : "";
+    throw new Error(ctx + (data.error || (res.status + " " + res.statusText)));
+  }
+  return data;
+}
+
+function logout(){
+  sb.auth.signOut();
+  authSession = null;
+  state.user = null;
+  render();
+}
+
+/* ============================================================
+   GitHub 讀寫（比照 Internal-Pages：公開 repo 直接打 GitHub API 讀，
+   讀取失敗才退回 github-proxy；寫入一律經過 github-proxy，因為那需要
+   服務帳號的 token，登入的人不會有自己的 GitHub 帳號）
+   ============================================================ */
+function utf8ToBase64(str){ return btoa(unescape(encodeURIComponent(str))); }
+function decodeGhFileData(data){
+  const content = decodeURIComponent(escape(atob(data.content.replace(/\n/g, ""))));
+  return { sha: data.sha, content };
+}
+async function ghFetchPublic(path){
+  const url = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${path.split("/").map(encodeURIComponent).join("/")}?ref=${REPO_BRANCH}&_=${Date.now()}`;
+  try{ return await fetch(url, { cache: "no-store" }); }catch(e){ return null; }
+}
+async function ghGetFile(path){
+  const res = await ghFetchPublic(path);
+  const data = (res && res.ok) ? await res.json() : await callFunction("github-proxy", { action: "getFile", path, repo: REPO_NAME });
+  const { sha, content } = decodeGhFileData(data);
+  return { sha, content, json: JSON.parse(content) };
+}
+async function ghListDir(path){
+  const res = await ghFetchPublic(path);
+  if(res && res.status === 404) return [];
+  if(res && res.ok) return res.json();
+  return callFunction("github-proxy", { action: "listDir", path, repo: REPO_NAME });
+}
+async function ghPutFile(path, base64Content, message, sha){
+  return callFunction("github-proxy", { action: "putFile", path, content: base64Content, message, sha, repo: REPO_NAME });
+}
+async function ghDeleteFile(path, message, sha){
+  return callFunction("github-proxy", { action: "deleteFile", path, message, sha, repo: REPO_NAME });
+}
+
+function readFileAsBase64(file){
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result.split(",")[1]);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+/* 上傳前先縮圖＋重新壓縮成 JPEG——相機原始檔案動輒好幾 MB，GitHub API
+   又要求轉成 base64（體積再漲 1/3），不壓縮上傳會很慢。GIF／SVG／已經
+   夠小的檔案直接用原檔，不為了壓縮反而讓小檔案變大或弄丟動畫。 */
+function compressImageFile(file, maxDimension, quality){
+  return new Promise((resolve) => {
+    if(!file.type || !file.type.startsWith("image/") || file.type === "image/svg+xml" || file.type === "image/gif"){
+      resolve(file); return;
+    }
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      const scale = Math.min(1, maxDimension / Math.max(img.naturalWidth, img.naturalHeight));
+      if(scale >= 1 && file.size < 1.5 * 1024 * 1024){ resolve(file); return; }
+      const width = Math.max(1, Math.round(img.naturalWidth * scale));
+      const height = Math.max(1, Math.round(img.naturalHeight * scale));
+      const canvas = document.createElement("canvas");
+      canvas.width = width; canvas.height = height;
+      canvas.getContext("2d").drawImage(img, 0, 0, width, height);
+      canvas.toBlob((blob) => {
+        if(!blob){ resolve(file); return; }
+        const newName = file.name.replace(/\.\w+$/, "") + ".jpg";
+        resolve(new File([blob], newName, { type: "image/jpeg" }));
+      }, "image/jpeg", quality);
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); resolve(file); };
+    img.src = url;
+  });
+}
+function sanitizeFilename(name){ return name.replace(/[^\w.\-一-鿿]+/g, "_"); }
+
+/* 上傳一張照片／影片到 public/images/<slug>/，回傳存進 ProjectImage.src
+   要用的網址（開頭 /images/...，Next.js 會直接從 public/ 底下用同樣的
+   相對路徑供應這個檔案，不用寫 "/public" 這個前綴）。影片檔（video/*）
+   不經過壓縮，圖片才壓。 */
+async function uploadAsset(file, slug){
+  const isVideo = file.type && file.type.startsWith("video/");
+  const compressed = isVideo ? file : await compressImageFile(file, 2400, 0.82);
+  const filename = sanitizeFilename(compressed.name);
+  const b64 = await readFileAsBase64(compressed);
+  const folder = `public/images/${slug}`;
+  const data = await callFunction("github-proxy", { action: "uploadAsset", folder, filename, content: b64, repo: REPO_NAME });
+  return "/" + data.path.replace(/^public\//, "");
+}
+
+/* ============================================================
+   State / router
+   ============================================================ */
+const state = {
+  user: null,
+  cases: null, // [{slug, name, published, thumb}]
+  editingCase: null, // { slug, item, sha, isNew }
+};
+
+async function loadCaseList(){
+  const entries = await ghListDir("content/projects");
+  const files = entries.filter(e => e.type === "file" && e.name.endsWith(".json"));
+  const items = await Promise.all(files.map(async f => {
+    try{
+      const { json } = await ghGetFile(f.path);
+      const thumb = (json.coverImages || []).find(c => c.src);
+      return { slug: json.slug || f.name.replace(/\.json$/, ""), name: json.name || "", published: json.published !== false, thumb: thumb ? thumb.src : "" };
+    }catch(e){
+      return { slug: f.name.replace(/\.json$/, ""), name: "（讀取失敗）", published: true, thumb: "" };
+    }
+  }));
+  state.cases = items;
+}
+
+const app = document.getElementById("app");
+
+function render(){
+  if(AUTH_LINK_TYPE && !state.user){ renderSetPassword(); return; }
+  if(!authSession || !state.user){ renderLogin(); return; }
+  if(state.editingCase){ renderCaseEditor(); return; }
+  renderList();
+}
+
+/* ============================================================
+   Login
+   ============================================================ */
+function renderLogin(){
+  app.innerHTML = `
+    <div class="wrap">
+      <div class="login-screen">
+        <h1>後台管理</h1>
+        <p>用 email 跟密碼登入。這裡跟 Internal-Pages 共用同一批使用者帳號——要邀請新人，到
+        Internal-Pages 的後台「使用者管理」分頁寄邀請信即可，不用在這裡重新設定一次。</p>
+        <input type="email" id="loginEmail" placeholder="email" autocomplete="username">
+        <input type="password" id="loginPassword" placeholder="密碼" autocomplete="current-password">
+        <button class="btn primary" id="loginBtn">登入</button>
+        <button type="button" class="back-link" id="forgotPasswordBtn">忘記密碼？</button>
+      </div>
+    </div>
+  `;
+  document.getElementById("forgotPasswordBtn").addEventListener("click", async () => {
+    const email = document.getElementById("loginEmail").value.trim();
+    if(!email){ toast("請先在上面填 email，再點忘記密碼", true); return; }
+    try{
+      setLoading(true, "寄送重設密碼信中…");
+      const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: location.origin + location.pathname });
+      if(error) throw error;
+      toast("重設密碼信已寄出，請到信箱點連結設定新密碼");
+    }catch(err){ toast(err.message || "寄送失敗", true); }
+    finally{ setLoading(false); }
+  });
+  document.getElementById("loginBtn").addEventListener("click", async () => {
+    const email = document.getElementById("loginEmail").value.trim();
+    const password = document.getElementById("loginPassword").value;
+    if(!email || !password){ toast("請輸入 email 跟密碼", true); return; }
+    try{
+      setLoading(true, "登入中…");
+      const { data, error } = await sb.auth.signInWithPassword({ email, password });
+      if(error) throw error;
+      authSession = data.session;
+      state.user = { email: data.user.email };
+      setLoading(true, "載入案例清單中…");
+      await loadCaseList();
+      render();
+    }catch(err){ toast(err.message || "登入失敗", true); }
+    finally{ setLoading(false); }
+  });
+}
+
+function renderSetPassword(){
+  app.innerHTML = `
+    <div class="wrap">
+      <div class="login-screen">
+        <h1>設定密碼</h1>
+        <p>請先設定密碼，之後就用 email + 這組密碼登入後台（跟 Internal-Pages 共用同一組帳號）。</p>
+        <input type="password" id="newPassword" placeholder="設定密碼（至少 6 個字）" autocomplete="new-password">
+        <button class="btn primary" id="setPasswordBtn">設定密碼並進入後台</button>
+      </div>
+    </div>
+  `;
+  document.getElementById("setPasswordBtn").addEventListener("click", async () => {
+    const password = document.getElementById("newPassword").value;
+    if(!password || password.length < 6){ toast("密碼至少要 6 個字", true); return; }
+    try{
+      setLoading(true, "設定密碼中…");
+      const { data, error } = await sb.auth.updateUser({ password });
+      if(error) throw error;
+      const { data: sessionData } = await sb.auth.getSession();
+      authSession = data.session || sessionData.session;
+      AUTH_LINK_TYPE = null;
+      history.replaceState(null, "", location.pathname);
+      if(!authSession){ toast("設定成功，請重新登入", false); render(); return; }
+      state.user = { email: authSession.user.email };
+      setLoading(true, "載入案例清單中…");
+      await loadCaseList();
+      render();
+    }catch(err){ toast(err.message || "設定密碼失敗", true); }
+    finally{ setLoading(false); }
+  });
+}
+
+function renderTopBar(){
+  return `
+    <div class="top-bar">
+      <div class="wrap">
+        <div class="site-title">後台管理<a href="/" target="_blank">↗ 查看網站</a></div>
+        <div class="user-box">
+          <span>${esc(state.user.email)}</span>
+          <button class="btn ghost" id="logoutBtn">登出</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+/* ============================================================
+   案例列表
+   ============================================================ */
+function renderList(){
+  const cases = state.cases || [];
+  app.innerHTML = `
+    ${renderTopBar()}
+    <div class="wrap">
+      <div class="item-grid">
+        ${cases.map(c => `
+          <div class="item-card" data-slug="${esc(c.slug)}">
+            <div class="thumb ${c.thumb ? "" : "empty"}">
+              ${c.thumb ? `<img src="${esc(c.thumb)}" alt="">` : "沒有封面圖"}
+            </div>
+            <div class="info">
+              <div class="t">${esc(c.name || c.slug)}</div>
+              <div class="m">
+                <span>${esc(c.slug)}</span>
+                <span class="pill ${c.published ? "on" : "off"}">${c.published ? "上架中" : "已下架"}</span>
+              </div>
+            </div>
+          </div>
+        `).join("")}
+      </div>
+    </div>
+  `;
+  document.getElementById("logoutBtn").addEventListener("click", logout);
+  document.querySelectorAll(".item-card").forEach(el => {
+    el.addEventListener("click", () => openCaseEditor(el.dataset.slug));
+  });
+}
+
+/* ============================================================
+   案例編輯器
+   ============================================================
+   六個章節固定是 design／module／structure／construction／assembly／site
+   這六個 key，跟前台 ProjectDetail.tsx／PhotoStream.tsx 認的順序與數量
+   綁死（見 src/lib/projects.ts 的型別定義），這裡不做「新增／刪除章節」
+   這種自由度，只能編輯這六章各自的內容。
+*/
+const CHAPTER_DEFS = [
+  { key: "design", label: "建築設計", kind: "narrative" },
+  { key: "module", label: "模矩", kind: "narrative" },
+  { key: "structure", label: "構造", kind: "narrative" },
+  { key: "construction", label: "施工", kind: "narrative" },
+  { key: "assembly", label: "組裝說明書", kind: "assembly" },
+  { key: "site", label: "基地", kind: "site" },
+];
+
+function emptyChapter(key, label){
+  return { key, title: label, text: "", images: [], moreImages: [] };
+}
+
+async function openCaseEditor(slug){
+  try{
+    setLoading(true, "載入案例中…");
+    const { json, sha } = await ghGetFile(`content/projects/${slug}.json`);
+    // 補齊六個固定章節（萬一資料裡缺了某一章，畫面上還是要看得到、能補上去）
+    const chapters = CHAPTER_DEFS.map(def => {
+      const existing = (json.chapters || []).find(c => c.key === def.key);
+      return existing || emptyChapter(def.key, def.label);
+    });
+    state.editingCase = { slug, item: Object.assign({}, json, { chapters }), sha };
+    render();
+  }catch(err){
+    toast(err.message || "載入失敗", true);
+  }finally{
+    setLoading(false);
+  }
+}
+
+// 文字份量決定照片上限——跟前台 lib/photoLayout.ts 的 maxPhotosForText()
+// 用同一條公式，讓後台這裡看到的上限提示跟畫面上實際會顯示的張數一致。
+function maxPhotosForText(text){
+  const len = [...String(text || "")].length;
+  if(len <= 300) return 2;
+  return 2 + Math.floor((len - 300) / 100);
+}
+
+function renderPhotoList(containerId, images, opts){
+  opts = opts || {};
+  return `
+    <div class="photo-list" id="${containerId}">
+      ${(images || []).map((img, i) => `
+        <div class="photo-row" data-idx="${i}">
+          <div class="thumb">${img.src ? `<img src="${esc(img.src)}" alt="">` : "沒有圖"}</div>
+          <div class="fields">
+            <input type="text" data-field="caption" placeholder="圖說（選填）" value="${esc(img.caption || "")}">
+            <input type="text" data-field="src" placeholder="圖片網址（用下面「上傳」按鈕自動填入，也可以手動貼）" value="${esc(img.src || "")}">
+          </div>
+          <button type="button" class="row-remove-btn" data-remove="${i}" title="移除這張">✕</button>
+        </div>
+      `).join("") || `<div class="field-hint">目前沒有照片。</div>`}
+    </div>
+    <button type="button" class="add-photo-btn" data-upload-target="${containerId}">＋ 上傳照片／影片</button>
+    <input type="file" accept="image/*,video/*" multiple style="display:none" data-upload-input="${containerId}">
+  `;
+}
+
+function renderCaseEditor(){
+  const ed = state.editingCase;
+  const item = ed.item;
+  const cap = (chapter) => maxPhotosForText(chapter.text);
+
+  app.innerHTML = `
+    ${renderTopBar()}
+    <div class="wrap editor">
+      <div class="editor-head">
+        <button type="button" class="back-link" id="backBtn">← 回案例列表</button>
+        <div style="display:flex; gap:10px;">
+          <button type="button" class="btn danger" id="deleteBtn">刪除這個案例</button>
+        </div>
+      </div>
+
+      <div class="field-block">
+        <label>案名</label>
+        <input type="text" id="f_name" value="${esc(item.name)}">
+      </div>
+
+      <div class="two-col">
+        <div class="field-block">
+          <label>slug（網址代號，不建議隨意更動）</label>
+          <input type="text" id="f_slug" value="${esc(item.slug)}">
+        </div>
+        <div class="field-block">
+          <label>簡短標籤（作品 A／作品 B 這類）</label>
+          <input type="text" id="f_shortLabel" value="${esc(item.shortLabel || "")}">
+        </div>
+      </div>
+
+      <div class="three-col">
+        <div class="field-block">
+          <label>地點</label>
+          <input type="text" id="f_location" value="${esc(item.location || "")}">
+        </div>
+        <div class="field-block">
+          <label>年份</label>
+          <input type="text" id="f_year" value="${esc(item.year || "")}">
+        </div>
+        <div class="field-block">
+          <label>類型</label>
+          <input type="text" id="f_type" value="${esc(item.type || "")}">
+        </div>
+      </div>
+
+      <div class="three-col">
+        <div class="field-block">
+          <label>主色（accent）</label>
+          <input type="color" id="f_accent" value="${esc(item.accent || "#39FF14")}">
+        </div>
+        <div class="field-block">
+          <label>封面標題對齊</label>
+          <select id="f_titleAlign">
+            <option value="left" ${item.titleAlign !== "right" ? "selected" : ""}>靠左（預設）</option>
+            <option value="right" ${item.titleAlign === "right" ? "selected" : ""}>靠右</option>
+          </select>
+        </div>
+        <div class="field-block">
+          <label>上架狀態</label>
+          <label class="checkbox-row"><input type="checkbox" id="f_published" ${item.published !== false ? "checked" : ""}> 上架（前台看得到）</label>
+        </div>
+      </div>
+
+      <div class="field-block">
+        <label>整體概述（intro，首頁用）</label>
+        <textarea id="f_intro">${esc(item.intro || "")}</textarea>
+      </div>
+
+      <div class="field-block">
+        <label>封面照片（coverImages，首頁大圖輪播用）</label>
+        ${renderPhotoList("coverImages", item.coverImages)}
+      </div>
+
+      <div class="field-block">
+        <label>基地座標（coordinates，選填——有填才會在「基地」章節顯示地圖）</label>
+        <div class="four-col">
+          <input type="text" id="f_coord_lat" placeholder="緯度 lat" value="${item.coordinates ? esc(item.coordinates.lat) : ""}">
+          <input type="text" id="f_coord_lng" placeholder="經度 lng" value="${item.coordinates ? esc(item.coordinates.lng) : ""}">
+          <input type="text" id="f_coord_address" placeholder="地址（選填）" value="${item.coordinates ? esc(item.coordinates.address || "") : ""}">
+          <input type="text" id="f_coord_zoom" placeholder="地圖縮放（選填，例如 16）" value="${item.coordinates && item.coordinates.zoom != null ? esc(item.coordinates.zoom) : ""}">
+        </div>
+      </div>
+
+      ${CHAPTER_DEFS.map((def, i) => {
+        const chapter = item.chapters[i];
+        return `
+        <div class="chapter-section" data-chapter="${def.key}">
+          <div class="chapter-section-head">
+            <span class="num">${i + 1}</span>
+            <h3>${esc(def.label)}</h3>
+            <span class="key">key: ${def.key}</span>
+          </div>
+
+          <div class="field-block">
+            <label>章節標題</label>
+            <input type="text" data-cfield="title" value="${esc(chapter.title || def.label)}">
+          </div>
+
+          <div class="field-block">
+            <label>內文（用空白行分段，「建築設計／模矩／構造／施工」四章會自動排版圖文）</label>
+            <textarea class="tall" data-cfield="text">${esc(chapter.text || "")}</textarea>
+          </div>
+
+          ${def.kind !== "site" ? `
+          <div class="field-block">
+            <div class="label">主要照片</div>
+            ${def.kind === "narrative" ? `<div class="photo-cap-hint ${(chapter.images || []).length > cap(chapter) ? "over" : ""}">
+              目前文字份量最多支援顯示 ${cap(chapter)} 張（超過的會自動只在「More in Detail」顯示）。
+            </div>` : ""}
+            ${renderPhotoList(`chapterImages_${def.key}`, chapter.images)}
+          </div>
+          ` : `<div class="field-hint">「基地」章節不使用照片，畫面上用上面填的座標顯示地圖。</div>`}
+
+          ${def.kind === "narrative" ? `
+          <div class="field-block">
+            <div class="label">More in Detail 收合圖庫（moreImages）</div>
+            ${renderPhotoList(`chapterMore_${def.key}`, chapter.moreImages)}
+          </div>
+          ` : ""}
+
+          ${def.kind === "assembly" ? `
+          <div class="two-col">
+            <div class="field-block">
+              <label>PDF 網址（pdf.url）</label>
+              <input type="text" data-cfield="pdfUrl" value="${esc(chapter.pdf ? chapter.pdf.url : "")}">
+            </div>
+            <div class="field-block">
+              <label>PDF 說明文字（pdf.label）</label>
+              <input type="text" data-cfield="pdfLabel" value="${esc(chapter.pdf ? chapter.pdf.label : "")}">
+            </div>
+          </div>
+          ` : ""}
+
+          <div class="field-block">
+            <label>影片路徑（選填）</label>
+            <input type="text" data-cfield="video" value="${esc(chapter.video || "")}">
+          </div>
+        </div>
+      `;}).join("")}
+
+      <div class="save-bar">
+        <span class="save-status" id="saveStatus"></span>
+        <button type="button" class="btn primary" id="saveBtn">儲存並發布（寫回 GitHub）</button>
+      </div>
+    </div>
+  `;
+
+  document.getElementById("logoutBtn").addEventListener("click", logout);
+  document.getElementById("backBtn").addEventListener("click", () => { state.editingCase = null; render(); });
+  document.getElementById("deleteBtn").addEventListener("click", () => deleteCaseEditor(ed));
+  document.getElementById("saveBtn").addEventListener("click", () => saveCaseEditor(ed));
+
+  wirePhotoList("coverImages", () => ed.item.coverImages, (next) => { ed.item.coverImages = next; }, ed.slug);
+  CHAPTER_DEFS.forEach((def, i) => {
+    const chapter = ed.item.chapters[i];
+    wirePhotoList(`chapterImages_${def.key}`, () => chapter.images, (next) => { chapter.images = next; }, ed.slug);
+    if(def.kind === "narrative"){
+      wirePhotoList(`chapterMore_${def.key}`, () => chapter.moreImages, (next) => { chapter.moreImages = next; }, ed.slug);
+    }
+  });
+}
+
+/* 幫一個 photo-list 容器接上：文字欄位即時同步回資料、移除按鈕、上傳按鈕。
+   getList/setList 讓呼叫端決定這份清單實際存在資料的哪個位置（coverImages
+   或某一章的 images／moreImages），這裡不用知道細節，只管清單本身怎麼編輯。*/
+function wirePhotoList(containerId, getList, setList, slug){
+  const container = document.getElementById(containerId);
+  if(!container) return;
+  container.addEventListener("input", (e) => {
+    const row = e.target.closest(".photo-row");
+    if(!row) return;
+    const idx = Number(row.dataset.idx);
+    const field = e.target.dataset.field;
+    if(!field) return;
+    const list = getList().slice();
+    list[idx] = Object.assign({}, list[idx], { [field]: e.target.value });
+    setList(list);
+  });
+  container.addEventListener("click", (e) => {
+    const btn = e.target.closest("[data-remove]");
+    if(!btn) return;
+    const idx = Number(btn.dataset.remove);
+    const list = getList().slice();
+    list.splice(idx, 1);
+    setList(list);
+    render();
+  });
+  const uploadBtn = document.querySelector(`[data-upload-target="${containerId}"]`);
+  const uploadInput = document.querySelector(`[data-upload-input="${containerId}"]`);
+  if(uploadBtn && uploadInput){
+    uploadBtn.addEventListener("click", () => uploadInput.click());
+    uploadInput.addEventListener("change", async () => {
+      const files = Array.from(uploadInput.files || []);
+      if(files.length === 0) return;
+      try{
+        setLoading(true, `上傳中… 0 / ${files.length}`);
+        const list = getList().slice();
+        for(let i = 0; i < files.length; i++){
+          setLoading(true, `上傳中… ${i + 1} / ${files.length}`);
+          const src = await uploadAsset(files[i], slug);
+          list.push({ id: `${slug}-${uid()}`, tone: "bg-neutral-300", caption: "", src });
+        }
+        setList(list);
+        render();
+        toast(`已上傳 ${files.length} 個檔案`);
+      }catch(err){
+        toast(err.message || "上傳失敗", true);
+      }finally{
+        setLoading(false);
+      }
+    });
+  }
+}
+
+function collectEditorFields(ed){
+  const item = ed.item;
+  item.name = document.getElementById("f_name").value.trim();
+  item.slug = document.getElementById("f_slug").value.trim();
+  item.shortLabel = document.getElementById("f_shortLabel").value.trim();
+  item.location = document.getElementById("f_location").value.trim();
+  item.year = document.getElementById("f_year").value.trim();
+  item.type = document.getElementById("f_type").value.trim();
+  item.accent = document.getElementById("f_accent").value.trim();
+  item.titleAlign = document.getElementById("f_titleAlign").value;
+  item.published = document.getElementById("f_published").checked;
+  item.intro = document.getElementById("f_intro").value;
+
+  const lat = document.getElementById("f_coord_lat").value.trim();
+  const lng = document.getElementById("f_coord_lng").value.trim();
+  const address = document.getElementById("f_coord_address").value.trim();
+  const zoom = document.getElementById("f_coord_zoom").value.trim();
+  if(lat && lng){
+    item.coordinates = { lat: Number(lat), lng: Number(lng) };
+    if(address) item.coordinates.address = address;
+    if(zoom) item.coordinates.zoom = Number(zoom);
+  }else{
+    delete item.coordinates;
+  }
+
+  document.querySelectorAll(".chapter-section").forEach((section, i) => {
+    const chapter = item.chapters[i];
+    section.querySelectorAll("[data-cfield]").forEach(el => {
+      const f = el.dataset.cfield;
+      if(f === "pdfUrl"){
+        chapter.pdf = Object.assign({}, chapter.pdf, { url: el.value.trim() });
+      }else if(f === "pdfLabel"){
+        chapter.pdf = Object.assign({}, chapter.pdf, { label: el.value.trim() });
+      }else if(f === "video"){
+        if(el.value.trim()) chapter.video = el.value.trim(); else delete chapter.video;
+      }else{
+        chapter[f] = el.value;
+      }
+    });
+    if(chapter.pdf && !chapter.pdf.url && !chapter.pdf.label) delete chapter.pdf;
+    // 沒有照片就不留空陣列以外的雜訊，moreImages 全空就整個拿掉這個欄位
+    if(!chapter.moreImages || chapter.moreImages.length === 0) delete chapter.moreImages;
+  });
+}
+
+async function saveCaseEditor(ed){
+  collectEditorFields(ed);
+  const statusEl = document.getElementById("saveStatus");
+  try{
+    setLoading(true, "儲存中…");
+    statusEl.classList.remove("err");
+    statusEl.textContent = "儲存中…";
+    const path = `content/projects/${ed.slug}.json`;
+    const content = utf8ToBase64(JSON.stringify(ed.item, null, 2) + "\n");
+    const result = await ghPutFile(path, content, `Update case ${ed.slug} via bamboo admin`, ed.sha);
+    ed.sha = result.content ? result.content.sha : ed.sha;
+    statusEl.textContent = "已儲存 " + new Date().toLocaleTimeString("zh-TW");
+    toast("已儲存並發布，網站會在下一次部署後更新");
+    await loadCaseList();
+  }catch(err){
+    statusEl.classList.add("err");
+    statusEl.textContent = "儲存失敗";
+    toast(err.message || "儲存失敗", true);
+  }finally{
+    setLoading(false);
+  }
+}
+
+async function deleteCaseEditor(ed){
+  if(!confirm(`確定要刪除案例「${ed.item.name || ed.slug}」嗎？這個動作會直接從 GitHub 上移除這個案例的資料檔，不能復原。`)) return;
+  try{
+    setLoading(true, "刪除中…");
+    await ghDeleteFile(`content/projects/${ed.slug}.json`, `Delete case ${ed.slug} via bamboo admin`, ed.sha);
+    toast("已刪除");
+    state.editingCase = null;
+    await loadCaseList();
+    render();
+  }catch(err){
+    toast(err.message || "刪除失敗", true);
+  }finally{
+    setLoading(false);
+  }
+}
+
+/* ============================================================
+   啟動
+   ============================================================ */
+(async function init(){
+  const { data } = await sb.auth.getSession();
+  authSession = data.session;
+  if(authSession && !AUTH_LINK_TYPE){
+    state.user = { email: authSession.user.email };
+    setLoading(true, "載入案例清單中…");
+    try{ await loadCaseList(); }catch(e){ toast(e.message || "載入案例清單失敗", true); }
+    setLoading(false);
+  }
+  render();
+})();
+</script>
+</body>
+</html>

@@ -83,7 +83,11 @@ export type ContentBlock =
   | { type: "photo-solo"; photo: PhotoWithRatio }
   | { type: "photo-row"; row: PhotoRow };
 
-// 把一組已知比例的照片切成一組一組——照抄 render.js 的 makePhotoChunks()。
+// 把一組已知比例的照片切成一組一組——照抄 render.js 的 makePhotoChunks()，但（已修正）
+// 每組最多 2 張，不會出現「三張並排」的模式：三張混合方向並排時，欄寬權重比例（7:7:4 這類）
+// 換算成實際版面反而常常留下一大塊不成比例的空白（曾經真的長這樣），兩張並排的欄寬比例
+// 差距小很多，不會有這個問題，直接把「最多幾張」的上限從 3 壓到 2，從源頭排除這個情況，
+// 不用另外修飾三張並排時的樣式。
 function makePhotoChunks(photos: PhotoWithRatio[]): PhotoWithRatio[][] {
   const chunks: PhotoWithRatio[][] = [];
   let i = 0;
@@ -94,7 +98,7 @@ function makePhotoChunks(photos: PhotoWithRatio[]): PhotoWithRatio[][] {
       i += 1;
     } else if (o === "portrait") {
       let j = i + 1;
-      while (j < photos.length && orientationOf(photos[j].ratio) === "portrait" && j - i < 3) j++;
+      while (j < photos.length && orientationOf(photos[j].ratio) === "portrait" && j - i < 2) j++;
       chunks.push(photos.slice(i, j));
       i = j;
     } else if (
@@ -110,16 +114,22 @@ function makePhotoChunks(photos: PhotoWithRatio[]): PhotoWithRatio[][] {
     }
   }
 
-  // 收尾：落單的一張併進旁邊那一組，不會出現「一張圖旁邊留白」的狀況（全景照除外，
-  // 那是刻意獨立的單張整排）。
+  // 收尾：落單的一張併進旁邊那一組——只在鄰居也剛好是「單張」時才併（併完剛好兩張），
+  // 不會併出三張以上的組。全景照除外（那是刻意獨立的單張整排，不參與合併）。鄰居已經是
+  // 兩張的話就不併了，讓這張落單的照片自己獨立成一整排（見 chunkToRow：單張一律當
+  // 「單張大圖」處理，不會有「圖片旁邊留白」的問題，跟原本擔心的狀況不衝突）。
   for (let k = 0; k < chunks.length; k++) {
     if (chunks[k].length !== 1) continue;
     if (orientationOf(chunks[k][0].ratio) === "panorama") continue;
-    if (k + 1 < chunks.length && chunks[k + 1].length < 3) {
+    const nextIsSingle =
+      k + 1 < chunks.length && chunks[k + 1].length === 1 && orientationOf(chunks[k + 1][0].ratio) !== "panorama";
+    const prevIsSingle =
+      k - 1 >= 0 && chunks[k - 1].length === 1 && orientationOf(chunks[k - 1][0].ratio) !== "panorama";
+    if (nextIsSingle) {
       chunks[k + 1] = chunks[k].concat(chunks[k + 1]);
       chunks.splice(k, 1);
       k--;
-    } else if (k - 1 >= 0 && chunks[k - 1].length < 3) {
+    } else if (prevIsSingle) {
       chunks[k - 1] = chunks[k - 1].concat(chunks[k]);
       chunks.splice(k, 1);
       k--;

@@ -276,9 +276,12 @@ function ReadMoreGallery({ images, accent }: { images: Chapter["moreImages"]; ac
       </button>
 
       {open && (
+        // （已修正）縮圖改小——原本手機 2 欄／桌機 3 欄，圖佔的份量太接近主要內文的照片，
+        // 跟「輔助素材、次要瀏覽」的定位不符；改成手機 3 欄／桌機 5 欄，縮圖更小、一次能看到
+        // 更多張，份量上更明顯跟上面的主要論述圖片區隔開來。
         <div className="mt-5 flex flex-wrap gap-3 sm:mt-6 sm:gap-4">
           {images.map((image) => (
-            <div key={image.id} className="w-[calc(50%-6px)] sm:w-[calc(33.333%-11px)]">
+            <div key={image.id} className="w-[calc(33.333%-8px)] sm:w-[calc(20%-13px)]">
               <ImagePlaceholder image={image} aspect="aspect-[4/3]" />
               {image.caption && (
                 <p className={`mt-2 text-[10px] leading-relaxed sm:text-[11px] ${TEXT_BODY}`}>{image.caption}</p>

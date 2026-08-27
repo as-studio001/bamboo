@@ -91,10 +91,19 @@ export const projects: Project[] = [
       {
         key: "design",
         title: "建築設計",
-        text: "〔佔位文字，抓版面用〕常民竹小屋的設計出發點，是重新思考「常民」與「構造」之間的距離——不是為了展示工法而蓋，而是回到最基本的生活尺度，思考人如何在竹構造的空間裡靜下來、待下來、慢慢住進去。整體配置刻意保留低矮、貼近地面的姿態，讓建築物退居成背景，把使用者的日常動作留在畫面中央，也呼應基地周邊聚落原有的生活紋理與尺度感，避免用一棟過於張揚的量體打斷既有的地景關係。\n\n空間的開放程度、遮蔽與穿透的比例，都在設計初期反覆推敲，希望呈現一種介於室內與戶外之間、隨天氣與時間而變化的曖昧邊界。屋簷深淺、開口大小、動線轉折，每一個決定背後都對應著一段關於「怎麼住」的具體想像，而不只是造型上的考量，也希望觀者在走進這個空間時，能感受到設計者對日常生活細節的體貼。這段文字之後會替換成正式的策展論述。",
+        text: "〔佔位文字，抓版面用〕常民竹小屋回應的是「常民」與「構造」之間的距離——不是為了展示工法而蓋，而是回到最基本的生活尺度，思考人如何在竹構造的空間裡靜下來、待下來、慢慢住進去。整體配置刻意保留低矮、貼近地面的姿態，讓建築物退居成背景，把使用者的日常動作留在畫面中央，也呼應基地周邊聚落原有的生活紋理與尺度感，避免用一棟過於張揚的量體打斷既有的地景關係。\n\n空間的開放程度、遮蔽與穿透的比例，都在設計初期反覆推敲，希望呈現一種介於室內與戶外之間、隨天氣與時間而變化的曖昧邊界。屋簷深淺、開口大小、動線轉折，每一個決定背後都對應著一段關於「怎麼住」的具體想像，而不只是造型上的考量，也希望觀者走進這個空間時能感受到細節的體貼。\n\n這裡先以現場影像鋪陳整體氛圍，設計圖說與正式論述文字之後會陸續補上，讓讀者可以從照片本身感受空間的尺度與光影變化。",
+        // 這批照片先重複借用工地現場的 10 張真實照片＋幾張網路免版權風景照湊出「5～10 張」的
+        // 展示份量（見下方各章節同樣的作法），純粹是為了讓自動排版演算法（lib/photoLayout.ts）
+        // 有足夠多樣的形狀可以排——之後有正式素材要替換時，直接改這裡的 images 陣列即可，
+        // 排版會自動跟著新照片的形狀重算，不用動排版邏輯本身。
         images: [
           { id: "a-design-1", tone: "bg-neutral-300", caption: "〔照片說明待補〕", src: "/images/project-one/1786700848131-_______2026-08-14_173851.png" },
           { id: "a-design-2", tone: "bg-neutral-400", caption: "〔照片說明待補〕", src: "/images/project-one/1786700851881-_______2026-08-14_173939.png" },
+          { id: "a-design-3", tone: "bg-neutral-300", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/portrait-1.jpg" },
+          { id: "a-design-4", tone: "bg-neutral-400", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/portrait-2.jpg" },
+          { id: "a-design-5", tone: "bg-neutral-300", caption: "〔照片說明待補〕", src: "/images/project-one/1786701211986-_______2026-08-14_175147.png" },
+          { id: "a-design-6", tone: "bg-neutral-400", caption: "〔照片說明待補〕", src: "/images/project-one/1786700856939-_______2026-08-14_174017.png" },
+          { id: "a-design-7", tone: "bg-neutral-300", caption: "〔照片說明待補〕", src: "/images/project-one/1786701229749-_______2026-08-14_175009.png" },
         ],
         moreImages: [
           { id: "a-design-more-1", tone: "bg-neutral-300", caption: "基地紋理分析圖" },
@@ -105,10 +114,14 @@ export const projects: Project[] = [
       {
         key: "module",
         title: "模矩",
-        text: "〔佔位文字，抓版面用〕模矩系統是整個構造邏輯的起點：以單根竹材的常見長度與直徑為基準，反推出一套可重複、可搭接的單元尺寸，讓每一個構件都能在不同的位置上互換使用，降低現場裁切與浪費，也讓非專業的參與者更容易理解整個系統的組成方式。這套模矩不只是結構計算的工具，也決定了立面的節奏與比例，形成一種可被閱讀的秩序感。\n\n從平面到剖面，模矩的網格貫穿整個設計，也成為施工階段溝通的共同語言——工班不需要逐一讀圖，只要理解模矩邏輯，就能判斷構件該落在哪裡，大幅降低溝通成本與現場出錯的機率。這種「先定規則、再長出形狀」的做法，是竹構造回應手工與效率之間拉扯的具體嘗試，之後會補上實際的模矩尺寸表與詳細圖說，讓論述更精確、更可被驗證。",
+        text: "〔佔位文字，抓版面用〕模矩系統是整個構造邏輯的起點：以單根竹材的常見長度與直徑為基準，反推出一套可重複、可搭接的單元尺寸，讓每一個構件都能在不同的位置上互換使用，降低現場裁切與浪費，也讓非專業的參與者更容易理解整個系統的組成方式，這套模矩同時也決定了立面的節奏與比例。\n\n從平面到剖面，模矩的網格貫穿整個設計，也成為施工階段溝通的共同語言——工班不需要逐一讀圖，只要理解模矩邏輯，就能判斷構件該落在哪裡，大幅降低溝通成本與現場出錯的機率，這種「先定規則、再長出形狀」的做法，是竹構造回應手工與效率之間拉扯的具體嘗試。\n\n這批照片先呈現模矩單元在不同位置重複出現的樣子，實際尺寸表與詳細圖說之後會補上，讓論述更精確、更可被驗證。",
         images: [
           { id: "a-module-1", tone: "bg-neutral-300", caption: "〔照片說明待補〕", src: "/images/project-one/1786700856939-_______2026-08-14_174017.png" },
           { id: "a-module-2", tone: "bg-neutral-400", caption: "〔照片說明待補〕", src: "/images/project-one/1786701209422-_______2026-08-14_175239.png" },
+          { id: "a-module-3", tone: "bg-neutral-300", caption: "〔照片說明待補〕", src: "/images/project-one/1786701820696-_______2026-08-14_180258.png" },
+          { id: "a-module-4", tone: "bg-neutral-400", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/portrait-3.jpg" },
+          { id: "a-module-5", tone: "bg-neutral-300", caption: "〔照片說明待補〕", src: "/images/project-one/1786700848131-_______2026-08-14_173851.png" },
+          { id: "a-module-6", tone: "bg-neutral-400", caption: "〔照片說明待補〕", src: "/images/project-one/1786700856939-_______2026-08-14_174017.png" },
         ],
         moreImages: [
           { id: "a-module-more-1", tone: "bg-neutral-300", caption: "模矩尺寸推演草圖" },
@@ -119,10 +132,16 @@ export const projects: Project[] = [
       {
         key: "structure",
         title: "構造",
-        text: "〔佔位文字，抓版面用〕構造系統採用竹材本身的彈性與韌性作為設計出發點，主結構以桁架式的組合方式，將荷重層層分散到地面基礎，減少對單一構件強度的依賴，也讓整體結構在面對不規則外力時，能有一定程度的彈性緩衝而不至於瞬間破壞。接點的處理是整個構造裡最關鍵的一環，既要傳遞力量，也要保留竹材熱脹冷縮與含水率變化的空間，這也是竹構造與一般木構造、鋼構造在細部思考上最大的不同之處。\n\n為了兼顧結構安全與可拆解性，多數接點採用綁紮與栓接混合的方式，而非單一膠合固定，讓未來的維護、替換單一構件成為可能，也呼應「常民構造」該有的可修復性格——壞掉的地方可以局部處理，不用整棟拆除重建。整個結構系統的設計過程，也反覆與在地匠師討論、調整，融入他們長年累積的實作經驗。這部分之後會補上完整的結構計算報告與細部接點圖說，讓論述更精確、更貼近實際施作。",
+        text: "〔佔位文字，抓版面用〕構造系統採用竹材本身的彈性與韌性作為設計出發點，主結構以桁架式的組合方式，將荷重層層分散到地面基礎，減少對單一構件強度的依賴，也讓整體結構在面對不規則外力時，能有一定程度的彈性緩衝而不至於瞬間破壞，這也是竹構造回應環境不確定性的方式之一。\n\n接點的處理是整個構造裡最關鍵的一環，既要傳遞力量，也要保留竹材熱脹冷縮與含水率變化的空間，多數接點採用綁紮與栓接混合的方式，而非單一膠合固定，讓未來的維護、替換單一構件成為可能，也呼應「常民構造」該有的可修復性格——壞掉的地方可以局部處理，不用整棟拆除重建。\n\n這裡先用現場照片呈現桁架與接點的實際樣貌，完整結構計算報告與細部接點圖說之後會補齊，讓論述更貼近實際施作。",
         images: [
           { id: "a-structure-1", tone: "bg-neutral-300", caption: "〔照片說明待補〕", src: "/images/project-one/1786701211986-_______2026-08-14_175147.png" },
           { id: "a-structure-2", tone: "bg-neutral-400", caption: "〔照片說明待補〕", src: "/images/project-one/1786701216631-_______2026-08-14_175056.png" },
+          { id: "a-structure-3", tone: "bg-neutral-300", caption: "〔照片說明待補〕", src: "/images/project-one/1786701229749-_______2026-08-14_175009.png" },
+          { id: "a-structure-4", tone: "bg-neutral-400", caption: "〔照片說明待補〕", src: "/images/project-one/1786701824261-_______2026-08-14_180200.png" },
+          { id: "a-structure-5", tone: "bg-neutral-300", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/portrait-4.jpg" },
+          { id: "a-structure-6", tone: "bg-neutral-400", caption: "〔照片說明待補〕", src: "/images/project-one/cover-01.png" },
+          { id: "a-structure-7", tone: "bg-neutral-300", caption: "〔照片說明待補〕", src: "/images/project-one/1786701209422-_______2026-08-14_175239.png" },
+          { id: "a-structure-8", tone: "bg-neutral-400", caption: "〔照片說明待補〕", src: "/images/project-one/1786700851881-_______2026-08-14_173939.png" },
         ],
         moreImages: [
           { id: "a-structure-more-1", tone: "bg-neutral-300", caption: "桁架系統受力分析圖" },
@@ -133,10 +152,14 @@ export const projects: Project[] = [
       {
         key: "construction",
         title: "施工",
-        text: "〔佔位文字，抓版面用〕施工過程刻意保留了手工參與的比例，從竹材的選料、防腐處理，到現場組裝，都邀請在地工班與志工共同完成，而不是全部交給機具與預製構件。這個決定讓整體工期拉長，卻也讓構造本身多了一層「這裡的人親手蓋起來」的重量，也讓參與者對這個空間產生更深的認同與情感連結，這種參與感也是「常民構造」想要傳遞的核心精神之一。\n\n現場搭建分成基礎放樣、主結構立起、次結構填充、屋面收頭四個階段，每個階段都留下影像與圖說紀錄，作為未來其他基地複製這套工法的參考。施工過程中遇到的天氣延誤、材料調度、人力調配等實際狀況，之後也會整理成完整的施工紀錄放進這個章節，讓經驗可以被傳承而不只是留在少數人的記憶裡，也讓下一次的搭建能少走一些彎路。",
+        text: "〔佔位文字，抓版面用〕施工過程刻意保留了手工參與的比例，從竹材的選料、防腐處理，到現場組裝，都邀請在地工班與志工共同完成，而不是全部交給機具與預製構件。這個決定讓整體工期拉長，卻也讓構造本身多了一層「這裡的人親手蓋起來」的重量，也讓參與者對這個空間產生更深的認同與情感連結，這種參與感也是「常民構造」想傳遞的核心精神之一。\n\n現場搭建分成基礎放樣、主結構立起、次結構填充、屋面收頭四個階段，每個階段都留下影像與圖說紀錄，作為未來其他基地複製這套工法的參考。施工過程中遇到的天氣延誤、材料調度、人力調配等實際狀況，之後也會整理成完整的施工紀錄放進這個章節，讓經驗可以被傳承。\n\n這批照片先記錄搭建現場的幾個關鍵時刻，讓經驗可以被傳承，而不只是留在少數人的記憶裡。",
         images: [
           { id: "a-construction-1", tone: "bg-neutral-300", caption: "〔照片說明待補〕", src: "/images/project-one/1786701229749-_______2026-08-14_175009.png" },
           { id: "a-construction-2", tone: "bg-neutral-400", caption: "〔照片說明待補〕", src: "/images/project-one/1786701820696-_______2026-08-14_180258.png" },
+          { id: "a-construction-3", tone: "bg-neutral-300", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/portrait-5.jpg" },
+          { id: "a-construction-4", tone: "bg-neutral-400", caption: "〔照片說明待補〕", src: "/images/project-one/1786700848131-_______2026-08-14_173851.png" },
+          { id: "a-construction-5", tone: "bg-neutral-300", caption: "〔照片說明待補〕", src: "/images/project-one/1786701824261-_______2026-08-14_180200.png" },
+          { id: "a-construction-6", tone: "bg-neutral-400", caption: "〔照片說明待補〕", src: "/images/project-one/1786701229749-_______2026-08-14_175009.png" },
         ],
         moreImages: [
           { id: "a-construction-more-1", tone: "bg-neutral-300", caption: "施工放樣過程紀錄" },
@@ -179,10 +202,18 @@ export const projects: Project[] = [
       {
         key: "design",
         title: "建築設計",
-        text: "〔佔位文字，抓版面用〕一籌的設計命題與常民竹小屋不同，它更像是一次對「臨時性」構造的重新詮釋——不追求恆久留存，而是思考一個構造物如何在短暫的使用週期裡，依然給人足夠的空間品質與情感重量。量體刻意輕盈、通透，讓光線與周邊環境自由穿越，也讓觀者不會把它誤認成一棟「正式的建築」，而是更接近一個暫時搭起的場景。\n\n整體造型語彙走向更抽象、更幾何的方向，減少裝飾性的細節，讓竹材本身的紋理與結構邏輯成為唯一的表情。這種克制的態度，也是一籌與常民竹小屋在同一個展覽裡相互對話、彼此襯托的方式——一個貼地生根、一個輕盈暫留，兩種對「住」的想像並置出現，讓觀眾在兩件作品之間來回走動時，能感受到明顯的語氣落差。正式論述文字之後會補上。",
+        text: "〔佔位文字，抓版面用〕一籌的設計命題與常民竹小屋不同，它更像是一次對「臨時性」構造的重新詮釋——不追求恆久留存，而是思考一個構造物如何在短暫的使用週期裡，依然給人足夠的空間品質與情感重量。量體刻意輕盈、通透，讓光線與周邊環境自由穿越，也讓觀者不會把它誤認成一棟「正式的建築」，而是更接近一個暫時搭起的場景。\n\n整體造型語彙走向更抽象、更幾何的方向，減少裝飾性的細節，讓竹材本身的紋理與結構邏輯成為唯一的表情。這種克制的態度，也是一籌與常民竹小屋在同一個展覽裡相互對話、彼此襯托的方式——一個貼地生根、一個輕盈暫留，兩種對「住」的想像並置出現，讓觀眾來回走動時能感受到語氣落差。\n\n這裡先用現場影像鋪陳整體氛圍，正式論述文字與圖說之後會補上，讓讀者先從畫面感受空間的輕盈感。",
+        // project-two 目前只有一張真實照片（cover-01.png），其餘先用網路免版權風景照湊出
+        // 「5～10 張」的展示份量——跟 project-one 一樣，純粹是為了讓排版演算法有形狀可以排，
+        // 之後補上正式空拍／現場照片時直接替換這裡的 src 即可。
         images: [
-          { id: "b-design-1", tone: "bg-neutral-300", caption: "建築設計 01" },
-          { id: "b-design-2", tone: "bg-neutral-400", caption: "建築設計 02" },
+          { id: "b-design-1", tone: "bg-neutral-300", caption: "〔照片說明待補〕", src: "/images/project-two/cover-01.png" },
+          { id: "b-design-2", tone: "bg-neutral-400", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/landscape-1.jpg" },
+          { id: "b-design-3", tone: "bg-neutral-300", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/landscape-2.jpg" },
+          { id: "b-design-4", tone: "bg-neutral-400", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/portrait-1.jpg" },
+          { id: "b-design-5", tone: "bg-neutral-300", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/portrait-2.jpg" },
+          { id: "b-design-6", tone: "bg-neutral-400", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/square-1.jpg" },
+          { id: "b-design-7", tone: "bg-neutral-300", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/landscape-3.jpg" },
         ],
         moreImages: [
           { id: "b-design-more-1", tone: "bg-neutral-300", caption: "基地紋理分析圖" },
@@ -193,10 +224,14 @@ export const projects: Project[] = [
       {
         key: "module",
         title: "模矩",
-        text: "〔佔位文字，抓版面用〕一籌的模矩系統採用比常民竹小屋更小、更密的單元尺寸，讓構造在視覺上呈現細膩的紋理感，也更貼近臨時構造需要快速搭拆的操作邏輯。每個模矩單元的重量與尺寸都控制在單人可搬運的範圍內，讓搭建過程不需要依賴大型機具，也讓非專業人員能獨立完成部分組裝工作。\n\n小尺度模矩帶來的代價是接點數量大幅增加，因此設計團隊另外發展了一套快拆式的連接構件，讓組裝與拆卸都能在短時間內完成，同時維持結構的穩定性，也讓一籌具備在不同場地間反覆巡迴展出的可能性。這套模矩與快拆邏輯之間的取捨，是整個設計過程反覆測試最多次的環節，前後修改了好幾個版本才定案。這套快拆系統的細部圖說與構件清單，之後會整理進這個章節。",
+        text: "〔佔位文字，抓版面用〕一籌的模矩系統採用比常民竹小屋更小、更密的單元尺寸，讓構造在視覺上呈現細膩的紋理感，也更貼近臨時構造需要快速搭拆的操作邏輯。每個模矩單元的重量與尺寸都控制在單人可搬運的範圍內，讓搭建過程不需要依賴大型機具，也讓非專業人員能獨立完成部分組裝工作，降低參與的門檻。\n\n小尺度模矩帶來的代價是接點數量大幅增加，因此設計團隊另外發展了一套快拆式的連接構件，讓組裝與拆卸都能在短時間內完成，同時維持結構的穩定性，也讓一籌具備在不同場地間反覆巡迴展出的可能性，這套取捨是整個設計過程反覆測試最多次的環節，前後修改了好幾個版本才定案。\n\n這批照片先呈現模矩單元與快拆構件的實際樣貌，細部圖說與構件清單之後會整理進這個章節。",
         images: [
-          { id: "b-module-1", tone: "bg-neutral-300", caption: "模矩 01" },
-          { id: "b-module-2", tone: "bg-neutral-400", caption: "模矩 02" },
+          { id: "b-module-1", tone: "bg-neutral-300", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/pano-1.jpg" },
+          { id: "b-module-2", tone: "bg-neutral-400", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/portrait-3.jpg" },
+          { id: "b-module-3", tone: "bg-neutral-300", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/landscape-4.jpg" },
+          { id: "b-module-4", tone: "bg-neutral-400", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/square-2.jpg" },
+          { id: "b-module-5", tone: "bg-neutral-300", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/portrait-4.jpg" },
+          { id: "b-module-6", tone: "bg-neutral-400", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/landscape-5.jpg" },
         ],
         moreImages: [
           { id: "b-module-more-1", tone: "bg-neutral-300", caption: "模矩尺寸推演草圖" },
@@ -207,10 +242,16 @@ export const projects: Project[] = [
       {
         key: "structure",
         title: "構造",
-        text: "〔佔位文字，抓版面用〕一籌的結構邏輯偏向輕構造（light structure）的思路，用大量小斷面的竹材互相支撐，取代少數幾根粗大構件的傳統做法，整體重量因此大幅降低，也讓構造本身帶有一種輕盈、幾乎懸浮的視覺效果，與常民竹小屋厚實穩重的量體形成對比，成為這次展覽裡兩種結構性格的直接對照。\n\n為了因應快速搭拆的需求，結構系統刻意避免使用不可逆的接合方式，改以夾具與繩索張力共同維持整體穩定，這也讓一籌得以在不同基地之間重複搭建、成為一個可移動的展示構造，而不是綁定在單一地點的固定建物。每一次搭建與拆卸，都會對構件進行檢查與微調，確保重複使用不影響結構安全，磨損較明顯的構件也會逐批汰換。結構驗算資料與接點測試紀錄，之後會補上。",
+        text: "〔佔位文字，抓版面用〕一籌的結構邏輯偏向輕構造（light structure）的思路，用大量小斷面的竹材互相支撐，取代少數幾根粗大構件的傳統做法，整體重量因此大幅降低，也讓構造本身帶有一種輕盈、幾乎懸浮的視覺效果，與常民竹小屋厚實穩重的量體形成對比，成為兩件作品結構性格的直接對照。\n\n為了因應快速搭拆的需求，結構系統刻意避免使用不可逆的接合方式，改以夾具與繩索張力共同維持整體穩定，這也讓一籌得以在不同基地之間重複搭建、成為一個可移動的展示構造，而不是綁定在單一地點的固定建物，每一次搭建與拆卸都會對構件進行檢查與微調，確保重複使用不影響安全。\n\n這裡先用現場照片呈現夾具與張力構件的樣貌，結構驗算資料與接點測試紀錄之後會補上。",
         images: [
-          { id: "b-structure-1", tone: "bg-neutral-300", caption: "構造 01" },
-          { id: "b-structure-2", tone: "bg-neutral-400", caption: "構造 02" },
+          { id: "b-structure-1", tone: "bg-neutral-300", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/landscape-6.jpg" },
+          { id: "b-structure-2", tone: "bg-neutral-400", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/portrait-5.jpg" },
+          { id: "b-structure-3", tone: "bg-neutral-300", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/pano-2.jpg" },
+          { id: "b-structure-4", tone: "bg-neutral-400", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/landscape-1.jpg" },
+          { id: "b-structure-5", tone: "bg-neutral-300", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/square-1.jpg" },
+          { id: "b-structure-6", tone: "bg-neutral-400", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/portrait-6.jpg" },
+          { id: "b-structure-7", tone: "bg-neutral-300", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/landscape-2.jpg" },
+          { id: "b-structure-8", tone: "bg-neutral-400", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/portrait-1.jpg" },
         ],
         moreImages: [
           { id: "b-structure-more-1", tone: "bg-neutral-300", caption: "輕構造受力分析圖" },
@@ -221,10 +262,14 @@ export const projects: Project[] = [
       {
         key: "construction",
         title: "施工",
-        text: "〔佔位文字，抓版面用〕一籌的施工強調「速度」與「可重複」——整個搭建過程被拆解成標準化的動作序列，讓不熟悉竹構造的人員也能在短時間的教學後加入搭建工作，這也是這件作品作為教育示範的重要部分，希望降低一般人對竹構造「很難、很專業」的距離感，讓更多人願意親手嘗試。\n\n現場施工分成基座定位、模組組裝、整體校正、收邊固定四個階段，每個階段都控制在明確的時間範圍內，作為未來巡迴展示時工班排程的參考依據。每次搭建也會邀請幾位第一次接觸的參與者，藉此驗證教學流程是否真的容易上手，並蒐集他們的操作回饋來修正教學步驟。詳細的施工時間紀錄、人力配置與現場照片，之後會補齊放入這個章節，作為其他巡迴場地籌備時的參考基準。",
+        text: "〔佔位文字，抓版面用〕一籌的施工強調「速度」與「可重複」——整個搭建過程被拆解成標準化的動作序列，讓不熟悉竹構造的人員也能在短時間的教學後加入搭建工作，這也是這件作品作為教育示範的重要部分，希望降低一般人對竹構造「很難、很專業」的距離感，讓更多人願意親手嘗試、參與這套系統的運作。\n\n現場施工分成基座定位、模組組裝、整體校正、收邊固定四個階段，每個階段都控制在明確的時間範圍內，作為未來巡迴展示時工班排程的參考依據，每次搭建也會邀請幾位第一次接觸的參與者，藉此驗證教學流程是否真的容易上手，並蒐集他們的操作回饋來修正教學步驟。\n\n這批照片先記錄幾次巡迴搭建的現場片段，詳細的施工時間紀錄之後會補齊放入這個章節。",
         images: [
-          { id: "b-construction-1", tone: "bg-neutral-300", caption: "施工 01" },
-          { id: "b-construction-2", tone: "bg-neutral-400", caption: "施工 02" },
+          { id: "b-construction-1", tone: "bg-neutral-300", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/portrait-2.jpg" },
+          { id: "b-construction-2", tone: "bg-neutral-400", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/landscape-3.jpg" },
+          { id: "b-construction-3", tone: "bg-neutral-300", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/pano-1.jpg" },
+          { id: "b-construction-4", tone: "bg-neutral-400", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/square-2.jpg" },
+          { id: "b-construction-5", tone: "bg-neutral-300", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/landscape-4.jpg" },
+          { id: "b-construction-6", tone: "bg-neutral-400", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/portrait-3.jpg" },
         ],
         moreImages: [
           { id: "b-construction-more-1", tone: "bg-neutral-300", caption: "動作序列教學拆解" },

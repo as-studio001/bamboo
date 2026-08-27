@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import type { Chapter, Project } from "@/lib/projects";
+import { autoLayoutBlocks } from "@/lib/autoLayout";
 import { ImagePlaceholder } from "@/components/ImagePlaceholder";
 import { ChapterMap, ChapterVideo } from "@/components/ChapterExtras";
 import { AssemblyBook } from "@/components/AssemblyBook";
@@ -54,10 +55,16 @@ export function ProjectDetail({
 
       <div className={`pt-10 pb-24 sm:pt-16 ${insetX}`}>
         <div className="min-w-0">
-          {design && <NarrativeSection chapter={design} accent={project.accent} />}
+          {design && <NarrativeSection chapter={design} accent={project.accent} seedPrefix={project.slug} />}
 
           {narrativeChapters.map((chapter) => (
-            <NarrativeSection key={chapter.key} chapter={chapter} title={chapter.title} accent={project.accent} />
+            <NarrativeSection
+              key={chapter.key}
+              chapter={chapter}
+              title={chapter.title}
+              accent={project.accent}
+              seedPrefix={project.slug}
+            />
           ))}
 
           {assembly && <AssemblySection project={project} chapter={assembly} accent={project.accent} />}
@@ -134,21 +141,42 @@ function ChapterEdgeNav({ chapters, accent }: { chapters: Chapter[]; accent: str
 
 // 「建築設計」「模矩」「構造」「施工」四個章節共用同一套圖文編輯模式——比照 Internal-Pages
 // （as-studio001/Internal-Pages，https://as-studio001.github.io/Internal-Pages/?case=laogu-fang）
-// 內文的排法：一段論述是「段落區塊」跟「圖片區塊」依作者排列順序交錯而成的一串序列
-// （chapter.blocks，見 projects.ts 的 ContentBlock 型別），不是固定「大圖—文—圖—文」模板。
-// 圖片區塊可以放 1 張（單張大圖）或 2 張（並排顯示，Internal-Pages 常見的手法）——每個
-// 章節自己決定要幾個區塊、圖片放單張還並排、放在哪兩段文字中間，各自獨立，不用套同一套
-// 版型。「建築設計」是開頭主要論述、緊接在 hero 之後，不重複顯示自己的標題；其餘三章有
-// title 就加一條分隔線＋小標，作為子章節之間的視覺斷點，圖文編輯邏輯完全相同。
-// 「組裝說明書」不用這套（見下面的 AssemblySection）——它的主要內容是可翻閱的 PDF，不是
-// 穿插圖片的論述文字。
+// 內文的排法：一段論述是「段落區塊」跟「圖片區塊」交錯而成的一串序列，不是固定「大圖—文—
+// 圖—文」模板。這串序列不是手動排的——資料只需要提供 text（純文字）＋images（一組照片），
+// autoLayoutBlocks（lib/autoLayout.ts）在渲染當下自動決定圖片要單張還是兩張並排、要插在
+// 哪兩段文字中間；用章節 key 當隨機種子，同一章節每次算出來的結果都一樣（不會重新整理就
+// 跳動），不同章節彼此節奏不同，做出「篇章差異、有呼吸感」的效果，不用逐章手動排版。
+// 「建築設計」是開頭主要論述、緊接在 hero 之後，不重複顯示自己的標題；其餘三章有 title 就
+// 加一條分隔線＋小標，作為子章節之間的視覺斷點，圖文編輯邏輯完全相同。「組裝說明書」不用
+// 這套（見下面的 AssemblySection）——它的主要內容是可翻閱的 PDF，不是穿插圖片的論述文字。
 //
 // 段落最後接一個「MORE IN DETAIL」可展開區塊（ReadMoreGallery），比照 Internal-Pages 同名
 // 區塊——放設計過程的手稿、模型、圖面這類輔助素材，預設收合、不會一開始就佔掉版面，讀者
-// 想深入才點開。這批圖是 chapter.moreImages，跟 blocks 裡的圖片分開存放，不會混進首頁的
-// 照片索引（PhotoStream.tsx 只讀 chapterPhotos(chapter)，只攤平 blocks 裡的 images 區塊）。
-function NarrativeSection({ chapter, title, accent }: { chapter: Chapter; title?: string; accent: string }) {
-  const blocks = chapter.blocks ?? [];
+// 想深入才點開。這批圖是 chapter.moreImages，跟 chapter.images 分開存放，不會混進自動排版
+// 或首頁的照片索引。
+//
+// seedPrefix（傳 project.slug）跟 chapter.key 一起組成隨機種子——只用 chapter.key 當種子的話，
+// 兩案「同名」章節（例如都是 design）會排出一模一樣的節奏，兩個案子的同一種章節看起來會像
+// 複製貼上；加上 project.slug 以後，兩案各自獨立算種子，同一種章節在不同案子裡也會有不同
+// 的圖文節奏，「篇章差異」不只發生在同一案的不同章節之間，也發生在兩案之間。
+function NarrativeSection({
+  chapter,
+  title,
+  accent,
+  seedPrefix,
+}: {
+  chapter: Chapter;
+  title?: string;
+  accent: string;
+  seedPrefix: string;
+}) {
+  const paragraphs = useMemo(() => (chapter.text ?? "").split("\n\n"), [chapter.text]);
+  const images = chapter.images ?? [];
+  const blocks = useMemo(
+    () => autoLayoutBlocks(`${seedPrefix}-${chapter.key}`, paragraphs, images),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [seedPrefix, chapter.key, chapter.text, chapter.images],
+  );
 
   return (
     <div

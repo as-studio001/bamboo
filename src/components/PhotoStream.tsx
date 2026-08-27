@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import type { Chapter, Project, ProjectImage } from "@/lib/projects";
+import { visibleImages } from "@/lib/photoLayout";
 import { usePdfCover } from "@/lib/usePdfCover";
 import { pdfCoverId } from "@/lib/pdfPages";
 import { TEXT_BODY, SHARED_ELEMENT_TRANSITION } from "@/components/theme";
@@ -54,28 +55,35 @@ export function PhotoStream({ project }: { project: Project }) {
   // 地圖自己的外層已經有 id={`${slug}-site`} 錨點，這裡再放一組同 id 的照片群組會撞成
   // 重複 id，導致標籤點擊時定位到錯的區塊。「組裝說明書」章節本身沒有 images（內容主體是
   // PDF），但只要有掛 chapter.pdf 就照樣算進來——用 PDF 封面當這一組唯一的「照片」。
+  //
+  // 這裡跟案例內頁（ProjectDetail.tsx 的 NarrativeSection）共用同一個 visibleImages()
+  // （見 lib/photoLayout.ts）——首頁索引跟內頁排版看到的是同一批「文字份量撐得起」的照片，
+  // 不會出現首頁列了一堆內頁其實沒顯示的照片、點進去卻找不到對應段落的狀況。
   const groups = project.chapters.filter(
-    (chapter) => chapter.key !== "site" && ((chapter.images?.length ?? 0) > 0 || chapter.pdf),
+    (chapter) => chapter.key !== "site" && (visibleImages(chapter.text, chapter.images).length > 0 || chapter.pdf),
   );
 
   return (
     <div className="flex flex-col">
-      {groups.map((chapter, groupIndex) => (
-        <div key={chapter.key} id={`${project.slug}-${chapter.key}`} className="scroll-mt-4">
-          {chapter.images && chapter.images.length > 0
-            ? chapter.images.map((photo, i) => (
-                <PhotoItem
-                  key={photo.id}
-                  project={project}
-                  photo={photo}
-                  isFirst={groupIndex === 0 && i === 0}
-                />
-              ))
-            : chapter.pdf && (
-                <AssemblyCoverItem project={project} chapter={chapter} isFirst={groupIndex === 0} />
-              )}
-        </div>
-      ))}
+      {groups.map((chapter, groupIndex) => {
+        const photos = visibleImages(chapter.text, chapter.images);
+        return (
+          <div key={chapter.key} id={`${project.slug}-${chapter.key}`} className="scroll-mt-4">
+            {photos.length > 0
+              ? photos.map((photo, i) => (
+                  <PhotoItem
+                    key={photo.id}
+                    project={project}
+                    photo={photo}
+                    isFirst={groupIndex === 0 && i === 0}
+                  />
+                ))
+              : chapter.pdf && (
+                  <AssemblyCoverItem project={project} chapter={chapter} isFirst={groupIndex === 0} />
+                )}
+          </div>
+        );
+      })}
     </div>
   );
 }

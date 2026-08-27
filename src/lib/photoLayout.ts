@@ -13,6 +13,23 @@ import type { ProjectImage } from "@/lib/projects";
 // 不加隨機抖動——原始碼裡「有機、不死板」的觀感全部來自圖片分組本身的不規則性，插入位置
 // 反而故意用最單純的等分公式，不需要另外調味。
 
+// 文字長度決定這個章節最多能顯示幾張照片——使用者訂的規則：前 200 字允許 3 張，
+// 之後每多滿 100 字再多 2 張（未滿 100 字的零頭不計）。目的是避免圖片量跟論述文字的份量
+// 脫節——論述還很單薄卻塞十幾張照片，讀起來會像圖庫而不是有內容支撐的策展論述。
+// 這是唯一的判斷依據（見下方 visibleImages()），不用另外在後台或上傳流程各自實作一次。
+export function maxPhotosForText(text: string | undefined): number {
+  const length = [...(text ?? "")].length;
+  if (length <= 200) return 3;
+  return 3 + 2 * Math.floor((length - 200) / 100);
+}
+
+// 章節實際「會顯示」的照片——chapter.images 允許存得比這個上限多（例如文字之後改長了，
+// 想讓多出來的照片自動顯示，不用重新上傳），但畫面上（案例內頁的自動排版、首頁雙欄的
+// 照片索引）一律只取前 maxPhotosForText() 張，兩處共用同一個函式，不用各自算一次上限。
+export function visibleImages(text: string | undefined, images: ProjectImage[] | undefined): ProjectImage[] {
+  return (images ?? []).slice(0, maxPhotosForText(text));
+}
+
 export type Orientation = "portrait" | "square" | "landscape" | "panorama";
 
 // 比例門檻跟權重數字都原封不動照抄 render.js 的 orientationOf()／ORIENTATION_WEIGHT。

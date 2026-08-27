@@ -18,7 +18,11 @@ export type Chapter = {
   // 「基地」也用這個欄位，但排版方式不同（AssemblySection 只取第一段，「基地」目前沒有
   // 用到文字內容）。
   images?: ProjectImage[]; // 這章要用的照片，順序就是自動排版時的插入優先順序；首頁雙欄的
-  // 照片索引（PhotoStream.tsx）也直接讀這個欄位。
+  // 照片索引（PhotoStream.tsx）也直接讀這個欄位。實際會顯示幾張不是看陣列長度，是看
+  // chapter.text 的字數（見 lib/photoLayout.ts 的 maxPhotosForText／visibleImages）——
+  // 文字太少配太多圖，讀起來會像圖庫而不是有內容支撐的論述，所以這裡允許存得比上限多
+  // （之後文字寫長了，多出來的照片會自動開始顯示，不用重新上傳），畫面上一律自動裁到
+  // 文字份量撐得起的張數。
   moreImages?: ProjectImage[]; // 「MORE IN DETAIL」可展開的設計過程圖庫（手稿／模型／圖面），
   // 只有「建築設計／模矩／構造／施工」會用到（見 ProjectDetail.tsx 的 ReadMoreGallery）。
   // 跟 images 分開存放——這批圖只在內頁展開後才看得到，不算進首頁雙欄的照片索引。

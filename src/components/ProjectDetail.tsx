@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import type { Chapter, Project } from "@/lib/projects";
-import { layoutChapter, createRatioState, type RatioState } from "@/lib/photoLayout";
+import { layoutChapter, createRatioState, visibleImages, type RatioState } from "@/lib/photoLayout";
 import { usePhotosWithRatio } from "@/lib/usePhotosWithRatio";
 import { ImagePlaceholder } from "@/components/ImagePlaceholder";
 import { ChapterMap, ChapterVideo } from "@/components/ChapterExtras";
@@ -173,7 +173,10 @@ function NarrativeSection({
   ratioState: RatioState;
 }) {
   const paragraphs = useMemo(() => (chapter.text ?? "").split("\n\n"), [chapter.text]);
-  const photosWithRatio = usePhotosWithRatio(chapter.images ?? []);
+  // 這章最多顯示幾張照片，由文字長度決定（見 photoLayout.ts 的 maxPhotosForText）——
+  // chapter.images 可以存得比上限多，這裡只取「這篇文字份量撐得起」的前面幾張。
+  const shownImages = useMemo(() => visibleImages(chapter.text, chapter.images), [chapter.text, chapter.images]);
+  const photosWithRatio = usePhotosWithRatio(shownImages);
   const blocks = useMemo(
     () => layoutChapter(paragraphs, photosWithRatio, ratioState),
     // eslint-disable-next-line react-hooks/exhaustive-deps

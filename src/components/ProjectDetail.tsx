@@ -219,16 +219,16 @@ function NarrativeSection({
         // 該照片真實比例自動算（ImagePlaceholder 的 natural 模式），這就是「形狀決定主次」
         // 具體會畫出來的樣子。
         //
-        // items-end——（已修正）真實照片各自的高度不一定相同（例如直幅照片配全景照，高度
-        // 差很多），沒有指定 align-items 的話，grid 預設會把每個格子「撐」到跟這排最高的
-        // 照片一樣高，矮的那張下面就會留一大塊空白（曾經真的長這樣）。改成 items-end 讓這排
-        // 照片統一「底部切齊」——矮的那張貼齊高的那張下緣，不會有懸空的留白，跟下一排內容
-        // 銜接時也不會中間卡一段空白。
+        // row.align（lib/photoLayout.ts 的 applyRowAlignment）——真實照片各自維持真實比例，
+        // 高度不一定一樣，矮的那張要「底部切齊」還是「頂部切齊」貼向高的那張，交給排版演算法
+        // 決定：單獨一排預設底部切齊；連續兩排以上中間沒有文字隔開時會交替方向，讓兩排矮的
+        // 那張都貼向彼此中間的接縫，留白被推到最外側（緊接段落文字的地方），不會卡在兩排
+        // 照片正中間顯得莫名其妙——這裡不用另外判斷，照 row.align 給對應的 Tailwind class 就好。
         const { row } = block;
         return (
           <div
             key={i}
-            className={`${topGap} grid items-end gap-3 sm:gap-4`}
+            className={`${topGap} grid gap-3 sm:gap-4 ${row.align === "start" ? "items-start" : "items-end"}`}
             style={{ gridTemplateColumns: row.columns.map((c) => `${c}fr`).join(" ") }}
           >
             {row.photos.map((photo) => (

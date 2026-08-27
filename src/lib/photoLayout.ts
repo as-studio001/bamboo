@@ -53,6 +53,8 @@ export type PhotoRow = {
   photos: PhotoWithRatio[];
   columns: number[]; // grid-template-columns 的 fr 權重，跟 photos 一一對應
   portrait: boolean; // 整排都是直幅——沒有真實照片的示意色塊要用 3:4 當預設比例
+  align: "end" | "start"; // 同一排照片各自維持真實比例、高度不一定一樣，這個決定矮的
+  // 那張要「底部切齊」還是「頂部切齊」貼向高的那張，見下面 applyRowAlignment() 的說明。
 };
 
 export type ContentBlock =
@@ -106,8 +108,10 @@ function makePhotoChunks(photos: PhotoWithRatio[]): PhotoWithRatio[][] {
 }
 
 function chunkToRow(chunk: PhotoWithRatio[], ratioState: RatioState): PhotoRow {
+  // align 這裡先給預設值，實際結果由下面的 applyRowAlignment() 統一決定
+  // （要看整個章節的區塊序列、不是單一組照片自己能判斷的）。
   if (chunk.length === 1) {
-    return { photos: chunk, columns: [1], portrait: orientationOf(chunk[0].ratio) === "portrait" };
+    return { photos: chunk, columns: [1], portrait: orientationOf(chunk[0].ratio) === "portrait", align: "end" };
   }
 
   const orientations = chunk.map((p) => orientationOf(p.ratio));
@@ -115,22 +119,47 @@ function chunkToRow(chunk: PhotoWithRatio[], ratioState: RatioState): PhotoRow {
   const allNonPortrait = orientations.every((o) => o !== "portrait");
 
   if (allPortrait) {
-    return { photos: chunk, columns: chunk.map(() => 1), portrait: true };
+    return { photos: chunk, columns: chunk.map(() => 1), portrait: true, align: "end" };
   }
   if (allNonPortrait && chunk.length === 2) {
     let idx = ratioState.next % PAIR_RATIOS.length;
     if (idx === ratioState.last) idx = (idx + 1) % PAIR_RATIOS.length;
     ratioState.last = idx;
     ratioState.next++;
-    return { photos: chunk, columns: [...PAIR_RATIOS[idx]], portrait: false };
+    return { photos: chunk, columns: [...PAIR_RATIOS[idx]], portrait: false, align: "end" };
   }
   // 混合方向（落單照片併組後的結果）：欄寬照每張自己的方向權重分配。
-  return { photos: chunk, columns: orientations.map((o) => ORIENTATION_WEIGHT[o]), portrait: false };
+  return { photos: chunk, columns: orientations.map((o) => ORIENTATION_WEIGHT[o]), portrait: false, align: "end" };
 }
 
 function rowToBlock(row: PhotoRow): ContentBlock {
   if (row.photos.length === 1) return { type: "photo-solo", photo: row.photos[0] };
   return { type: "photo-row", row };
+}
+
+// 連續兩排以上的照片區塊中間沒有文字隔開時（插入位置剛好湊在同一段落前後），每排照片各自
+// 維持真實比例，高度不一定一樣，統一「底部切齊」的話，矮的那張會在整排的上方留一塊空白，
+// 跟緊接在它前面那排的下緣中間會卡出一段沒有理由的死白（曾經真的長這樣，使用者截圖抓到過
+// 兩次：先是抓到完全沒指定對齊、整塊被 grid 拉伸留白的版本；改成統一底部切齊後，又抓到
+// 「連續兩排」這個情境本身還是留白，只是白的位置換到中間）。
+//
+// 解法是讓相鄰的連續排「交替」對齊方向——第一排底部切齊、緊接著的第二排改頂部切齊，兩排
+// 矮的那張因此都貼向彼此中間的接縫，原本躲不掉的留白被推到最外側（第一排的頂端、最後一排
+// 的底端），那裡本來就緊接著段落文字或下一段內容，留白看起來就像正常的區塊間距，不會卡在
+// 兩排照片正中間顯得莫名其妙。單獨一排（前後都是文字或只有它自己）維持預設的底部切齊。
+function applyRowAlignment(blocks: ContentBlock[]): void {
+  let previousWasRow = false;
+  let previousAlign: "end" | "start" = "end";
+  for (const block of blocks) {
+    if (block.type !== "photo-row") {
+      previousWasRow = false;
+      continue;
+    }
+    const align: "end" | "start" = previousWasRow ? (previousAlign === "end" ? "start" : "end") : "end";
+    block.row.align = align;
+    previousAlign = align;
+    previousWasRow = true;
+  }
 }
 
 // 主入口：段落陣列＋已量測比例的照片陣列 → 交錯區塊序列。照抄 render.js 的 renderContent()。
@@ -146,7 +175,9 @@ export function layoutChapter(
   const rows = makePhotoChunks(photos).map((chunk) => chunkToRow(chunk, ratioState));
 
   if (cleanParagraphs.length === 0) {
-    return rows.map(rowToBlock);
+    const blocks = rows.map(rowToBlock);
+    applyRowAlignment(blocks);
+    return blocks;
   }
   if (photos.length === 0) {
     return cleanParagraphs.map((text) => ({ type: "paragraph", text }));
@@ -171,5 +202,6 @@ export function layoutChapter(
     blocks.push(rowToBlock(rows[rowIndex]));
     rowIndex++;
   }
+  applyRowAlignment(blocks);
   return blocks;
 }

@@ -104,9 +104,6 @@ export const projects: Project[] = [
         images: [
           { id: "a-design-1", tone: "bg-neutral-300", caption: "〔照片說明待補〕", src: "/images/project-one/1786700848131-_______2026-08-14_173851.png" },
           { id: "a-design-2", tone: "bg-neutral-400", caption: "〔照片說明待補〕", src: "/images/project-one/1786700851881-_______2026-08-14_173939.png" },
-          { id: "a-design-3", tone: "bg-neutral-300", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/portrait-1.jpg" },
-          { id: "a-design-4", tone: "bg-neutral-400", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/portrait-2.jpg" },
-          { id: "a-design-5", tone: "bg-neutral-300", caption: "〔照片說明待補〕", src: "/images/project-one/1786701211986-_______2026-08-14_175147.png" },
         ],
         moreImages: [
           { id: "a-design-more-1", tone: "bg-neutral-300", caption: "基地紋理分析圖" },
@@ -114,6 +111,9 @@ export const projects: Project[] = [
           { id: "a-design-more-3", tone: "bg-neutral-300", caption: "動線與開口研究模型" },
           { id: "a-design-more-4", tone: "bg-neutral-400", caption: "〔照片說明待補〕", src: "/images/project-one/1786700856939-_______2026-08-14_174017.png" },
           { id: "a-design-more-5", tone: "bg-neutral-300", caption: "〔照片說明待補〕", src: "/images/project-one/1786701229749-_______2026-08-14_175009.png" },
+          { id: "a-design-more-6", tone: "bg-neutral-400", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/portrait-1.jpg" },
+          { id: "a-design-more-7", tone: "bg-neutral-300", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/portrait-2.jpg" },
+          { id: "a-design-more-8", tone: "bg-neutral-400", caption: "〔照片說明待補〕", src: "/images/project-one/1786701211986-_______2026-08-14_175147.png" },
         ],
       },
       {
@@ -123,15 +123,15 @@ export const projects: Project[] = [
         images: [
           { id: "a-module-1", tone: "bg-neutral-300", caption: "〔照片說明待補〕", src: "/images/project-one/1786700856939-_______2026-08-14_174017.png" },
           { id: "a-module-2", tone: "bg-neutral-400", caption: "〔照片說明待補〕", src: "/images/project-one/1786701209422-_______2026-08-14_175239.png" },
-          { id: "a-module-3", tone: "bg-neutral-300", caption: "〔照片說明待補〕", src: "/images/project-one/1786701820696-_______2026-08-14_180258.png" },
-          { id: "a-module-4", tone: "bg-neutral-400", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/portrait-3.jpg" },
-          { id: "a-module-5", tone: "bg-neutral-300", caption: "〔照片說明待補〕", src: "/images/project-one/1786700848131-_______2026-08-14_173851.png" },
         ],
         moreImages: [
           { id: "a-module-more-1", tone: "bg-neutral-300", caption: "模矩尺寸推演草圖" },
           { id: "a-module-more-2", tone: "bg-neutral-400", caption: "單元接合方式測試" },
           { id: "a-module-more-3", tone: "bg-neutral-300", caption: "模矩網格對應立面圖" },
           { id: "a-module-more-4", tone: "bg-neutral-400", caption: "〔照片說明待補〕", src: "/images/project-one/1786700856939-_______2026-08-14_174017.png" },
+          { id: "a-module-more-5", tone: "bg-neutral-300", caption: "〔照片說明待補〕", src: "/images/project-one/1786701820696-_______2026-08-14_180258.png" },
+          { id: "a-module-more-6", tone: "bg-neutral-400", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/portrait-3.jpg" },
+          { id: "a-module-more-7", tone: "bg-neutral-300", caption: "〔照片說明待補〕", src: "/images/project-one/1786700848131-_______2026-08-14_173851.png" },
         ],
       },
       {
@@ -141,9 +141,6 @@ export const projects: Project[] = [
         images: [
           { id: "a-structure-1", tone: "bg-neutral-300", caption: "〔照片說明待補〕", src: "/images/project-one/1786701211986-_______2026-08-14_175147.png" },
           { id: "a-structure-2", tone: "bg-neutral-400", caption: "〔照片說明待補〕", src: "/images/project-one/1786701216631-_______2026-08-14_175056.png" },
-          { id: "a-structure-3", tone: "bg-neutral-300", caption: "〔照片說明待補〕", src: "/images/project-one/1786701229749-_______2026-08-14_175009.png" },
-          { id: "a-structure-4", tone: "bg-neutral-400", caption: "〔照片說明待補〕", src: "/images/project-one/1786701824261-_______2026-08-14_180200.png" },
-          { id: "a-structure-5", tone: "bg-neutral-300", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/portrait-4.jpg" },
         ],
         moreImages: [
           { id: "a-structure-more-1", tone: "bg-neutral-300", caption: "桁架系統受力分析圖" },
@@ -152,6 +149,9 @@ export const projects: Project[] = [
           { id: "a-structure-more-4", tone: "bg-neutral-400", caption: "〔照片說明待補〕", src: "/images/project-one/cover-01.png" },
           { id: "a-structure-more-5", tone: "bg-neutral-300", caption: "〔照片說明待補〕", src: "/images/project-one/1786701209422-_______2026-08-14_175239.png" },
           { id: "a-structure-more-6", tone: "bg-neutral-400", caption: "〔照片說明待補〕", src: "/images/project-one/1786700851881-_______2026-08-14_173939.png" },
+          { id: "a-structure-more-7", tone: "bg-neutral-300", caption: "〔照片說明待補〕", src: "/images/project-one/1786701229749-_______2026-08-14_175009.png" },
+          { id: "a-structure-more-8", tone: "bg-neutral-400", caption: "〔照片說明待補〕", src: "/images/project-one/1786701824261-_______2026-08-14_180200.png" },
+          { id: "a-structure-more-9", tone: "bg-neutral-300", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/portrait-4.jpg" },
         ],
       },
       {
@@ -161,15 +161,15 @@ export const projects: Project[] = [
         images: [
           { id: "a-construction-1", tone: "bg-neutral-300", caption: "〔照片說明待補〕", src: "/images/project-one/1786701229749-_______2026-08-14_175009.png" },
           { id: "a-construction-2", tone: "bg-neutral-400", caption: "〔照片說明待補〕", src: "/images/project-one/1786701820696-_______2026-08-14_180258.png" },
-          { id: "a-construction-3", tone: "bg-neutral-300", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/portrait-5.jpg" },
-          { id: "a-construction-4", tone: "bg-neutral-400", caption: "〔照片說明待補〕", src: "/images/project-one/1786700848131-_______2026-08-14_173851.png" },
-          { id: "a-construction-5", tone: "bg-neutral-300", caption: "〔照片說明待補〕", src: "/images/project-one/1786701824261-_______2026-08-14_180200.png" },
         ],
         moreImages: [
           { id: "a-construction-more-1", tone: "bg-neutral-300", caption: "施工放樣過程紀錄" },
           { id: "a-construction-more-2", tone: "bg-neutral-400", caption: "現場組裝步驟紀錄" },
           { id: "a-construction-more-3", tone: "bg-neutral-300", caption: "收尾細節紀錄" },
           { id: "a-construction-more-4", tone: "bg-neutral-400", caption: "〔照片說明待補〕", src: "/images/project-one/1786701229749-_______2026-08-14_175009.png" },
+          { id: "a-construction-more-5", tone: "bg-neutral-300", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/portrait-5.jpg" },
+          { id: "a-construction-more-6", tone: "bg-neutral-400", caption: "〔照片說明待補〕", src: "/images/project-one/1786700848131-_______2026-08-14_173851.png" },
+          { id: "a-construction-more-7", tone: "bg-neutral-300", caption: "〔照片說明待補〕", src: "/images/project-one/1786701824261-_______2026-08-14_180200.png" },
         ],
       },
       {
@@ -214,9 +214,6 @@ export const projects: Project[] = [
         images: [
           { id: "b-design-1", tone: "bg-neutral-300", caption: "〔照片說明待補〕", src: "/images/project-two/cover-01.png" },
           { id: "b-design-2", tone: "bg-neutral-400", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/landscape-1.jpg" },
-          { id: "b-design-3", tone: "bg-neutral-300", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/landscape-2.jpg" },
-          { id: "b-design-4", tone: "bg-neutral-400", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/portrait-1.jpg" },
-          { id: "b-design-5", tone: "bg-neutral-300", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/portrait-2.jpg" },
         ],
         moreImages: [
           { id: "b-design-more-1", tone: "bg-neutral-300", caption: "基地紋理分析圖" },
@@ -224,6 +221,9 @@ export const projects: Project[] = [
           { id: "b-design-more-3", tone: "bg-neutral-300", caption: "動線與開口研究模型" },
           { id: "b-design-more-4", tone: "bg-neutral-400", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/square-1.jpg" },
           { id: "b-design-more-5", tone: "bg-neutral-300", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/landscape-3.jpg" },
+          { id: "b-design-more-6", tone: "bg-neutral-400", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/landscape-2.jpg" },
+          { id: "b-design-more-7", tone: "bg-neutral-300", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/portrait-1.jpg" },
+          { id: "b-design-more-8", tone: "bg-neutral-400", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/portrait-2.jpg" },
         ],
       },
       {
@@ -233,15 +233,15 @@ export const projects: Project[] = [
         images: [
           { id: "b-module-1", tone: "bg-neutral-300", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/pano-1.jpg" },
           { id: "b-module-2", tone: "bg-neutral-400", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/portrait-3.jpg" },
-          { id: "b-module-3", tone: "bg-neutral-300", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/landscape-4.jpg" },
-          { id: "b-module-4", tone: "bg-neutral-400", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/square-2.jpg" },
-          { id: "b-module-5", tone: "bg-neutral-300", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/portrait-4.jpg" },
         ],
         moreImages: [
           { id: "b-module-more-1", tone: "bg-neutral-300", caption: "模矩尺寸推演草圖" },
           { id: "b-module-more-2", tone: "bg-neutral-400", caption: "快拆構件測試" },
           { id: "b-module-more-3", tone: "bg-neutral-300", caption: "模矩網格對應立面圖" },
           { id: "b-module-more-4", tone: "bg-neutral-400", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/landscape-5.jpg" },
+          { id: "b-module-more-5", tone: "bg-neutral-300", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/landscape-4.jpg" },
+          { id: "b-module-more-6", tone: "bg-neutral-400", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/square-2.jpg" },
+          { id: "b-module-more-7", tone: "bg-neutral-300", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/portrait-4.jpg" },
         ],
       },
       {
@@ -251,9 +251,6 @@ export const projects: Project[] = [
         images: [
           { id: "b-structure-1", tone: "bg-neutral-300", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/landscape-6.jpg" },
           { id: "b-structure-2", tone: "bg-neutral-400", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/portrait-5.jpg" },
-          { id: "b-structure-3", tone: "bg-neutral-300", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/pano-2.jpg" },
-          { id: "b-structure-4", tone: "bg-neutral-400", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/landscape-1.jpg" },
-          { id: "b-structure-5", tone: "bg-neutral-300", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/square-1.jpg" },
         ],
         moreImages: [
           { id: "b-structure-more-1", tone: "bg-neutral-300", caption: "輕構造受力分析圖" },
@@ -262,6 +259,9 @@ export const projects: Project[] = [
           { id: "b-structure-more-4", tone: "bg-neutral-400", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/portrait-6.jpg" },
           { id: "b-structure-more-5", tone: "bg-neutral-300", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/landscape-2.jpg" },
           { id: "b-structure-more-6", tone: "bg-neutral-400", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/portrait-1.jpg" },
+          { id: "b-structure-more-7", tone: "bg-neutral-300", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/pano-2.jpg" },
+          { id: "b-structure-more-8", tone: "bg-neutral-400", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/landscape-1.jpg" },
+          { id: "b-structure-more-9", tone: "bg-neutral-300", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/square-1.jpg" },
         ],
       },
       {
@@ -271,15 +271,15 @@ export const projects: Project[] = [
         images: [
           { id: "b-construction-1", tone: "bg-neutral-300", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/portrait-2.jpg" },
           { id: "b-construction-2", tone: "bg-neutral-400", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/landscape-3.jpg" },
-          { id: "b-construction-3", tone: "bg-neutral-300", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/pano-1.jpg" },
-          { id: "b-construction-4", tone: "bg-neutral-400", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/square-2.jpg" },
-          { id: "b-construction-5", tone: "bg-neutral-300", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/landscape-4.jpg" },
         ],
         moreImages: [
           { id: "b-construction-more-1", tone: "bg-neutral-300", caption: "動作序列教學拆解" },
           { id: "b-construction-more-2", tone: "bg-neutral-400", caption: "快拆組裝步驟紀錄" },
           { id: "b-construction-more-3", tone: "bg-neutral-300", caption: "巡迴搭建現場紀錄" },
           { id: "b-construction-more-4", tone: "bg-neutral-400", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/portrait-3.jpg" },
+          { id: "b-construction-more-5", tone: "bg-neutral-300", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/pano-1.jpg" },
+          { id: "b-construction-more-6", tone: "bg-neutral-400", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/square-2.jpg" },
+          { id: "b-construction-more-7", tone: "bg-neutral-300", caption: "〔網路免版權風景照，待替換〕", src: "/images/stock/landscape-4.jpg" },
         ],
       },
       {

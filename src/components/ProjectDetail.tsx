@@ -132,21 +132,23 @@ function ChapterEdgeNav({ chapters, accent }: { chapters: Chapter[]; accent: str
   );
 }
 
-// 「建築設計」「模矩」「構造」「施工」四個章節共用同一套圖文排列模板（比照 Internal-Pages
-// 的 render.js 主論述排法）：大圖—首段文字—次圖—其餘段落，圖與文交錯呈現，不是文字段落
-// 集中寫完才接一排縮圖。「建築設計」是開頭主要論述、緊接在 hero 之後，不重複顯示自己的
-// 標題；其餘三章有 title 就加一條分隔線＋小標，作為子章節之間的視覺斷點，圖文排列邏輯完全
-// 相同。「組裝說明書」不用這套（見下面的 AssemblySection）——它的主要內容是可翻閱的 PDF，
-// 不是穿插圖片的論述文字。
-//
-// 段落最後接一個「MORE IN DETAIL」可展開區塊（ReadMoreGallery），比照 Internal-Pages
+// 「建築設計」「模矩」「構造」「施工」四個章節共用同一套圖文編輯模式——比照 Internal-Pages
 // （as-studio001/Internal-Pages，https://as-studio001.github.io/Internal-Pages/?case=laogu-fang）
-// 「+ MORE IN DETAIL」那個收合圖庫——放設計過程的手稿、模型、圖面這類輔助素材，預設收合、
-// 不會一開始就佔掉版面，讀者想深入才點開。這批圖是 chapter.moreImages，跟 chapter.images
-// （leadImage／secondImage，首頁雙欄也會用到）分開存放，不會混進首頁的照片索引。
+// 內文的排法：一段論述是「段落區塊」跟「圖片區塊」依作者排列順序交錯而成的一串序列
+// （chapter.blocks，見 projects.ts 的 ContentBlock 型別），不是固定「大圖—文—圖—文」模板。
+// 圖片區塊可以放 1 張（單張大圖）或 2 張（並排顯示，Internal-Pages 常見的手法）——每個
+// 章節自己決定要幾個區塊、圖片放單張還並排、放在哪兩段文字中間，各自獨立，不用套同一套
+// 版型。「建築設計」是開頭主要論述、緊接在 hero 之後，不重複顯示自己的標題；其餘三章有
+// title 就加一條分隔線＋小標，作為子章節之間的視覺斷點，圖文編輯邏輯完全相同。
+// 「組裝說明書」不用這套（見下面的 AssemblySection）——它的主要內容是可翻閱的 PDF，不是
+// 穿插圖片的論述文字。
+//
+// 段落最後接一個「MORE IN DETAIL」可展開區塊（ReadMoreGallery），比照 Internal-Pages 同名
+// 區塊——放設計過程的手稿、模型、圖面這類輔助素材，預設收合、不會一開始就佔掉版面，讀者
+// 想深入才點開。這批圖是 chapter.moreImages，跟 blocks 裡的圖片分開存放，不會混進首頁的
+// 照片索引（PhotoStream.tsx 只讀 chapterPhotos(chapter)，只攤平 blocks 裡的 images 區塊）。
 function NarrativeSection({ chapter, title, accent }: { chapter: Chapter; title?: string; accent: string }) {
-  const [leadImage, secondImage] = chapter.images;
-  const [firstParagraph, ...restParagraphs] = chapter.text.split("\n\n");
+  const blocks = chapter.blocks ?? [];
 
   return (
     <div
@@ -160,31 +162,40 @@ function NarrativeSection({ chapter, title, accent }: { chapter: Chapter; title?
         </h3>
       )}
 
-      {leadImage && (
-        <div
-          id={leadImage.id}
-          data-photo-anchor
-          className={`h-64 scroll-mt-4 sm:h-96 lg:h-[28rem] ${title ? "mt-6 sm:mt-8" : ""}`}
-        >
-          <ImagePlaceholder image={leadImage} fill layoutId={leadImage.id} />
-        </div>
-      )}
+      {blocks.map((block, i) => {
+        // 第一個區塊如果前面已經有標題，就補上跟標題的間距；沒有標題（「建築設計」）的話，
+        // 第一個區塊要緊接在容器頂端，不用再加一次上邊距。
+        const topGap = i === 0 && !title ? "" : "mt-6 sm:mt-8";
 
-      <p className={`mt-6 max-w-2xl text-sm leading-relaxed sm:mt-8 sm:text-base ${TEXT_BODY}`}>
-        {firstParagraph}
-      </p>
+        if (block.type === "paragraph") {
+          return (
+            <p key={i} className={`${topGap} max-w-2xl text-sm leading-relaxed sm:text-base ${TEXT_BODY}`}>
+              {block.text}
+            </p>
+          );
+        }
 
-      {secondImage && (
-        <div id={secondImage.id} data-photo-anchor className="mt-6 h-56 scroll-mt-4 sm:mt-8 sm:h-72">
-          <ImagePlaceholder image={secondImage} fill layoutId={secondImage.id} />
-        </div>
-      )}
+        if (block.images.length <= 1) {
+          const image = block.images[0];
+          if (!image) return null;
+          return (
+            <div key={i} id={image.id} data-photo-anchor className={`${topGap} h-64 scroll-mt-4 sm:h-96 lg:h-[28rem]`}>
+              <ImagePlaceholder image={image} fill layoutId={image.id} />
+            </div>
+          );
+        }
 
-      {restParagraphs.map((paragraph, i) => (
-        <p key={i} className={`mt-6 max-w-2xl text-sm leading-relaxed sm:mt-8 sm:text-base ${TEXT_BODY}`}>
-          {paragraph}
-        </p>
-      ))}
+        // 2 張並排——比照 Internal-Pages 常見的雙圖區塊。
+        return (
+          <div key={i} className={`${topGap} grid grid-cols-2 gap-3 sm:gap-4`}>
+            {block.images.map((image) => (
+              <div key={image.id} id={image.id} data-photo-anchor className="h-40 scroll-mt-4 sm:h-64 lg:h-80">
+                <ImagePlaceholder image={image} fill layoutId={image.id} />
+              </div>
+            ))}
+          </div>
+        );
+      })}
 
       {chapter.video && <ChapterVideo src={chapter.video} />}
 
@@ -233,7 +244,7 @@ function ReadMoreGallery({ images, accent }: { images: Chapter["moreImages"]; ac
 // 下載），不再用縮圖列——這一章的內容本質是操作手冊，PDF 本身才是主要內容，原本那排縮圖
 // 反而是重複資訊。只取 chapter.text 的第一段，不管資料裡實際存了幾段，維持排版簡潔。
 function AssemblySection({ project, chapter, accent }: { project: Project; chapter: Chapter; accent: string }) {
-  const [firstParagraph] = chapter.text.split("\n\n");
+  const [firstParagraph] = (chapter.text ?? "").split("\n\n");
 
   return (
     <div

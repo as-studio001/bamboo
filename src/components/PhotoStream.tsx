@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import type { Chapter, Project, ProjectImage } from "@/lib/projects";
+import { chapterPhotos, type Chapter, type Project, type ProjectImage } from "@/lib/projects";
 import { usePdfCover } from "@/lib/usePdfCover";
 import { pdfCoverId } from "@/lib/pdfPages";
 import { TEXT_BODY, SHARED_ELEMENT_TRANSITION } from "@/components/theme";
@@ -33,9 +33,14 @@ import { TEXT_BODY, SHARED_ELEMENT_TRANSITION } from "@/components/theme";
 // 點的如果是第二張就對不上）。ProjectDetail.tsx 每張圖自己的容器都掛了同一個 id={image.id}
 // （見 NarrativeSection／DetailSubsection），瀏覽器原生的 hash 捲動天生就能精確定位到那張圖。
 //
-// 照片直接借用 project.chapters 各章節自己的 images（不是獨立的扁平清單）——這樣每張照片
+// 照片直接借用 project.chapters 各章節自己的照片（不是獨立的扁平清單）——這樣每張照片
 // 天生就知道自己屬於哪個章節，每個章節的照片群組外層都有 id={`${slug}-${key}`} 錨點，
 // 頂部的章節標籤（TopChapterNav）才能準確捲到對應的照片群組。
+//
+// （已修正）改呼叫 chapterPhotos(chapter)，不要直接讀 chapter.images——「建築設計／模矩／
+// 構造／施工」四章現在用 chapter.blocks 決定圖文順序（見 projects.ts、ProjectDetail.tsx 的
+// NarrativeSection），這裡的照片清單要從 blocks 裡的圖片區塊自動攤平算出來，兩邊資料才不會
+// 各自維護、對不上；「組裝說明書」「基地」沒有 blocks，chapterPhotos 會退回讀舊的 images 欄位。
 //
 // 每張照片連結本身也掛了 id={photo.id}＋data-photo-anchor——跟 ProjectDetail.tsx 內文那張
 // 同一張圖用同一個 id（見上方 layoutId 說明）。關閉 modal 時（DetailModal.tsx 的 close()）
@@ -54,16 +59,16 @@ export function PhotoStream({ project }: { project: Project }) {
   // 地圖自己的外層已經有 id={`${slug}-site`} 錨點，這裡再放一組同 id 的照片群組會撞成
   // 重複 id，導致標籤點擊時定位到錯的區塊。「組裝說明書」章節本身沒有 images（內容主體是
   // PDF），但只要有掛 chapter.pdf 就照樣算進來——用 PDF 封面當這一組唯一的「照片」。
-  const groups = project.chapters.filter(
-    (chapter) => chapter.key !== "site" && (chapter.images.length > 0 || chapter.pdf),
-  );
+  const groups = project.chapters
+    .map((chapter) => ({ chapter, photos: chapterPhotos(chapter) }))
+    .filter(({ chapter, photos }) => chapter.key !== "site" && (photos.length > 0 || chapter.pdf));
 
   return (
     <div className="flex flex-col">
-      {groups.map((chapter, groupIndex) => (
+      {groups.map(({ chapter, photos }, groupIndex) => (
         <div key={chapter.key} id={`${project.slug}-${chapter.key}`} className="scroll-mt-4">
-          {chapter.images.length > 0
-            ? chapter.images.map((photo, i) => (
+          {photos.length > 0
+            ? photos.map((photo, i) => (
                 <PhotoItem
                   key={photo.id}
                   project={project}

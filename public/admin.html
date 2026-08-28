@@ -456,11 +456,20 @@ function renderSetPassword(){
   });
 }
 
+// INTERNAL_PAGES_ADMIN_URL：原型建築（as-studio001/Internal-Pages）自己的後台網址，跟
+// 這裡共用同一個 Supabase 專案／同一批登入使用者（見這個檔案最上面的設定說明）。兩邊
+// 後台各自是獨立部署（這裡是 bamboo 專案的 /admin，原型建築是它自己 GitHub Pages 上的
+// admin/index.html），不是同一個網站的兩個分頁，所以「切換」是整頁導覽過去，不是原地
+// 切換畫面——過去那邊如果瀏覽器裡還留著 Supabase 的登入狀態（同一個瀏覽器、之前登入過
+// 那個網域）就會直接進去；沒有的話跟平常一樣要再登入一次，這是不同網域各自存一份登入
+// 狀態的正常限制，不是這裡少做了什麼。
+const INTERNAL_PAGES_ADMIN_URL = "https://as-studio001.github.io/Internal-Pages/admin/";
+
 function renderTopBar(){
   return `
     <div class="top-bar">
       <div class="wrap">
-        <div class="site-title">後台管理<a href="/" target="_blank">↗ 查看網站</a></div>
+        <div class="site-title">後台管理<a href="/" target="_blank">↗ 查看網站</a><a href="${INTERNAL_PAGES_ADMIN_URL}" target="_blank">↗ 原型建築後台</a></div>
         <div class="user-box">
           <span>${esc(state.user.email)}</span>
           <button class="btn ghost" id="logoutBtn">登出</button>

@@ -339,6 +339,31 @@ function compressImageFile(file, maxDimension, quality){
 }
 function sanitizeFilename(name){ return name.replace(/[^\w.\-一-鿿]+/g, "_"); }
 
+// 單一檔案上傳大小上限——Netlify Function 本身收 request body 有實際上限
+// （約 6MB），留一點餘裕訂在 4MB，跟 Internal-Pages 現在的後台（admin/index.html
+// 的 MAX_UPLOAD_BYTES）用同一個數字。超過這個大小先在瀏覽器端擋掉、給清楚的
+// 錯誤訊息，不要讓請求送出去才卡住、或在後端失敗後丟一段看不懂的技術錯誤。
+// （已修正，2026-10-01：影片／GIF 上傳失敗——根本原因是這個檔案原本完全沒有
+// 大小防呆，超過 MAX_UPLOAD_BYTES 的檔案會直接送出去，卡在 Netlify／GitHub
+// 那端才失敗，使用者只看到「上傳失敗」四個字猜不出原因。）
+const MAX_UPLOAD_BYTES = 4 * 1024 * 1024;
+// GitHub「Create/Update file contents」這支 API（uploadAsset 預設走的路徑）
+// 單檔內容實際上限大約 1MB（官方文件寫的，base64 編碼又會再膨脹 1/3，門檻抓
+// 保守一點）。一般照片已經過 compressImageFile 壓縮，通常遠低於這個門檻；
+// 影片完全沒壓縮、GIF 也跳過壓縮（compressImageFile 裡特別排除），這兩種
+// 檔案很容易超過——超過這個門檻但還在 MAX_UPLOAD_BYTES 以內的話，改傳
+// useBlob:true，讓 github-proxy.js 改走 Git Data API（uploadViaBlob()，見
+// 那支 function 的註解），不受 Contents API 這個較小的單檔上限限制，這是
+// github-proxy.js 本來就支援、一直沒被這裡用到的路徑。
+const CONTENTS_API_LIMIT_BYTES = 900 * 1024;
+
+function assertUploadSize(file){
+  if(file.size > MAX_UPLOAD_BYTES){
+    const mb = (file.size / 1024 / 1024).toFixed(1);
+    throw new Error(`檔案太大（${mb}MB）：單一檔案上傳大小上限約 4MB。照片通常會先自動壓縮到遠低於這個門檻，會擋到這裡多半是影片／GIF 檔，請先剪短或壓縮後再上傳。`);
+  }
+}
+
 /* 上傳一張照片／影片到 public/images/<slug>/，回傳存進 ProjectImage.src
    要用的網址（開頭 /images/...，Next.js 會直接從 public/ 底下用同樣的
    相對路徑供應這個檔案，不用寫 "/public" 這個前綴）。影片檔（video/*）
@@ -346,10 +371,12 @@ function sanitizeFilename(name){ return name.replace(/[^\w.\-一-鿿]+/g, "_"); 
 async function uploadAsset(file, slug){
   const isVideo = file.type && file.type.startsWith("video/");
   const compressed = isVideo ? file : await compressImageFile(file, 2400, 0.82);
+  assertUploadSize(compressed);
   const filename = sanitizeFilename(compressed.name);
   const b64 = await readFileAsBase64(compressed);
   const folder = `public/images/${slug}`;
-  const data = await callFunction("github-proxy", { action: "uploadAsset", folder, filename, content: b64, repo: REPO_NAME });
+  const useBlob = compressed.size > CONTENTS_API_LIMIT_BYTES;
+  const data = await callFunction("github-proxy", { action: "uploadAsset", folder, filename, content: b64, repo: REPO_NAME, useBlob });
   return "/" + data.path.replace(/^public\//, "");
 }
 

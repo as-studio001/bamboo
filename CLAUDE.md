@@ -15,12 +15,28 @@
 
 ## 如何讓其他人也能協作（vibecoding，不是透過 `/admin`）
 
-`/admin` 只能改文字、照片、上下架——改不到版面結構、排版演算法、新功能這類**程式碼層級**的改動。如果有其他人（同事、新協作者）也要用 AI 輔助開發（例如 Claude Code）直接改這類東西，不需要原本負責的人每次都出面操刀，流程是：
+`/admin` 只能改文字、照片、上下架——改不到版面結構、排版演算法、新功能這類**程式碼層級**的改動。這類改動目前都是透過「vibecoding」完成的：不是工程師手刻程式碼，而是用自然語言跟 AI（Claude Code）描述想要的結果，AI 自己讀懂整個專案、動手改程式碼、驗證、commit、push——這份 `CLAUDE.md` 就是讓 AI 不用每次重新問一輪架構問題的關鍵。要讓其他人（同事、新協作者）也能這樣做，不需要原本負責的人每次都出面操刀，完整步驟如下。
 
-1. **給 repo 存取權**：GitHub 上把對方加成 `as-studio001/bamboo` 的 collaborator（Settings → Collaborators and teams → Add people，需要 org 擁有者權限）。**範圍只給 `bamboo` 這個 repo**，不要連 `as-studio001/Internal-Pages` 也給——那是另一個團隊的 production 系統，這個網站只是「借用」對方的後端，不是共同擁有，不應該讓新人也有權限去動那邊的程式碼（除非確實需要同步修改共用後端，見上面「兩個 repo 的關係」）。
-2. **對方開自己的 Claude Code**：把這個 repo clone 下來（或直接開這個資料夾），開一個新 session。**不需要額外交接**——這份 `CLAUDE.md` 會被自動讀取，架構、資料模型、排版演算法、已知的坑全部都在裡面。
-3. **部署是全自動的**：Vercel 盯著 `main` 分支，對方 commit + push 之後就直接上線，不需要額外部署步驟。
-4. **要不要加審核是唯一需要人工決定的事**：預設（目前這個專案採用的做法）是**直接給 push 權限、對方自己對自己的改動負責**，最沒摩擦；如果想要有安全網，可以在 GitHub Settings → Branches 幫 `main` 加 branch protection，要求 PR + review 才能 merge，但這樣就需要有人固定抽空看 PR，等於沒有完全不出面。折衷做法：不即時審查，但定期（例如每週）掃一次 `git log` 看新 commit 在改什麼。
+### 新人上手步驟（照順序做）
+
+1. **拿到 GitHub 權限**：請 `as-studio001` org 的擁有者把你加成 [`as-studio001/bamboo`](https://github.com/as-studio001/bamboo) 的 collaborator（GitHub 網站上 Settings → Collaborators and teams → Add people，輸入你的 GitHub 帳號或 email）。你會收到一封邀請信，點接受。**只需要這一個 repo 的權限**——不需要也不應該要求 `as-studio001/Internal-Pages` 的權限，那是另一個團隊的系統，這個網站只是「借用」對方的後端（見下面「兩個 repo 的關係」），一般的版面／功能改動完全不會碰到那邊。
+2. **把程式碼抓到自己電腦**：電腦上要先裝好 [Git](https://git-scm.com/) 跟 [Node.js](https://nodejs.org/)（LTS 版即可），然後在終端機／命令提示字元執行：
+   ```bash
+   git clone https://github.com/as-studio001/bamboo.git
+   cd bamboo
+   npm install
+   ```
+3. **準備好 Claude Code**：到 [claude.com/code](https://claude.com/claude-code) 下載安裝（Desktop app 或 CLI 都可以，用法大同小異），用自己的帳號登入。這是會寫入真正程式碼、能直接操作你電腦的 AI 工具，不是聊天機器人——第一次用建議先用小改動試水溫（例如請它改一行文字顏色），熟悉它每個動作都會先讓你確認之後，再放心請它做大一點的事。
+4. **用 Claude Code 打開這個資料夾**（Desktop app 選「開啟專案」指到剛剛 clone 下來的 `bamboo` 資料夾；CLI 則是在那個資料夾裡直接執行 `claude`）。**不用跟它說明這個專案是什麼**——它一啟動就會自動讀取這份 `CLAUDE.md`，技術架構、資料模型、排版演算法、已知的坑全部都知道了。
+5. **直接用白話描述你想要的結果**，例如「首頁的齒輪圖示太小了，放大一點」「我想在組裝說明書章節加一個下載次數統計」——不用懂程式碼、不用知道要改哪個檔案，AI 會自己去讀相關的程式碼、改完、用瀏覽器實際驗證過才回報給你。看到它在做什麼有疑問，直接問就好。
+6. **改完怎麼上線**：確認結果滿意後，請它 commit 並 push（或直接說「推上去」）。[Vercel](https://vercel.com) 盯著 `main` 分支，push 之後幾十秒到一兩分鐘內就會自動部署上線，**不需要額外的部署步驟，也不需要通知任何人**。
+
+### 安全邊界（AI 跟新人都該知道）
+
+- **不要主動改動 `netlify/functions/`、`netlify.toml`、或任何在 `as-studio001/Internal-Pages` 這個 repo 裡的東西**——那是共用的 production 後端，改壞了會連帶影響另一個團隊的真實使用者。真的需要改（例如要支援新的後台功能）屬於例外狀況，動手前要先確認、改完要提醒負責人去 Netlify 確認部署狀態。
+- **`public/admin.html` 可以放心改**——那是 bamboo 自己的後台介面原始碼，屬於這個 repo。
+- **`content/projects/*.json` 理論上可以直接改**（前台會讀），但正常情況下這些檔案是透過 `/admin` 後台寫入的，直接手改程式碼層級的這些檔案容易跟後台的存檔動作打架，一般內容調整建議還是走 `/admin`，不要用 vibecoding 去改。
+- **要不要幫新人的改動加審核是唯一需要人工決定的事**：預設（目前這個專案採用的做法）是**直接給 push 權限、對方自己對自己的改動負責**，最沒摩擦；如果想要有安全網，可以在 GitHub Settings → Branches 幫 `main` 加 branch protection，要求 PR + review 才能 merge，但這樣就需要有人固定抽空看 PR，等於沒有完全不出面。折衷做法：不即時審查，但定期（例如每週）掃一次 `git log` 看新 commit 在改什麼。
 
 ## 專案是什麼
 

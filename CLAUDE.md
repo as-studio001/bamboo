@@ -2,7 +2,7 @@
 
 # 專案說明（給 Claude Code／未來協作者讀取）
 
-本檔案是這個 repo 的持續性背景資料，取代反覆口頭說明。完整原始規格見 [展覽網站規格書.md](展覽網站規格書.md)，以下是目前為止最完整、最新的執行狀態摘要——**這份文件本身就是給「新接手的 AI 或同事」看的交接備忘錄**，新加入的人應該從頭讀到尾，不用再回去翻對話紀錄。
+本檔案是這個 repo 的持續性背景資料，取代反覆口頭說明。完整原始規格見 [展覽網站規格書.md](展覽網站規格書.md)，以下是目前為止最完整、最新的執行狀態摘要（最後更新 2026-10-01）——**這份文件本身就是給「新接手的 AI 或同事」看的交接備忘錄**，新加入的人應該從頭讀到尾，不用再回去翻對話紀錄。
 
 ## 快速上手
 
@@ -12,6 +12,15 @@
 | **後台網址** | <https://bamboo-sage.vercel.app/admin> |
 | **登入後台入口** | 前台首頁「策展宣言」畫面左下角有一顆低調的齒輪圖示（預設半透明，滑鼠移上去才變不透明），點下去就是 `/admin`；也可以直接輸入後台網址 |
 | **如何登入** | Email／密碼登入（Supabase Auth）。**這個專案沒有自己的帳號系統**，帳號是跟姊妹專案 as-studio001/Internal-Pages 共用的同一批使用者——如果還沒有帳號，要請已有帳號的人到 [Internal-Pages 的後台](https://as-studio001.github.io/Internal-Pages/admin/)「使用者管理」分頁輸入 email 寄邀請信，不是在這裡自己註冊；忘記密碼可以在 bamboo 後台登入畫面點「忘記密碼」寄重設信 |
+
+## 如何讓其他人也能協作（vibecoding，不是透過 `/admin`）
+
+`/admin` 只能改文字、照片、上下架——改不到版面結構、排版演算法、新功能這類**程式碼層級**的改動。如果有其他人（同事、新協作者）也要用 AI 輔助開發（例如 Claude Code）直接改這類東西，不需要原本負責的人每次都出面操刀，流程是：
+
+1. **給 repo 存取權**：GitHub 上把對方加成 `as-studio001/bamboo` 的 collaborator（Settings → Collaborators and teams → Add people，需要 org 擁有者權限）。**範圍只給 `bamboo` 這個 repo**，不要連 `as-studio001/Internal-Pages` 也給——那是另一個團隊的 production 系統，這個網站只是「借用」對方的後端，不是共同擁有，不應該讓新人也有權限去動那邊的程式碼（除非確實需要同步修改共用後端，見上面「兩個 repo 的關係」）。
+2. **對方開自己的 Claude Code**：把這個 repo clone 下來（或直接開這個資料夾），開一個新 session。**不需要額外交接**——這份 `CLAUDE.md` 會被自動讀取，架構、資料模型、排版演算法、已知的坑全部都在裡面。
+3. **部署是全自動的**：Vercel 盯著 `main` 分支，對方 commit + push 之後就直接上線，不需要額外部署步驟。
+4. **要不要加審核是唯一需要人工決定的事**：預設（目前這個專案採用的做法）是**直接給 push 權限、對方自己對自己的改動負責**，最沒摩擦；如果想要有安全網，可以在 GitHub Settings → Branches 幫 `main` 加 branch protection，要求 PR + review 才能 merge，但這樣就需要有人固定抽空看 PR，等於沒有完全不出面。折衷做法：不即時審查，但定期（例如每週）掃一次 `git log` 看新 commit 在改什麼。
 
 ## 專案是什麼
 
@@ -113,6 +122,7 @@ Project = { slug, shortLabel, name, location, year, type, intro, accent, titleAl
 - **這個 sandbox 環境（開發測試用）的 `requestAnimationFrame` 在 Browser 分頁沒有實際顯示時會凍結**，導致 Framer Motion 的 shared element 轉場動畫在這裡測試不出來——這不是產品本身的 bug，機制本身是對的（用 computed style 檢查過 FLIP transform 有正確算出來），只是這個沙盒的限制，不用又花時間重查。
 - **內文照片一律用「原生比例」顯示，不是裁切滿版**：`ImagePlaceholder.tsx` 的 `natural` 模式用原生 `<img>`（不是 `next/image` 的 `fill`），寬度照 grid 的 fr 權重分配、高度依真實比例自動算——這是圖文自動排版演算法「主次關係」看得出來的關鍵，不要為了統一視覺又改回固定框裁切。
 - **`next.config.ts` 的 `rewrites()` 把 `/admin` 導去 `public/admin.html`**——這是一支完全獨立的靜態 HTML app，不受 Next.js App Router／React 影響，改後台要直接改這個檔案，不是去 `src/app/admin/`（那個 React 版本的舊後台已經刪掉了）。
+- **後台上傳大檔案（影片／GIF）會失敗**（2026-10-01 修過）：`public/admin.html` 的 `uploadAsset()` 原本完全沒有檔案大小防呆，而且影片不壓縮、GIF 跳過壓縮——容易超過 GitHub「Create/Update file contents」API 單檔內容約 1MB 的實際上限，請求送出去才在 GitHub 那端失敗，畫面上只看到一句「上傳失敗」。現在已經加上 `MAX_UPLOAD_BYTES`（4MB，超過直接在瀏覽器端擋下並給清楚錯誤訊息）跟 `CONTENTS_API_LIMIT_BYTES`（900KB，超過這個門檻但在 4MB 以內的檔案改傳 `useBlob:true`，讓 `github-proxy.js` 改走它本來就支援的 Git Data API 路徑 `uploadViaBlob()`，不受 Contents API 較小的單檔上限限制）。**如果以後又看到上傳失敗，先檢查是不是檔案超過 4MB、或是不是又有哪個上傳路徑忘記設定 `useBlob`**，不要假設又是 `github-proxy.js` 本身的問題（這支共用 Function 的程式碼在這次修復裡完全沒改動）。
 
 ## 目前內容狀態（哪些是真的、哪些是佔位）
 
@@ -129,6 +139,7 @@ Project = { slug, shortLabel, name, location, year, type, intro, accent, titleAl
 - [x] 案例照片 shared element 轉場、組裝說明書 PDF 翻頁書
 - [x] 圖文自動排版演算法（照抄 Internal-Pages，形狀／大小決定主次，張數跟文字份量掛鉤）
 - [x] 正式後台 `/admin`（跟 Internal-Pages 共用 Supabase／Netlify 後端，git-JSON 存儲，跨後台登入交接）
+- [x] 後台大檔案（影片／GIF）上傳修復（2026-10-01，見「已知的坑」）
 - [ ] **實際建築案圖片與文字內容**——目前大多還是佔位文字／免版權風景照，需要真實案名、地點、年份、論述、正式照片跟正式組裝說明書 PDF，直接用 `/admin` 後台編輯即可
 - [ ] 首頁「策展宣言」正式文案
 - [ ] 「新增案例」在後台操作後，`src/lib/projects.ts` 頂端的 import 清單需要手動補一行（見「資料模型」一節）——這步驟目前沒有自動化，如果之後要支援後台自己新增案例並且前台自動生效，這是需要再處理的地方

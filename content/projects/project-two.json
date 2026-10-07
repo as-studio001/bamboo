@@ -86,57 +86,34 @@
       "text": "〔佔位文字，抓版面用〕一籌的模矩系統採用比常民竹小屋更小、更密的單元尺寸，讓構造在視覺上呈現細膩的紋理感，也更貼近臨時構造需要快速搭拆的操作邏輯。每個模矩單元的重量與尺寸都控制在單人可搬運的範圍內，讓搭建過程不需要依賴大型機具，也讓非專業人員能獨立完成部分組裝工作，降低參與的門檻。\n\n小尺度模矩帶來的代價是接點數量大幅增加，因此設計團隊另外發展了一套快拆式的連接構件，讓組裝與拆卸都能在短時間內完成，同時維持結構的穩定性，也讓一籌具備在不同場地間反覆巡迴展出的可能性，這套取捨是整個設計過程反覆測試最多次的環節，前後修改了好幾個版本才定案。\n\n這批照片先呈現模矩單元與快拆構件的實際樣貌，細部圖說與構件清單之後會整理進這個章節。",
       "images": [
         {
-          "id": "b-module-1",
+          "id": "project-two-ru7xumo",
           "tone": "bg-neutral-300",
-          "caption": "〔網路免版權風景照，待替換〕",
-          "src": "/images/stock/pano-1.jpg"
+          "caption": "",
+          "src": "/images/project-two/messageImage_1785401046266.jpg"
         },
         {
-          "id": "b-module-2",
-          "tone": "bg-neutral-400",
-          "caption": "〔網路免版權風景照，待替換〕",
-          "src": "/images/stock/portrait-3.jpg"
-        }
-      ],
-      "moreImages": [
-        {
-          "id": "b-module-more-1",
+          "id": "project-two-5b49tf6",
           "tone": "bg-neutral-300",
-          "caption": "模矩尺寸推演草圖"
+          "caption": "",
+          "src": "/images/project-two/Snipaste_2026-10-07_18-24-39.jpg"
         },
         {
-          "id": "b-module-more-2",
-          "tone": "bg-neutral-400",
-          "caption": "快拆構件測試"
-        },
-        {
-          "id": "b-module-more-3",
+          "id": "project-two-r8x8ihf",
           "tone": "bg-neutral-300",
-          "caption": "模矩網格對應立面圖"
+          "caption": "",
+          "src": "/images/project-two/Snipaste_2026-10-07_18-25-17.jpg"
         },
         {
-          "id": "b-module-more-4",
-          "tone": "bg-neutral-400",
-          "caption": "〔網路免版權風景照，待替換〕",
-          "src": "/images/stock/landscape-5.jpg"
-        },
-        {
-          "id": "b-module-more-5",
+          "id": "project-two-u6vrq18",
           "tone": "bg-neutral-300",
-          "caption": "〔網路免版權風景照，待替換〕",
-          "src": "/images/stock/landscape-4.jpg"
+          "caption": "",
+          "src": "/images/project-two/Snipaste_2026-10-07_18-25-24.jpg"
         },
         {
-          "id": "b-module-more-6",
-          "tone": "bg-neutral-400",
-          "caption": "〔網路免版權風景照，待替換〕",
-          "src": "/images/stock/square-2.jpg"
-        },
-        {
-          "id": "b-module-more-7",
+          "id": "project-two-h8xzwia",
           "tone": "bg-neutral-300",
-          "caption": "〔網路免版權風景照，待替換〕",
-          "src": "/images/stock/portrait-4.jpg"
+          "caption": "",
+          "src": "/images/project-two/Snipaste_2026-10-07_18-25-33.jpg"
         }
       ]
     },

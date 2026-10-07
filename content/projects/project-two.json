@@ -123,69 +123,16 @@
       "text": "〔佔位文字，抓版面用〕一籌的結構邏輯偏向輕構造（light structure）的思路，用大量小斷面的竹材互相支撐，取代少數幾根粗大構件的傳統做法，整體重量因此大幅降低，也讓構造本身帶有一種輕盈、幾乎懸浮的視覺效果，與常民竹小屋厚實穩重的量體形成對比，成為兩件作品結構性格的直接對照。\n\n為了因應快速搭拆的需求，結構系統刻意避免使用不可逆的接合方式，改以夾具與繩索張力共同維持整體穩定，這也讓一籌得以在不同基地之間重複搭建、成為一個可移動的展示構造，而不是綁定在單一地點的固定建物，每一次搭建與拆卸都會對構件進行檢查與微調，確保重複使用不影響安全。\n\n這裡先用現場照片呈現夾具與張力構件的樣貌，結構驗算資料與接點測試紀錄之後會補上。",
       "images": [
         {
-          "id": "b-structure-1",
+          "id": "project-two-md7u9kn",
           "tone": "bg-neutral-300",
-          "caption": "〔網路免版權風景照，待替換〕",
-          "src": "/images/stock/landscape-6.jpg"
+          "caption": "",
+          "src": "/images/project-two/Snipaste_2026-10-07_18-25-43.jpg"
         },
         {
-          "id": "b-structure-2",
-          "tone": "bg-neutral-400",
-          "caption": "〔網路免版權風景照，待替換〕",
-          "src": "/images/stock/portrait-5.jpg"
-        }
-      ],
-      "moreImages": [
-        {
-          "id": "b-structure-more-1",
+          "id": "project-two-dnyp5x7",
           "tone": "bg-neutral-300",
-          "caption": "輕構造受力分析圖"
-        },
-        {
-          "id": "b-structure-more-2",
-          "tone": "bg-neutral-400",
-          "caption": "夾具接點細部大樣圖"
-        },
-        {
-          "id": "b-structure-more-3",
-          "tone": "bg-neutral-300",
-          "caption": "結構模型局部"
-        },
-        {
-          "id": "b-structure-more-4",
-          "tone": "bg-neutral-400",
-          "caption": "〔網路免版權風景照，待替換〕",
-          "src": "/images/stock/portrait-6.jpg"
-        },
-        {
-          "id": "b-structure-more-5",
-          "tone": "bg-neutral-300",
-          "caption": "〔網路免版權風景照，待替換〕",
-          "src": "/images/stock/landscape-2.jpg"
-        },
-        {
-          "id": "b-structure-more-6",
-          "tone": "bg-neutral-400",
-          "caption": "〔網路免版權風景照，待替換〕",
-          "src": "/images/stock/portrait-1.jpg"
-        },
-        {
-          "id": "b-structure-more-7",
-          "tone": "bg-neutral-300",
-          "caption": "〔網路免版權風景照，待替換〕",
-          "src": "/images/stock/pano-2.jpg"
-        },
-        {
-          "id": "b-structure-more-8",
-          "tone": "bg-neutral-400",
-          "caption": "〔網路免版權風景照，待替換〕",
-          "src": "/images/stock/landscape-1.jpg"
-        },
-        {
-          "id": "b-structure-more-9",
-          "tone": "bg-neutral-300",
-          "caption": "〔網路免版權風景照，待替換〕",
-          "src": "/images/stock/square-1.jpg"
+          "caption": "",
+          "src": "/images/project-two/Snipaste_2026-10-07_18-25-58.jpg"
         }
       ]
     },
@@ -195,57 +142,22 @@
       "text": "〔佔位文字，抓版面用〕一籌的施工強調「速度」與「可重複」——整個搭建過程被拆解成標準化的動作序列，讓不熟悉竹構造的人員也能在短時間的教學後加入搭建工作，這也是這件作品作為教育示範的重要部分，希望降低一般人對竹構造「很難、很專業」的距離感，讓更多人願意親手嘗試、參與這套系統的運作。\n\n現場施工分成基座定位、模組組裝、整體校正、收邊固定四個階段，每個階段都控制在明確的時間範圍內，作為未來巡迴展示時工班排程的參考依據，每次搭建也會邀請幾位第一次接觸的參與者，藉此驗證教學流程是否真的容易上手，並蒐集他們的操作回饋來修正教學步驟。\n\n這批照片先記錄幾次巡迴搭建的現場片段，詳細的施工時間紀錄之後會補齊放入這個章節。",
       "images": [
         {
-          "id": "b-construction-1",
+          "id": "project-two-5x1dbk4",
           "tone": "bg-neutral-300",
-          "caption": "〔網路免版權風景照，待替換〕",
-          "src": "/images/stock/portrait-2.jpg"
+          "caption": "",
+          "src": "/images/project-two/LINE_ALBUM_20260902_D4隔熱冷凍板_鋼構底座_水泥基座_260903_1.jpg"
         },
         {
-          "id": "b-construction-2",
-          "tone": "bg-neutral-400",
-          "caption": "〔網路免版權風景照，待替換〕",
-          "src": "/images/stock/landscape-3.jpg"
-        }
-      ],
-      "moreImages": [
-        {
-          "id": "b-construction-more-1",
+          "id": "project-two-0o95lkf",
           "tone": "bg-neutral-300",
-          "caption": "動作序列教學拆解"
+          "caption": "",
+          "src": "/images/project-two/LINE_ALBUM_20260902_D4隔熱冷凍板_鋼構底座_水泥基座_260903_2.jpg"
         },
         {
-          "id": "b-construction-more-2",
-          "tone": "bg-neutral-400",
-          "caption": "快拆組裝步驟紀錄"
-        },
-        {
-          "id": "b-construction-more-3",
+          "id": "project-two-fbqi4ak",
           "tone": "bg-neutral-300",
-          "caption": "巡迴搭建現場紀錄"
-        },
-        {
-          "id": "b-construction-more-4",
-          "tone": "bg-neutral-400",
-          "caption": "〔網路免版權風景照，待替換〕",
-          "src": "/images/stock/portrait-3.jpg"
-        },
-        {
-          "id": "b-construction-more-5",
-          "tone": "bg-neutral-300",
-          "caption": "〔網路免版權風景照，待替換〕",
-          "src": "/images/stock/pano-1.jpg"
-        },
-        {
-          "id": "b-construction-more-6",
-          "tone": "bg-neutral-400",
-          "caption": "〔網路免版權風景照，待替換〕",
-          "src": "/images/stock/square-2.jpg"
-        },
-        {
-          "id": "b-construction-more-7",
-          "tone": "bg-neutral-300",
-          "caption": "〔網路免版權風景照，待替換〕",
-          "src": "/images/stock/landscape-4.jpg"
+          "caption": "",
+          "src": "/images/project-two/LINE_ALBUM_20260902_D4隔熱冷凍板_鋼構底座_水泥基座_260903_8.jpg"
         }
       ]
     },

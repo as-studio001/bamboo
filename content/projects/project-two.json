@@ -6,19 +6,20 @@
   "year": "年份待補",
   "type": "類型待補",
   "intro": "〔佔位文字，約150字，抓版面用〕一籌是這次展覽的第二件作品，展現與常民竹小屋不同的語氣與空間態度。這段文字作為整體概述，說明作品的設計思考、構造精神與施工方式，之後會替換成正式的策展論述文字。",
-  "accent": "#39FF14",
+  "accent": "#39ff14",
   "titleAlign": "right",
   "coverImages": [
     {
-      "id": "b-cover-1",
+      "id": "project-two-pblxja5",
       "tone": "bg-neutral-300",
       "caption": "封面 01",
-      "src": "/images/project-two/cover-01.png"
+      "src": "/images/project-two/室外06_Large.jpeg"
     },
     {
-      "id": "b-cover-2",
-      "tone": "bg-neutral-400",
-      "caption": "封面 02"
+      "id": "project-two-9r2d5si",
+      "tone": "bg-neutral-300",
+      "caption": "封面 02",
+      "src": "/images/project-two/室外02_Large.jpeg"
     }
   ],
   "chapters": [
@@ -28,63 +29,60 @@
       "text": "〔佔位文字，抓版面用〕一籌的設計命題與常民竹小屋不同，它更像是一次對「臨時性」構造的重新詮釋——不追求恆久留存，而是思考一個構造物如何在短暫的使用週期裡，依然給人足夠的空間品質與情感重量。量體刻意輕盈、通透，讓光線與周邊環境自由穿越，也讓觀者不會把它誤認成一棟「正式的建築」，而是更接近一個暫時搭起的場景。\n\n整體造型語彙走向更抽象、更幾何的方向，減少裝飾性的細節，讓竹材本身的紋理與結構邏輯成為唯一的表情。這種克制的態度，也是一籌與常民竹小屋在同一個展覽裡相互對話、彼此襯托的方式——一個貼地生根、一個輕盈暫留，兩種對「住」的想像並置出現，讓觀眾來回走動時能感受到語氣落差。\n\n這裡先用現場影像鋪陳整體氛圍，正式論述文字與圖說之後會補上，讓讀者先從畫面感受空間的輕盈感。",
       "images": [
         {
-          "id": "b-design-1",
+          "id": "project-two-jsnzfah",
           "tone": "bg-neutral-300",
-          "caption": "〔照片說明待補〕",
-          "src": "/images/project-two/cover-01.png"
+          "caption": "",
+          "src": "/images/project-two/室外01_Large.jpeg"
         },
         {
-          "id": "b-design-2",
-          "tone": "bg-neutral-400",
-          "caption": "〔網路免版權風景照，待替換〕",
-          "src": "/images/stock/landscape-1.jpg"
+          "id": "project-two-9qkar7a",
+          "tone": "bg-neutral-300",
+          "caption": "",
+          "src": "/images/project-two/室內05_Large.jpeg"
         }
       ],
       "moreImages": [
         {
-          "id": "b-design-more-1",
+          "id": "project-two-811s0f4",
           "tone": "bg-neutral-300",
-          "caption": "基地紋理分析圖"
+          "caption": "",
+          "src": "/images/project-two/室外04_Large.jpeg"
         },
         {
-          "id": "b-design-more-2",
-          "tone": "bg-neutral-400",
-          "caption": "空間量體推演手稿"
-        },
-        {
-          "id": "b-design-more-3",
+          "id": "project-two-u1wf4mx",
           "tone": "bg-neutral-300",
-          "caption": "動線與開口研究模型"
+          "caption": "",
+          "src": "/images/project-two/1791347627292-室外06_Large.jpeg"
         },
         {
-          "id": "b-design-more-4",
-          "tone": "bg-neutral-400",
-          "caption": "〔網路免版權風景照，待替換〕",
-          "src": "/images/stock/square-1.jpg"
-        },
-        {
-          "id": "b-design-more-5",
+          "id": "project-two-40n5xz6",
           "tone": "bg-neutral-300",
-          "caption": "〔網路免版權風景照，待替換〕",
-          "src": "/images/stock/landscape-3.jpg"
+          "caption": "",
+          "src": "/images/project-two/室外07_Large.jpeg"
         },
         {
-          "id": "b-design-more-6",
-          "tone": "bg-neutral-400",
-          "caption": "〔網路免版權風景照，待替換〕",
-          "src": "/images/stock/landscape-2.jpg"
-        },
-        {
-          "id": "b-design-more-7",
+          "id": "project-two-2kn279k",
           "tone": "bg-neutral-300",
-          "caption": "〔網路免版權風景照，待替換〕",
-          "src": "/images/stock/portrait-1.jpg"
+          "caption": "",
+          "src": "/images/project-two/室內01_Large.jpeg"
         },
         {
-          "id": "b-design-more-8",
-          "tone": "bg-neutral-400",
-          "caption": "〔網路免版權風景照，待替換〕",
-          "src": "/images/stock/portrait-2.jpg"
+          "id": "project-two-ep447k9",
+          "tone": "bg-neutral-300",
+          "caption": "",
+          "src": "/images/project-two/室內02_Large.jpeg"
+        },
+        {
+          "id": "project-two-gy7kw0j",
+          "tone": "bg-neutral-300",
+          "caption": "",
+          "src": "/images/project-two/室內03_Large.jpeg"
+        },
+        {
+          "id": "project-two-4lep2xn",
+          "tone": "bg-neutral-300",
+          "caption": "",
+          "src": "/images/project-two/室內04_Large.jpeg"
         }
       ]
     },

@@ -190,5 +190,9 @@
       "images": []
     }
   ],
-  "published": true
+  "published": true,
+  "coordinates": {
+    "lat": null,
+    "lng": 120.53941093457391
+  }
 }

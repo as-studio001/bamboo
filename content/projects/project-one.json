@@ -154,5 +154,9 @@
     }
   ],
   "published": true,
-  "titleAlign": "left"
+  "titleAlign": "left",
+  "coordinates": {
+    "lat": 23.744961161161275,
+    "lng": 120.6700766905575
+  }
 }

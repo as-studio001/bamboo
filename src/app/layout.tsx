@@ -15,7 +15,7 @@ const notoSansTC = Noto_Sans_TC({
 });
 
 export const metadata: Metadata = {
-  title: "林鐵構竹展",
+  title: "常民竹小屋",
   description: "兩棟建築案的線上展覽",
 };
 

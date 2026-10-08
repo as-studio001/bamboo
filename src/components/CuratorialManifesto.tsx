@@ -28,7 +28,7 @@ export function CuratorialManifesto() {
           className="font-mono text-[10px] tracking-[0.25em] uppercase sm:text-xs"
           style={{ color: "var(--foreground-muted)" }}
         >
-          2026 林鐵構築 · 策展宣言
+          2026 常民竹小屋
         </motion.p>
 
         <motion.div
@@ -38,13 +38,21 @@ export function CuratorialManifesto() {
           className="mt-6 max-w-3xl sm:mt-8"
         >
           <p className="font-serif-tc text-2xl leading-[1.7] font-medium sm:text-3xl lg:text-[2.35rem]">
-            〔佔位文字，抓版面用〕這是一場關於構造的展覽，也是一場關於等待的展覽。竹子從林間被砍下，經過選料、防腐、裁切，最終被人的雙手一根一根綁紮起來，成為可以遮蔭、可以停留的空間。
+            竹構的下一步｜Bamboo, Reconfigured<br />
+            ●親近常民使用的當代竹構<br />
+            ●可被模組化的未來竹構<br />
+            ●可與業主共同創造的竹構<br />
+            <br />
+            竹，不只是傳統材料，也不只是被重新詮釋的自然建材。<br />
+            本展覽從「竹構如何被建造」出發，重新思考竹構建築的可能性。
           </p>
           <p
             className="mt-6 max-w-xl text-sm leading-relaxed sm:text-base"
             style={{ color: "var(--foreground-muted)" }}
           >
-            常民竹小屋與一籌，分別回應了「長久」與「暫留」兩種截然不同的居住想像，並置在同一片林鐵沿線的土地上，邀請觀者重新思考構造、材料與時間之間的關係。這段文字之後會替換成正式的策展論述。
+            首先，讓竹構築回到常民生活，親近日常使用的需求，成為人們可以休憩、閱讀、聚會、工作與生活的場所；竹構不再只是節慶、藝術或活動中的展示物，而是一種真正被使用、被喜愛，並能持續融入當代生活的建築形式。<br />
+            在此基礎上，進一步思考竹構如何被建造：如何將竹材轉化為可以被標準化、拆解、組裝、替換與再利用的構件系統；又如何透過使用者與業主的參與，讓同一套系統產生不同的空間結果。<br />
+            因此，竹小屋不是一個固定的完成品，而是一套可以持續生成、隨著不同使用者與生活情境演變的竹構系統。
           </p>
         </motion.div>
       </div>

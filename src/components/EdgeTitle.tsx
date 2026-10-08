@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-const TITLE = "2026林鐵構築";
+const TITLE = "2026常民竹小屋";
 
 // 標題整併進三周白色邊框裡，貼著左右兩側直書呈現，參考 Meili Vogt Conzett 的邊界直書標題處理。
 // 用 fixed（不是 absolute）貼在視窗邊緣——首頁雙欄整頁固定 100dvh 不捲動，兩種定位視覺上沒差別；

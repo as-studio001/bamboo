@@ -48,7 +48,10 @@ export function ImagePlaceholder({
       </motion.div>
     );
   }
-
+  if (!image) {
+    console.error("ImagePlaceholder received undefined image");
+    return null;
+  }
   return (
     <motion.div
       layoutId={layoutId}

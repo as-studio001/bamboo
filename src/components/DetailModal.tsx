@@ -164,6 +164,16 @@ export function DetailModal({ children }: { children: React.ReactNode }) {
 
   return (
     <>
+      {/* 背景遮罩
+        覆蓋首頁所有內容，因此首頁圖片與文字看不到。
+        同時吃掉 pointer events，因此首頁按鈕也不能點。 */}
+    <div
+      className="pointer-events-auto fixed inset-0 z-0"
+      style={{
+        backgroundColor: "var(--background)",
+      }}
+      aria-hidden="true"
+    />
       {/* 左右脫縫的液態玻璃條，z-30（低於 EdgeTitle 的 z-40，文字才會浮在玻璃上面）。點這條
           玻璃本身可以關閉視窗（取代原本蓋滿全螢幕的透明點擊區），一條內側細線讓這條「脫縫」
           讀起來是刻意留白的設計，不是渲染失誤。 */}

@@ -10,10 +10,10 @@
   "titleAlign": "right",
   "coverImages": [
     {
-      "id": "project-two-pblxja5",
+      "id": "project-two-e2x4mze",
       "tone": "bg-neutral-300",
-      "caption": "封面 01",
-      "src": "/images/project-two/室外06_Large.jpeg"
+      "caption": "",
+      "src": "/images/project-two/Snipaste_2026-10-08_12-00-39.jpg"
     }
   ],
   "chapters": [
@@ -27,12 +27,6 @@
           "tone": "bg-neutral-300",
           "caption": "",
           "src": "/images/project-two/室外01_Large.jpeg"
-        },
-        {
-          "id": "project-two-9qkar7a",
-          "tone": "bg-neutral-300",
-          "caption": "",
-          "src": "/images/project-two/室內05_Large.jpeg"
         }
       ],
       "moreImages": [

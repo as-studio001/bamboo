@@ -93,7 +93,7 @@ function DetailHero({ project, insetX }: { project: Project; insetX: string }) {
   const finalHeroSrc = finalImage?.src;
 
   const heroIsDark = useImageTextColor(finalHeroSrc);
-  const heroTitleColor = finalHeroSrc ? (heroIsDark === false ? "text-white" : "text-white") : TEXT_PRIMARY;
+  const heroTitleColor = finalHeroSrc ? (heroIsDark === false ? "text-white" : "text-white") : TEXT_PRIMARY; //讓兩個案子的標題顏色一樣，前者"text-[#141414]"都改成白色，保留if，之後可依照片再調整 
 
   return (
     <div className="relative flex h-[70vh] min-h-[420px] w-full shrink-0 flex-col justify-end sm:h-[80vh]">

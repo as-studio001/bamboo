@@ -93,7 +93,7 @@ function DetailHero({ project, insetX }: { project: Project; insetX: string }) {
   const finalHeroSrc = finalImage?.src;
 
   const heroIsDark = useImageTextColor(finalHeroSrc);
-  const heroTitleColor = finalHeroSrc ? (heroIsDark === false ? "text-[#141414]" : "text-white") : TEXT_PRIMARY;
+  const heroTitleColor = finalHeroSrc ? (heroIsDark === false ? "text-white" : "text-white") : TEXT_PRIMARY;
 
   return (
     <div className="relative flex h-[70vh] min-h-[420px] w-full shrink-0 flex-col justify-end sm:h-[80vh]">

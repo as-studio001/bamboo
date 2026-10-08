@@ -23,13 +23,17 @@ export function ImagePlaceholder({
   className = "",
   layoutId,
 }: {
-  image: ProjectImage;
+  image: ProjectImage | undefined;
   aspect?: string;
   fill?: boolean;
   natural?: boolean;
   className?: string;
   layoutId?: string;
 }) {
+  if (!image) {
+    console.error("ImagePlaceholder received undefined image");
+    return null;
+  }
   if (natural && image.src) {
     return (
       <motion.div
@@ -48,10 +52,7 @@ export function ImagePlaceholder({
       </motion.div>
     );
   }
-  if (!image) {
-    console.error("ImagePlaceholder received undefined image");
-    return null;
-  }
+
   return (
     <motion.div
       layoutId={layoutId}

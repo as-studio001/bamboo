@@ -38,10 +38,12 @@ export function CuratorialManifesto() {
           className="mt-6 max-w-3xl sm:mt-8"
         >
           <p className="font-serif-tc text-2xl leading-[1.7] font-medium sm:text-3xl lg:text-[2.35rem]">
-            竹構的下一步｜Bamboo, Reconfigured<br />
-            ●親近常民使用的當代竹構<br />
-            ●可被模組化的未來竹構<br />
-            ●可與業主共同創造的竹構<br />
+            竹構的下一步｜Bamboo, Reconfigured
+          </p>
+          <p className="font-serif-tc text-lg leading-[1.7] font-medium sm:text-xl lg:text-[1.5rem]">
+            ☉常民使用的當代竹構<br />
+            ☉模組化的未來竹構<br />
+            ☉可與業主共同創造的竹構<br />
             <br />
             竹，不只是傳統材料，也不只是被重新詮釋的自然建材。<br />
             本展覽從「竹構如何被建造」出發，重新思考竹構建築的可能性。

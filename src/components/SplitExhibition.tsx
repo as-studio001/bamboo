@@ -271,8 +271,7 @@ function TopChapterNav({ projects }: { projects: [Project, Project] }) {
         <button
           key={chapter.key}
           onClick={() => goTo(chapter.key)}
-          className="font-mono text-[10px] tracking-wide uppercase sm:text-xs"
-          style={{ color: a.accent }}
+          className="font-black text-[10px] tracking-wide uppercase text-foreground sm:text-sm"
         >
           {chapter.title}
         </button>
@@ -305,7 +304,7 @@ function Panel({
   // 開場首圖的標題顏色：不加漸層／陰影，改成直接分析封面照片底部（文字疊放處）的平均亮度，
   // 自動決定用白字還是深字，之後換照片也不用手動再調。
   const heroIsDark = useImageTextColor(finalHeroSrc);
-  const heroTitleColor = finalHeroSrc ? (heroIsDark === false ? "text-[#141414]" : "text-white") : TEXT_PRIMARY;
+  const heroTitleColor = finalHeroSrc ? (heroIsDark === false ? "text-white" : "text-white") : TEXT_PRIMARY; //讓兩個案子的標題顏色一樣，前者"text-[#141414]"都改成白色，保留if，之後可依照片再調整 
 
   return (
     <div

@@ -293,13 +293,15 @@ function TopChapterNav({ projects }: { projects: [Project, Project] }) {
     .filter(Boolean)
     .join("");
   // 手機上字只有 10px，按鈕本身只有約 20×15px，手指很難點中——用 ::before 往四周擴大可點範圍
-  // （左右各 12px＝剛好跟隔壁的間距 gap-6 接上、上下各 16px，接近整條選單列高度），畫面上的字
-  // 大小與間距完全不變。
+  // （左右各半個間距，剛好跟隔壁接上；上下各 16px，接近整條選單列高度），畫面上的字大小不變。
+  // （2026-10-12 修正）寬度 400px 以下的手機（例如 Pixel）原本間距 gap-6 時整排放不下，最右邊的
+  // 「活動」會被擠到右側邊框的直書標示（EdgeTitle，也是連結、疊在上層）底下，點「活動」右半邊
+  // 其實點到的是 EdgeTitle、被帶回策展宣言。400px 以下間距縮成 gap-4，可點範圍也跟著縮成左右各 8px。
   const labelClass =
-    "relative font-black text-[10px] tracking-wide uppercase text-[var(--nav-label,var(--foreground))] before:absolute before:-inset-x-3 before:-inset-y-4 before:content-[''] sm:text-sm";
+    "relative font-black text-[10px] tracking-wide uppercase text-[var(--nav-label,var(--foreground))] before:absolute before:-inset-x-2 before:-inset-y-4 before:content-[''] min-[400px]:before:-inset-x-3 sm:text-sm";
 
   return (
-    <div className="flex h-[52px] shrink-0 items-center justify-center gap-6 sm:h-[76px] sm:gap-10">
+    <div className="flex h-[52px] shrink-0 items-center justify-center gap-4 min-[400px]:gap-6 sm:h-[76px] sm:gap-10">
       {colorCss && <style>{colorCss}</style>}
       {a.chapters.map((chapter) => (
         <button key={chapter.key} onClick={() => goTo(chapter.key)} className={labelClass}>
@@ -352,16 +354,16 @@ function Panel({
       {/* 這個欄位的滾輪捲動由 usePanelWheelScroll 自己接管（見上方），不再依賴瀏覽器原生捲動／
           scroll-behavior／scroll-snap 這些各家實作不一致的機制——全程用 rAF 逐格推進，幀數密集、
           跟手自由，停下來才會吸附對齊最近的照片（data-snap，見下方）。 */}
-      {/* （2026-10-12 再修正）案名標頭改成疊在圖片上、貼齊圖片上緣：灰白大字案名＋下方小字地點／年份／
+      {/* （2026-10-12 再修正）案名標頭改成疊在圖片上、貼齊圖片上緣：大字案名＋下方小字地點／年份／
           類型。疊在捲動容器上面（absolute，不佔版面、pointer-events-none 不擋點擊），往下捲照片時
-          一直留在欄位頂端。往下會捲到白底的圖面，灰白字加一層很淡的陰影，淺色圖上也看得到。 */}
+          一直留在欄位頂端。原本用灰白字，往下捲到白底圖面時看不清楚，改成黑字（不跟深色模式切換——
+          文字是疊在照片上，不是疊在頁面底色上）。 */}
       {showHeader && (
         <div
           className={`pointer-events-none absolute inset-x-0 top-0 z-20 px-3 pt-3 ${project.titleAlign === "right" ? "text-right" : ""}`}
-          style={{ textShadow: "0 1px 6px rgba(0,0,0,0.45)" }}
         >
-          <h2 className="truncate text-3xl leading-[0.95] font-black tracking-tight text-[#ecebe8] uppercase">{project.name}</h2>
-          <p className="mt-2 truncate font-mono text-[10px] tracking-wide text-[#ecebe8]/90 uppercase">
+          <h2 className="truncate text-3xl leading-[0.95] font-black tracking-tight text-[#141414] uppercase">{project.name}</h2>
+          <p className="mt-2 truncate font-mono text-[10px] tracking-wide text-[#141414] uppercase">
             {project.location} · {project.year} · {project.type}
           </p>
         </div>

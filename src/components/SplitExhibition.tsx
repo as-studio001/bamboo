@@ -324,6 +324,10 @@ function Panel({
 }) {
   const isCompact = role === "secondary";
   const isMobile = useIsMobile();
+  // 手機 85/15 時，放大的那一案在欄位頂端常駐一條案名標頭（2026-10-12 新增）。原本窄條的名稱
+  // 在頂端、自己的小封面在底端，名稱反而緊貼隔壁的大圖，容易被誤認成那張圖的案名。標頭放在
+  // 捲動容器外面（不是 sticky 在裡面），不會蓋到照片，章節跳轉的捲動位置也不用另外補償。
+  const showHeader = isMobile && role === "dominant";
   const width = (isMobile ? WIDTH_MOBILE : WIDTH)[role];
   const scrollerRef = useRef<HTMLDivElement>(null);
   usePanelWheelScroll(scrollerRef);
@@ -348,18 +352,26 @@ function Panel({
       {/* 這個欄位的滾輪捲動由 usePanelWheelScroll 自己接管（見上方），不再依賴瀏覽器原生捲動／
           scroll-behavior／scroll-snap 這些各家實作不一致的機制——全程用 rAF 逐格推進，幀數密集、
           跟手自由，停下來才會吸附對齊最近的照片（data-snap，見下方）。 */}
+      {showHeader && (
+        <div
+          className={`shrink-0 truncate pb-2 font-black text-base leading-tight tracking-tight uppercase ${TEXT_PRIMARY} ${PANEL_BG} ${project.titleAlign === "right" ? "text-right" : ""}`}
+        >
+          {project.name}
+        </div>
+      )}
       <div ref={scrollerRef} className={`no-scrollbar flex min-h-0 flex-1 flex-col overflow-y-auto ${PANEL_BG}`}>
         {isCompact ? (
-          // 手機版底部多留 pb-20，讓窄條底部的小封面避開固定在左下／右下角的齒輪與深色模式按鈕
-          <div className="flex flex-1 flex-col items-center justify-between pt-6 pb-20 sm:py-10">
-            <span
-              className={`[writing-mode:vertical-rl] font-black tracking-[0.2em] uppercase leading-none text-base sm:text-xl lg:text-2xl ${TEXT_PRIMARY}`}
-            >
-              {project.shortLabel}
-            </span>
-            <div className="mt-6 aspect-[3/4] w-full">
-              <ImagePlaceholder image={project.coverImages[0]} />
+          // 窄條：小封面跟直書案名綁成一組、一起靠在頂端，跟隔壁大圖的關係才不會被誤讀。
+          // 頂端留 pt-[28px]＝放大那一案頂端標頭的高度，讓小封面跟大圖的上緣切齊。
+          <div className="flex flex-1 flex-col items-center pt-[28px]">
+            <div className="aspect-[3/4] w-full">
+              <ImagePlaceholder image={finalImage ?? project.coverImages[0]} />
             </div>
+            <span
+              className={`mt-3 [writing-mode:vertical-rl] font-black tracking-[0.15em] uppercase leading-none text-sm ${TEXT_PRIMARY}`}
+            >
+              {project.name}
+            </span>
           </div>
         ) : (
           <>
@@ -390,11 +402,14 @@ function Panel({
               <div
                 className={`relative z-10 pb-20 sm:pb-10 ${TEXT_PAD} ${project.titleAlign === "right" ? "text-right" : ""}`}
               >
-                <h2
-                  className={`font-black leading-[0.95] tracking-tight uppercase text-3xl sm:text-6xl lg:text-7xl ${heroTitleColor}`}
-                >
-                  {project.name}
-                </h2>
+                {/* 手機放大狀態時案名已經在欄位頂端的標頭裡，封面上不重複，只留地點／年份／類型 */}
+                {!showHeader && (
+                  <h2
+                    className={`font-black leading-[0.95] tracking-tight uppercase text-3xl sm:text-6xl lg:text-7xl ${heroTitleColor}`}
+                  >
+                    {project.name}
+                  </h2>
+                )}
                 <p
                   className="mt-2 font-mono text-[10px] tracking-wide uppercase sm:text-xs"
                   style={{ color: project.accent }}

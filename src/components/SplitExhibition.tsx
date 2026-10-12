@@ -171,7 +171,13 @@ const WHEEL_STOP_THRESHOLD = 0.08; // 速度低於這個值視為已經停止
 // 同時因為 FRICTION 調低了，同樣的總距離會在更短時間內滑完、停得更乾脆，不會有拖尾的漂浮感。
 const WHEEL_SCALE = 0.36;
 const MAX_VELOCITY = 45; // 速度上限，避免快速連續滾動時越疊越快、衝過頭
+// 兩次 wheel 事件間隔超過這個時間，才算「停下來之後重新開始的一次滾動」——欄位靠慣性滑到頂／底時，
+// 同一串滾動（尤其觸控板的慣性事件）不會順勢衝到上一屏／下一屏，要停一下再滾才會交給整頁捲動。
+const WHEEL_GESTURE_GAP_MS = 200;
 
+// 欄位已經在最頂還往上滾、或在最底還往下滾時，不攔截這次滾輪，讓它照瀏覽器原生行為往上傳給整頁
+// 捲動容器（(site)/layout.tsx 的 main，scroll-snap），切到「策展宣言」或「活動」那一屏——
+// 這樣滑鼠停在欄位上任何位置都能捲到首頁最上方跟最下方，不用先移到空白處。
 function usePanelWheelScroll(ref: React.RefObject<HTMLDivElement | null>) {
   useEffect(() => {
     const el = ref.current;
@@ -180,6 +186,8 @@ function usePanelWheelScroll(ref: React.RefObject<HTMLDivElement | null>) {
     let velocity = 0;
     let rafId: number | null = null;
     let lastTime = 0;
+    let lastWheelTime = 0;
+    let handingOff = false; // 這一串滾動已經交給整頁捲動，連續事件就繼續交出去，不中途又被欄位攔下
 
     function normalizeDelta(e: WheelEvent) {
       if (e.deltaMode === 1) return e.deltaY * 16; // line 模式概略換算成 px
@@ -217,8 +225,21 @@ function usePanelWheelScroll(ref: React.RefObject<HTMLDivElement | null>) {
     }
 
     function onWheel(e: WheelEvent) {
+      const now = performance.now();
+      const isNewGesture = now - lastWheelTime > WHEEL_GESTURE_GAP_MS;
+      lastWheelTime = now;
+
+      const delta = normalizeDelta(e);
+      const max = el!.scrollHeight - el!.clientHeight;
+      const pushingPastEdge = (delta < 0 && el!.scrollTop <= 0) || (delta > 0 && el!.scrollTop >= max - 1);
+      if (pushingPastEdge && rafId === null && (handingOff || isNewGesture)) {
+        handingOff = true;
+        return;
+      }
+      handingOff = false;
+
       e.preventDefault();
-      velocity += normalizeDelta(e) * WHEEL_SCALE;
+      velocity += delta * WHEEL_SCALE;
       velocity = Math.max(-MAX_VELOCITY, Math.min(MAX_VELOCITY, velocity));
       if (rafId === null) {
         lastTime = 0;

@@ -388,7 +388,7 @@ const state = {
   user: null,
   cases: null, // [{slug, name, published, thumb}]
   editingCase: null, // { slug, item, sha, isNew }
-  editingEvents: false, // 「活動」（整個展覽共用，content/events.json）編輯畫面
+  editingEvents: null, // { item, sha }——「活動」（整個展覽共用，content/events.json）編輯畫面
 };
 
 async function loadCaseList(){
@@ -576,37 +576,104 @@ function renderList(){
   document.querySelectorAll(".item-card[data-slug]").forEach(el => {
     el.addEventListener("click", () => openCaseEditor(el.dataset.slug));
   });
-  document.getElementById("eventsCard").addEventListener("click", () => {
-    state.editingEvents = true;
-    render();
-  });
+  document.getElementById("eventsCard").addEventListener("click", openEventsEditor);
 }
 
 /* ============================================================
    活動（整個展覽共用一份，不屬於任何案例）
    ============================================================
    對應 content/events.json（前台 src/lib/events.ts 讀這個檔案），顯示在
-   首頁最尾端的活動畫面、以及案例內頁最尾端。欄位還沒規劃，這一區先留白——
-   之後要加欄位時，照案例編輯器的模式用 ghGetFile／ghPutFile 讀寫這個檔案。
+   首頁最尾端的活動畫面、以及案例內頁最尾端。欄位：title（標題）、text
+   （內文，空白行分段）、posters（海報，上傳到 public/images/events/）。
+   文字欄位一打字就同步回 state——上傳／移除海報會整個重畫畫面，不先同步
+   的話還沒存檔的文字會被洗掉。
 */
+async function openEventsEditor(){
+  try{
+    setLoading(true, "載入活動中…");
+    const { json, sha } = await ghGetFile("content/events.json");
+    state.editingEvents = { item: Object.assign({ title: "活動", text: "", posters: [] }, json), sha };
+    render();
+  }catch(err){
+    toast(err.message || "載入失敗", true);
+  }finally{
+    setLoading(false);
+  }
+}
+
 function renderEventsEditor(){
+  const ed = state.editingEvents;
+  const item = ed.item;
   app.innerHTML = `
     ${renderTopBar()}
     <div class="wrap editor">
       <div class="editor-head">
         <button type="button" class="back-link" id="backBtn">← 回案例列表</button>
       </div>
+
       <div class="field-block">
-        <div class="label">活動</div>
-        <div class="field-hint">此區塊內容待規劃。目前前台的活動區塊會顯示「活動資訊即將公布」。</div>
+        <label>標題</label>
+        <input type="text" id="ev_title" value="${esc(item.title || "")}">
+        <div class="field-hint">同時也是首頁頂部選單「基地」右邊那個選項的名稱。</div>
+      </div>
+
+      <div class="field-block">
+        <label>活動文字資訊（日期、地點、內容…，用空白行分段）</label>
+        <textarea class="tall" id="ev_text">${esc(item.text || "")}</textarea>
+        <div class="field-hint">文字跟海報都留空的話，前台會顯示「活動資訊即將公布」。</div>
+      </div>
+
+      <div class="field-block">
+        <div class="label">海報</div>
+        <div class="field-hint" style="margin-top:0; margin-bottom:10px;">海報會用原比例完整顯示、不裁切。可以上傳多張，會依序並排。</div>
+        ${renderPhotoList("eventPosters", item.posters)}
+      </div>
+
+      <div class="save-bar">
+        <span class="save-status" id="saveStatus"></span>
+        <button type="button" class="btn primary" id="saveBtn">儲存並發布（寫回 GitHub）</button>
       </div>
     </div>
   `;
   document.getElementById("logoutBtn").addEventListener("click", logout);
   document.getElementById("backBtn").addEventListener("click", () => {
-    state.editingEvents = false;
+    state.editingEvents = null;
     render();
   });
+  document.getElementById("ev_title").addEventListener("input", (e) => { item.title = e.target.value; });
+  document.getElementById("ev_text").addEventListener("input", (e) => { item.text = e.target.value; });
+  document.getElementById("saveBtn").addEventListener("click", () => saveEventsEditor(ed));
+  wirePhotoList("eventPosters", () => item.posters || [], (next) => { item.posters = next; }, "events");
+}
+
+async function saveEventsEditor(ed){
+  const statusEl = document.getElementById("saveStatus");
+  const item = ed.item;
+  item.title = item.title.trim() || "活動";
+  item.posters = (item.posters || [])
+    .filter(p => p.src && p.src.trim())
+    .map(p => {
+      const poster = { id: p.id || `events-${uid()}`, src: p.src.trim() };
+      if(p.caption && p.caption.trim()) poster.caption = p.caption.trim();
+      return poster;
+    });
+  try{
+    setLoading(true, "儲存中…");
+    statusEl.classList.remove("err");
+    statusEl.textContent = "儲存中…";
+    const content = utf8ToBase64(JSON.stringify(item, null, 2) + "\n");
+    const result = await ghPutFile("content/events.json", content, "Update events via bamboo admin", ed.sha);
+    ed.sha = result.content ? result.content.sha : ed.sha;
+    render();
+    document.getElementById("saveStatus").textContent = "已儲存 " + new Date().toLocaleTimeString("zh-TW");
+    toast("已儲存並發布，網站會在下一次部署後更新");
+  }catch(err){
+    statusEl.classList.add("err");
+    statusEl.textContent = "儲存失敗";
+    toast(err.message || "儲存失敗", true);
+  }finally{
+    setLoading(false);
+  }
 }
 
 /* ============================================================

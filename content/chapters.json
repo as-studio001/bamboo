@@ -1,0 +1,15 @@
+{
+  "labels": {
+    "design": "建築設計",
+    "module": "模矩",
+    "structure": "構造",
+    "construction": "施工",
+    "assembly": "組裝說明書",
+    "site": "基地",
+    "events": "活動"
+  },
+  "navColor": {
+    "light": "",
+    "dark": ""
+  }
+}

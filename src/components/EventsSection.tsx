@@ -1,4 +1,5 @@
 import { exhibitionEvents, type EventPoster } from "@/lib/events";
+import { chapterLabel } from "@/lib/chapters";
 import { TEXT_PRIMARY } from "@/components/theme";
 
 // 「活動」區塊：整個展覽共用一份內容（content/events.json，見 lib/events.ts），兩種擺法——
@@ -7,7 +8,8 @@ import { TEXT_PRIMARY } from "@/components/theme";
 // - variant="inline"：案例內頁（獨立頁面／彈出視窗）最尾端、基地地圖後面，排法跟「基地」標題一致
 // 文字跟海報都還沒填的時候只顯示一句「活動資訊即將公布」。
 export function EventsSection({ variant, id }: { variant: "screen" | "inline"; id: string }) {
-  const { title, text } = exhibitionEvents;
+  const { text } = exhibitionEvents;
+  const title = chapterLabel("events");
   const posters = (exhibitionEvents.posters || []).filter((p) => p.src);
   const paragraphs = (text || "").split(/\n\n+/).map((p) => p.trim()).filter(Boolean);
 

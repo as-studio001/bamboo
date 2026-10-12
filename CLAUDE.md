@@ -77,9 +77,10 @@
 ## 頁面架構
 
 1. **展覽首頁 `/`** — 現在是**兩個滿版畫面疊起來、用整頁 `scroll-snap` 切換**（2026-08-28 新增）：
-   - 第一畫面：**策展宣言**（`CuratorialManifesto.tsx`）——純文字、非對稱靠左，不用任何一案的照片當背景（避免偏袒觀感），底部有捲動提示
+   - 第一畫面：**策展宣言**（`CuratorialManifesto.tsx`）——純文字、非對稱靠左，不用任何一案的照片當背景（避免偏袒觀感），底部有捲動提示。文字存在 `content/manifesto.json`（由 `lib/manifesto.ts` 讀入，欄位 `eyebrow`／`title`／`lead`／`body`，換行原樣保留），後台案例列表下方「展覽共用區塊 → 策展宣言」可以編輯。左右兩側的直書標題「2026常民竹小屋」（`EdgeTitle.tsx`）點下去會捲回這一屏（首頁開著彈出視窗時會一併關掉視窗；案例獨立頁面則導回首頁）
    - 第二畫面：**兩欄展覽**（`SplitExhibition.tsx`）——兩棟建築案左右並列，各自獨立的封面／照片索引／基地地圖，滑鼠滾輪在欄位內是自訂的慣性捲動物理（`usePanelWheelScroll`），跟整頁的 scroll-snap 是兩層獨立的捲動範圍（欄位內的 wheel handler 會 `preventDefault()`，不會漏出去影響整頁捲動）
-   - 第三畫面：**活動**（`EventsSection.tsx`，2026-10-12 新增）——整個展覽**共用一份**（不屬於任何案例），內容存在 `content/events.json`（由 `lib/events.ts` 讀入）。頂部選單「基地」右邊的「活動」捲到這裡；案例內頁（獨立頁面／彈出視窗）最尾端、基地後面也會顯示同一份。後台案例列表下方有「展覽共用區塊 → 活動」入口，可以編輯標題、活動文字（空白行分段，網址會自動變成可點的連結）跟海報（`posters`，上傳到 `public/images/events/`，前台用原比例完整顯示、不裁切）
+   - 第三畫面：**活動**（`EventsSection.tsx`，2026-10-12 新增）——整個展覽**共用一份**（不屬於任何案例），內容存在 `content/events.json`（由 `lib/events.ts` 讀入）。頂部選單「基地」右邊的「活動」捲到這裡；案例內頁（獨立頁面／彈出視窗）最尾端、基地後面也會顯示同一份。後台案例列表下方有「展覽共用區塊 → 活動」入口，可以編輯活動文字（空白行分段，網址會自動變成可點的連結）跟海報（`posters`，上傳到 `public/images/events/`，前台用原比例完整顯示、不裁切）
+   - **章節名稱**（建築設計／模矩／構造／施工／組裝說明書／基地／活動）兩案共用一份，存在 `content/chapters.json`（`lib/chapters.ts` 的 `chapterLabel()`），首頁頂部選單、內頁章節小標、獨立頁左側直書導覽、活動區塊標題都讀這裡；各案例 JSON 裡的 `chapter.title`、`events.json` 的 `title` 已不再使用。同一個檔案的 `navColor`（`light`／`dark`，hex 色碼，空字串＝跟隨主題）**只**控制首頁頂部選單的文字顏色。後台「展覽共用區塊 → 章節標題」可以編輯（2026-10-12 新增）
 2. **建築案內頁** — 兩種進入方式共用同一套內容元件（`ProjectDetail.tsx`）：
    - `/projects/[slug]` 獨立頁面（分享連結／SEO 用，自己畫左側章節導覽 `ChapterEdgeNav`）
    - 從首頁點照片進來的**彈出視窗**（Parallel + Intercepting Routes：`@modal/(.)projects/[slug]/page.tsx`，`DetailModal.tsx` 包一層液態玻璃質感的殼），首頁在背後維持掛載、章節標籤列共用首頁那份 `TopChapterNav`，不重複做
@@ -145,7 +146,7 @@ Project = { slug, shortLabel, name, location, year, type, intro, accent, titleAl
 
 - **project-one（常民竹小屋）**：10 張真實工地現場照片（`public/images/project-one/`），已分散用在各章節；`intro`／各章節 `text` 都還是「〔佔位文字，抓版面用〕」開頭的草稿；`location`／`year`／`type` 都是「待補」；`coordinates` 還沒有值
 - **project-two（一籌）**：只有 1 張真實照片（封面），其餘照片全部是從 picsum.photos 下載的免版權風景照（`public/images/stock/`，已存進專案不是外連），標「〔網路免版權風景照，待替換〕」；其餘欄位狀態同 project-one
-- **首頁「策展宣言」文字**：全新的佔位文字，還沒有正式策展論述
+- **首頁「策展宣言」文字**：已有一版正式文案（「竹構的下一步｜Bamboo, Reconfigured」），存在 `content/manifesto.json`，可以直接用 `/admin` 修改
 - **組裝說明書 PDF**：兩案都是同一份範例檔案（`public/files/project-*/assembly.pdf`），不是正式內容
 - **這些全部都可以直接用 `/admin` 後台編輯，不需要改程式碼、不需要重新部署**——這是這整套架構存在的目的
 
@@ -158,7 +159,7 @@ Project = { slug, shortLabel, name, location, year, type, intro, accent, titleAl
 - [x] 正式後台 `/admin`（跟 Internal-Pages 共用 Supabase／Netlify 後端，git-JSON 存儲，跨後台登入交接）
 - [x] 後台大檔案（影片／GIF）上傳修復（2026-10-01，見「已知的坑」）
 - [ ] **實際建築案圖片與文字內容**——目前大多還是佔位文字／免版權風景照，需要真實案名、地點、年份、論述、正式照片跟正式組裝說明書 PDF，直接用 `/admin` 後台編輯即可
-- [ ] 首頁「策展宣言」正式文案
+- [x] 首頁「策展宣言」改由後台編輯（2026-10-12）
 - [ ] 「新增案例」在後台操作後，`src/lib/projects.ts` 頂端的 import 清單需要手動補一行（見「資料模型」一節）——這步驟目前沒有自動化，如果之後要支援後台自己新增案例並且前台自動生效，這是需要再處理的地方
 
 ## 開發指令

@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { manifesto } from "@/lib/manifesto";
 
 // 首頁最上面新增的第一個畫面——「策展宣言」，點進網站先看到這個滿版的宣言頁，向下捲動
 // （或點下面的捲動提示）才會進到現有的兩欄並列版面（SplitExhibition）。這一頁不屬於任何
@@ -13,13 +14,19 @@ import { motion } from "framer-motion";
 //
 // 進場淡入位移沿用全站動效原則（20px／0.6~0.8s）；底部的「向下捲動」提示用緩慢的上下
 // 浮動＋淡入淡出循環，克制、不搶戲，純粹當作一個「這裡還沒完，往下捲」的視覺線索。
+//
+// 文字內容存在 content/manifesto.json（見 lib/manifesto.ts），由後台 /admin 的「策展宣言」編輯；
+// lead／body 用 whitespace-pre-line 保留後台輸入的換行。id="manifesto" 是給兩側直書標題
+// （EdgeTitle）點擊時捲回這裡用的。
 export function CuratorialManifesto() {
+  const { eyebrow, title, lead, body } = manifesto;
+
   function scrollToExhibition() {
     document.getElementById("exhibition")?.scrollIntoView({ behavior: "smooth" });
   }
 
   return (
-    <section className="relative flex h-[100dvh] w-full shrink-0 snap-start flex-col justify-between overflow-hidden bg-[var(--background)] text-[var(--foreground)]">
+    <section id="manifesto" className="relative flex h-[100dvh] w-full shrink-0 snap-start flex-col justify-between overflow-hidden bg-[var(--background)] text-[var(--foreground)]">
       <div className="flex flex-1 flex-col justify-center px-6 pt-16 pb-10 sm:px-12 sm:pt-20 lg:px-20">
         <motion.p
           initial={{ opacity: 0, y: 20 }}
@@ -28,7 +35,7 @@ export function CuratorialManifesto() {
           className="font-mono text-[10px] tracking-[0.25em] uppercase sm:text-xs"
           style={{ color: "var(--foreground-muted)" }}
         >
-          2026 常民竹小屋
+          {eyebrow}
         </motion.p>
 
         <motion.div
@@ -37,25 +44,22 @@ export function CuratorialManifesto() {
           transition={{ duration: 0.7, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
           className="mt-6 max-w-3xl sm:mt-8"
         >
-          <p className="font-serif-tc text-2xl leading-[1.7] font-medium sm:text-3xl lg:text-[2.35rem]">
-            竹構的下一步｜Bamboo, Reconfigured
-          </p>
-          <p className="font-serif-tc text-lg leading-[1.7] font-medium sm:text-xl lg:text-[1.5rem]">
-            ☉常民使用的當代竹構<br />
-            ☉模組化的未來竹構<br />
-            ☉可與業主共同創造的竹構<br />
-            <br />
-            竹，不只是傳統材料，也不只是被重新詮釋的自然建材。<br />
-            本展覽從「竹構如何被建造」出發，重新思考竹構建築的可能性。
-          </p>
-          <p
-            className="mt-6 max-w-xl text-sm leading-relaxed sm:text-base"
-            style={{ color: "var(--foreground-muted)" }}
-          >
-            首先，讓竹構築回到常民生活，親近日常使用的需求，成為人們可以休憩、閱讀、聚會、工作與生活的場所；竹構不再只是節慶、藝術或活動中的展示物，而是一種真正被使用、被喜愛，並能持續融入當代生活的建築形式。<br />
-            在此基礎上，進一步思考竹構如何被建造：如何將竹材轉化為可以被標準化、拆解、組裝、替換與再利用的構件系統；又如何透過使用者與業主的參與，讓同一套系統產生不同的空間結果。<br />
-            因此，竹小屋不是一個固定的完成品，而是一套可以持續生成、隨著不同使用者與生活情境演變的竹構系統。
-          </p>
+          {title && (
+            <p className="font-serif-tc text-2xl leading-[1.7] font-medium sm:text-3xl lg:text-[2.35rem]">{title}</p>
+          )}
+          {lead && (
+            <p className="font-serif-tc text-lg leading-[1.7] font-medium whitespace-pre-line sm:text-xl lg:text-[1.5rem]">
+              {lead}
+            </p>
+          )}
+          {body && (
+            <p
+              className="mt-6 max-w-xl text-sm leading-relaxed whitespace-pre-line sm:text-base"
+              style={{ color: "var(--foreground-muted)" }}
+            >
+              {body}
+            </p>
+          )}
         </motion.div>
       </div>
 

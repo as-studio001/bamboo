@@ -10,8 +10,8 @@ export type EventPoster = {
   caption?: string;
 };
 
+// 標題（「活動」這兩個字）跟章節名稱放在一起管理，見 lib/chapters.ts 的 chapterLabel("events")。
 export type ExhibitionEvents = {
-  title: string;
   text?: string; // 段落文字，用 \n\n 分段；文字跟海報都留空時前台顯示「活動資訊即將公布」
   posters?: EventPoster[];
 };

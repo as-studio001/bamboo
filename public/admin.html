@@ -288,6 +288,13 @@ async function ghGetFile(path){
   const { sha, content } = decodeGhFileData(data);
   return { sha, content, json: JSON.parse(content) };
 }
+// 跟 ghGetFile 一樣，但檔案在 GitHub 上還不存在（404）時回傳 null，不丟錯——給「展覽共用
+// 區塊」這類單一 JSON 檔用：檔案還沒建立時用預設值打開編輯畫面，存檔時（不帶 sha）會新建檔案。
+async function ghGetFileOrNull(path){
+  const res = await ghFetchPublic(path);
+  if(res && res.status === 404) return null;
+  return ghGetFile(path);
+}
 async function ghListDir(path){
   const res = await ghFetchPublic(path);
   if(res && res.status === 404) return [];
@@ -389,6 +396,8 @@ const state = {
   cases: null, // [{slug, name, published, thumb}]
   editingCase: null, // { slug, item, sha, isNew }
   editingEvents: null, // { item, sha }——「活動」（整個展覽共用，content/events.json）編輯畫面
+  editingManifesto: null, // { item, sha }——「策展宣言」（整個展覽共用，content/manifesto.json）編輯畫面
+  editingChapters: null, // { item, sha }——「章節標題」（兩案共用，content/chapters.json）編輯畫面
 };
 
 async function loadCaseList(){
@@ -413,6 +422,8 @@ function render(){
   if(!authSession || !state.user){ renderLogin(); return; }
   if(state.editingCase){ renderCaseEditor(); return; }
   if(state.editingEvents){ renderEventsEditor(); return; }
+  if(state.editingManifesto){ renderManifestoEditor(); return; }
+  if(state.editingChapters){ renderChaptersEditor(); return; }
   renderList();
 }
 
@@ -562,6 +573,20 @@ function renderList(){
 
       <div class="list-section-title">展覽共用區塊</div>
       <div class="item-grid">
+        <div class="item-card" id="manifestoCard">
+          <div class="thumb empty">策展宣言</div>
+          <div class="info">
+            <div class="t">策展宣言</div>
+            <div class="m"><span>content/manifesto.json</span></div>
+          </div>
+        </div>
+        <div class="item-card" id="chaptersCard">
+          <div class="thumb empty">章節標題</div>
+          <div class="info">
+            <div class="t">章節標題</div>
+            <div class="m"><span>content/chapters.json</span></div>
+          </div>
+        </div>
         <div class="item-card" id="eventsCard">
           <div class="thumb empty">活動</div>
           <div class="info">
@@ -577,6 +602,229 @@ function renderList(){
     el.addEventListener("click", () => openCaseEditor(el.dataset.slug));
   });
   document.getElementById("eventsCard").addEventListener("click", openEventsEditor);
+  document.getElementById("manifestoCard").addEventListener("click", openManifestoEditor);
+  document.getElementById("chaptersCard").addEventListener("click", openChaptersEditor);
+}
+
+/* ============================================================
+   章節標題（兩案共用一份）
+   ============================================================
+   對應 content/chapters.json（前台 src/lib/chapters.ts 讀這個檔案）。
+   labels：六個章節＋「活動」的名稱，首頁頂部選單、案例內頁小標、獨立頁
+   左側直書導覽、活動區塊標題都用這一份；留空就用預設名稱。
+   navColor：只套用在首頁頂部選單的文字顏色，淺色／深色模式各一個，
+   空字串＝沿用主題本身的文字色。
+*/
+const LABEL_DEFS = [
+  { key: "design", label: "建築設計" },
+  { key: "module", label: "模矩" },
+  { key: "structure", label: "構造" },
+  { key: "construction", label: "施工" },
+  { key: "assembly", label: "組裝說明書" },
+  { key: "site", label: "基地" },
+  { key: "events", label: "活動" },
+];
+const NAV_COLOR_DEFS = [
+  { key: "light", label: "淺色模式", fallback: "#171412" },
+  { key: "dark", label: "深色模式", fallback: "#f2f1ee" },
+];
+
+async function openChaptersEditor(){
+  try{
+    setLoading(true, "載入章節標題中…");
+    const { json, sha } = (await ghGetFileOrNull("content/chapters.json")) || { json: {}, sha: undefined };
+    const labels = {};
+    LABEL_DEFS.forEach(d => { labels[d.key] = (json.labels && json.labels[d.key]) || d.label; });
+    const navColor = Object.assign({ light: "", dark: "" }, json.navColor);
+    state.editingChapters = { item: { labels, navColor }, sha };
+    render();
+  }catch(err){
+    toast(err.message || "載入失敗", true);
+  }finally{
+    setLoading(false);
+  }
+}
+
+function renderChaptersEditor(){
+  const ed = state.editingChapters;
+  const item = ed.item;
+  app.innerHTML = `
+    ${renderTopBar()}
+    <div class="wrap editor">
+      <div class="editor-head">
+        <button type="button" class="back-link" id="backBtn">← 回案例列表</button>
+      </div>
+
+      <div class="field-block">
+        <div class="label">章節名稱</div>
+        <div class="field-hint" style="margin-top:0; margin-bottom:10px;">兩個案例共用。首頁頂部選單、案例內頁的章節小標、獨立頁左側直書導覽都會一起改；留空會用預設名稱。</div>
+        <div class="two-col">
+          ${LABEL_DEFS.map(d => `
+            <div class="field-block">
+              <label>${esc(d.label)}</label>
+              <input type="text" data-label="${d.key}" value="${esc(item.labels[d.key] || "")}">
+            </div>
+          `).join("")}
+        </div>
+      </div>
+
+      <div class="field-block">
+        <div class="label">首頁頂部選單的文字顏色</div>
+        <div class="field-hint" style="margin-top:0; margin-bottom:10px;">只影響首頁頂部那一排選單。淺色、深色模式分開設定；勾「跟隨主題」就維持原本的黑／白。</div>
+        <div class="two-col">
+          ${NAV_COLOR_DEFS.map(d => {
+            const value = item.navColor[d.key];
+            return `
+            <div class="field-block">
+              <label>${esc(d.label)}</label>
+              <input type="color" data-color="${d.key}" value="${esc(value || d.fallback)}" ${value ? "" : "disabled"} style="height:48px; padding:4px; cursor:pointer;">
+              <label class="checkbox-row" style="margin-top:8px;"><input type="checkbox" data-color-default="${d.key}" ${value ? "" : "checked"}> 跟隨主題（預設）</label>
+            </div>`;
+          }).join("")}
+        </div>
+      </div>
+
+      <div class="save-bar">
+        <span class="save-status" id="saveStatus"></span>
+        <button type="button" class="btn primary" id="saveBtn">儲存並發布（寫回 GitHub）</button>
+      </div>
+    </div>
+  `;
+  document.getElementById("logoutBtn").addEventListener("click", logout);
+  document.getElementById("backBtn").addEventListener("click", () => {
+    state.editingChapters = null;
+    render();
+  });
+  document.querySelectorAll("[data-label]").forEach(el => {
+    el.addEventListener("input", (e) => { item.labels[el.dataset.label] = e.target.value; });
+  });
+  document.querySelectorAll("[data-color]").forEach(el => {
+    el.addEventListener("input", (e) => { item.navColor[el.dataset.color] = e.target.value; });
+  });
+  document.querySelectorAll("[data-color-default]").forEach(el => {
+    el.addEventListener("change", () => {
+      const k = el.dataset.colorDefault;
+      const picker = document.querySelector(`[data-color="${k}"]`);
+      picker.disabled = el.checked;
+      item.navColor[k] = el.checked ? "" : picker.value;
+    });
+  });
+  document.getElementById("saveBtn").addEventListener("click", () => saveChaptersEditor(ed));
+}
+
+async function saveChaptersEditor(ed){
+  const statusEl = document.getElementById("saveStatus");
+  const item = ed.item;
+  LABEL_DEFS.forEach(d => { item.labels[d.key] = (item.labels[d.key] || "").trim() || d.label; });
+  try{
+    setLoading(true, "儲存中…");
+    statusEl.classList.remove("err");
+    statusEl.textContent = "儲存中…";
+    const content = utf8ToBase64(JSON.stringify(item, null, 2) + "\n");
+    const result = await ghPutFile("content/chapters.json", content, "Update chapter labels via bamboo admin", ed.sha);
+    ed.sha = result.content ? result.content.sha : ed.sha;
+    render();
+    document.getElementById("saveStatus").textContent = "已儲存 " + new Date().toLocaleTimeString("zh-TW");
+    toast("已儲存並發布，網站會在下一次部署後更新");
+  }catch(err){
+    statusEl.classList.add("err");
+    statusEl.textContent = "儲存失敗";
+    toast(err.message || "儲存失敗", true);
+  }finally{
+    setLoading(false);
+  }
+}
+
+/* ============================================================
+   策展宣言（整個展覽共用一份，首頁第一個畫面）
+   ============================================================
+   對應 content/manifesto.json（前台 src/lib/manifesto.ts 讀這個檔案）。
+   欄位：eyebrow（最上面的小字）、title（大標）、lead（重點段落）、
+   body（灰色內文）；lead／body 裡的換行前台會原樣保留。
+*/
+async function openManifestoEditor(){
+  try{
+    setLoading(true, "載入策展宣言中…");
+    const { json, sha } = await ghGetFile("content/manifesto.json");
+    state.editingManifesto = { item: Object.assign({ eyebrow: "", title: "", lead: "", body: "" }, json), sha };
+    render();
+  }catch(err){
+    toast(err.message || "載入失敗", true);
+  }finally{
+    setLoading(false);
+  }
+}
+
+function renderManifestoEditor(){
+  const ed = state.editingManifesto;
+  const item = ed.item;
+  app.innerHTML = `
+    ${renderTopBar()}
+    <div class="wrap editor">
+      <div class="editor-head">
+        <button type="button" class="back-link" id="backBtn">← 回案例列表</button>
+      </div>
+
+      <div class="field-block">
+        <label>小標（最上面的灰色小字）</label>
+        <input type="text" id="mf_eyebrow" value="${esc(item.eyebrow || "")}">
+      </div>
+
+      <div class="field-block">
+        <label>標題</label>
+        <input type="text" id="mf_title" value="${esc(item.title || "")}">
+      </div>
+
+      <div class="field-block">
+        <label>重點段落（標題下方的大字，換行會照樣顯示）</label>
+        <textarea class="tall" id="mf_lead">${esc(item.lead || "")}</textarea>
+      </div>
+
+      <div class="field-block">
+        <label>內文（最下面的灰色小字，換行會照樣顯示）</label>
+        <textarea class="tall" id="mf_body">${esc(item.body || "")}</textarea>
+        <div class="field-hint">任一欄留空，前台就不顯示那一塊。</div>
+      </div>
+
+      <div class="save-bar">
+        <span class="save-status" id="saveStatus"></span>
+        <button type="button" class="btn primary" id="saveBtn">儲存並發布（寫回 GitHub）</button>
+      </div>
+    </div>
+  `;
+  document.getElementById("logoutBtn").addEventListener("click", logout);
+  document.getElementById("backBtn").addEventListener("click", () => {
+    state.editingManifesto = null;
+    render();
+  });
+  ["eyebrow", "title", "lead", "body"].forEach(k => {
+    document.getElementById("mf_" + k).addEventListener("input", (e) => { item[k] = e.target.value; });
+  });
+  document.getElementById("saveBtn").addEventListener("click", () => saveManifestoEditor(ed));
+}
+
+async function saveManifestoEditor(ed){
+  const statusEl = document.getElementById("saveStatus");
+  const item = ed.item;
+  ["eyebrow", "title"].forEach(k => { item[k] = (item[k] || "").trim(); });
+  ["lead", "body"].forEach(k => { item[k] = (item[k] || "").replace(/\r\n/g, "\n").trim(); });
+  try{
+    setLoading(true, "儲存中…");
+    statusEl.classList.remove("err");
+    statusEl.textContent = "儲存中…";
+    const content = utf8ToBase64(JSON.stringify(item, null, 2) + "\n");
+    const result = await ghPutFile("content/manifesto.json", content, "Update manifesto via bamboo admin", ed.sha);
+    ed.sha = result.content ? result.content.sha : ed.sha;
+    render();
+    document.getElementById("saveStatus").textContent = "已儲存 " + new Date().toLocaleTimeString("zh-TW");
+    toast("已儲存並發布，網站會在下一次部署後更新");
+  }catch(err){
+    statusEl.classList.add("err");
+    statusEl.textContent = "儲存失敗";
+    toast(err.message || "儲存失敗", true);
+  }finally{
+    setLoading(false);
+  }
 }
 
 /* ============================================================
@@ -592,7 +840,7 @@ async function openEventsEditor(){
   try{
     setLoading(true, "載入活動中…");
     const { json, sha } = await ghGetFile("content/events.json");
-    state.editingEvents = { item: Object.assign({ title: "活動", text: "", posters: [] }, json), sha };
+    state.editingEvents = { item: Object.assign({ text: "", posters: [] }, json), sha };
     render();
   }catch(err){
     toast(err.message || "載入失敗", true);
@@ -611,11 +859,7 @@ function renderEventsEditor(){
         <button type="button" class="back-link" id="backBtn">← 回案例列表</button>
       </div>
 
-      <div class="field-block">
-        <label>標題</label>
-        <input type="text" id="ev_title" value="${esc(item.title || "")}">
-        <div class="field-hint">同時也是首頁頂部選單「基地」右邊那個選項的名稱。</div>
-      </div>
+      <div class="field-hint" style="margin-bottom:18px;">標題（「活動」這兩個字）改到「章節標題」裡設定。</div>
 
       <div class="field-block">
         <label>活動文字資訊（日期、地點、內容…，用空白行分段）</label>
@@ -640,7 +884,6 @@ function renderEventsEditor(){
     state.editingEvents = null;
     render();
   });
-  document.getElementById("ev_title").addEventListener("input", (e) => { item.title = e.target.value; });
   document.getElementById("ev_text").addEventListener("input", (e) => { item.text = e.target.value; });
   document.getElementById("saveBtn").addEventListener("click", () => saveEventsEditor(ed));
   wirePhotoList("eventPosters", () => item.posters || [], (next) => { item.posters = next; }, "events");
@@ -649,7 +892,7 @@ function renderEventsEditor(){
 async function saveEventsEditor(ed){
   const statusEl = document.getElementById("saveStatus");
   const item = ed.item;
-  item.title = item.title.trim() || "活動";
+  delete item.title; // 標題已改存在 content/chapters.json
   item.posters = (item.posters || [])
     .filter(p => p.src && p.src.trim())
     .map(p => {
@@ -825,11 +1068,6 @@ function renderCaseEditor(){
             <span class="num">${i + 1}</span>
             <h3>${esc(def.label)}</h3>
             <span class="key">key: ${def.key}</span>
-          </div>
-
-          <div class="field-block">
-            <label>章節標題</label>
-            <input type="text" data-cfield="title" value="${esc(chapter.title || def.label)}">
           </div>
 
           <div class="field-block">

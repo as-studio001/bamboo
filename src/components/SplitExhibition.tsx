@@ -8,7 +8,8 @@ import { PhotoStream } from "@/components/PhotoStream";
 import { ChapterMap } from "@/components/ChapterExtras";
 import { AdminAccessLink } from "@/components/AdminAccessLink";
 import { useImageTextColor } from "@/lib/useImageTextColor";
-import { exhibitionEvents, EVENTS_KEY } from "@/lib/events";
+import { EVENTS_KEY } from "@/lib/events";
+import { chapterLabel, navColor } from "@/lib/chapters";
 import { PANEL_BG, TEXT_PRIMARY, TEXT_PAD } from "@/components/theme";
 
 type Focus = "a" | "b" | null;
@@ -297,22 +298,28 @@ function TopChapterNav({ projects }: { projects: [Project, Project] }) {
     document.getElementById("events-screen")?.scrollIntoView({ behavior: "smooth" });
   }
 
+  // 名稱跟文字顏色都由後台「章節標題」設定（content/chapters.json，見 lib/chapters.ts）。
+  // 顏色淺色／深色模式各一個，用 --nav-label 這個 CSS 變數跟著 <html data-theme> 切換；
+  // 沒設定的模式就沿用主題文字色。
+  const colorCss = [
+    navColor.light && `:root{--nav-label:${navColor.light}}`,
+    navColor.dark && `:root[data-theme="dark"]{--nav-label:${navColor.dark}}`,
+    navColor.light && !navColor.dark && `:root[data-theme="dark"]{--nav-label:var(--foreground)}`,
+  ]
+    .filter(Boolean)
+    .join("");
+  const labelClass = "font-black text-[10px] tracking-wide uppercase text-[var(--nav-label,var(--foreground))] sm:text-sm";
+
   return (
     <div className="flex h-[52px] shrink-0 items-center justify-center gap-6 sm:h-[76px] sm:gap-10">
+      {colorCss && <style>{colorCss}</style>}
       {a.chapters.map((chapter) => (
-        <button
-          key={chapter.key}
-          onClick={() => goTo(chapter.key)}
-          className="font-black text-[10px] tracking-wide uppercase text-foreground sm:text-sm"
-        >
-          {chapter.title}
+        <button key={chapter.key} onClick={() => goTo(chapter.key)} className={labelClass}>
+          {chapterLabel(chapter.key)}
         </button>
       ))}
-      <button
-        onClick={goToEvents}
-        className="font-black text-[10px] tracking-wide uppercase text-foreground sm:text-sm"
-      >
-        {exhibitionEvents.title}
+      <button onClick={goToEvents} className={labelClass}>
+        {chapterLabel("events")}
       </button>
     </div>
   );

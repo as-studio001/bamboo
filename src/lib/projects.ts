@@ -12,7 +12,8 @@ export type ChapterKey = "design" | "module" | "structure" | "construction" | "a
 
 export type Chapter = {
   key: ChapterKey;
-  title: string;
+  title: string; // 已不再使用——章節名稱改成兩案共用一份，見 lib/chapters.ts 的 chapterLabel()
+  // （舊資料跟後台仍會寫這個欄位，留著無妨）
   text?: string; // 段落文字，用 \n\n 分段——「建築設計／模矩／構造／施工」這四章會自動排版
   // （見 lib/photoLayout.ts 的 layoutChapter），不用自己決定圖片插在哪裡；「組裝說明書」
   // 「基地」也用這個欄位，但排版方式不同（AssemblySection 只取第一段，「基地」目前沒有

@@ -9,7 +9,8 @@ import { ChapterMap, ChapterVideo } from "@/components/ChapterExtras";
 import { AssemblyBook } from "@/components/AssemblyBook";
 import { useImageTextColor } from "@/lib/useImageTextColor";
 import { EventsSection } from "@/components/EventsSection";
-import { exhibitionEvents, EVENTS_KEY } from "@/lib/events";
+import { EVENTS_KEY } from "@/lib/events";
+import { chapterLabel } from "@/lib/chapters";
 import { PANEL_BG, TEXT_PRIMARY, TEXT_BODY } from "@/components/theme";
 
 // 案例內頁：架構直接照抄 Internal-Pages（as-studio001/Internal-Pages 的 js/render.js）的順序——
@@ -67,7 +68,7 @@ export function ProjectDetail({
             <NarrativeSection
               key={chapter.key}
               chapter={chapter}
-              title={chapter.title}
+              title={chapterLabel(chapter.key)}
               accent={project.accent}
               ratioState={ratioState}
             />
@@ -77,7 +78,7 @@ export function ProjectDetail({
 
           <div id="site" className="scroll-mt-10 border-t pt-10 sm:pt-14" style={{ borderColor: "var(--border-subtle)" }}>
             <h3 className={`font-serif-tc text-lg font-bold tracking-wide uppercase sm:text-xl ${TEXT_PRIMARY}`}>
-              基地
+              {chapterLabel("site")}
             </h3>
             <div className="mt-4">
               <ChapterMap project={project} />
@@ -141,7 +142,7 @@ function ChapterEdgeNav({ chapters, accent }: { chapters: Chapter[]; accent: str
           className="[writing-mode:vertical-rl] font-mono text-[9px] tracking-[0.15em] uppercase sm:text-[10px]"
           style={{ color: accent }}
         >
-          {chapter.title}
+          {chapterLabel(chapter.key)}
         </button>
       ))}
       <button
@@ -149,7 +150,7 @@ function ChapterEdgeNav({ chapters, accent }: { chapters: Chapter[]; accent: str
         className="[writing-mode:vertical-rl] font-mono text-[9px] tracking-[0.15em] uppercase sm:text-[10px]"
         style={{ color: accent }}
       >
-        {exhibitionEvents.title}
+        {chapterLabel("events")}
       </button>
     </nav>
   );
@@ -319,7 +320,7 @@ function AssemblySection({ project, chapter, accent }: { project: Project; chapt
       style={{ borderColor: "var(--border-subtle)" }}
     >
       <h3 className={`font-serif-tc text-lg font-bold tracking-wide uppercase sm:text-xl ${TEXT_PRIMARY}`}>
-        {chapter.title}
+        {chapterLabel(chapter.key)}
       </h3>
 
       <p className={`mt-4 max-w-2xl text-sm leading-relaxed sm:text-base ${TEXT_BODY}`}>{firstParagraph}</p>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useState } from "react";
 import type { Project } from "@/lib/projects";
 import { TEXT_BODY, TEXT_PAD } from "@/components/theme";
 
@@ -40,54 +40,41 @@ function formatCoords(lat: number, lng: number) {
   return `${Math.abs(lat).toFixed(4)}° ${ns}, ${Math.abs(lng).toFixed(4)}° ${ew}`;
 }
 
+// 基地地圖：嵌入 Google 地圖（衛星圖，t=k），用 maps.google.com 的 output=embed 網址——不需要
+// API 金鑰、不用綁帳單，座標直接沿用後台「基地」章節填的經緯度／縮放。
+// 地圖上蓋一層透明遮罩：iframe 是跨網域的，滑鼠在上面時滾輪事件會被地圖接走，欄位的自訂慣性捲動
+// （SplitExhibition.tsx 的 usePanelWheelScroll）跟整頁捲動都會在地圖上卡住。遮罩擋著時滾輪照常
+// 捲動頁面，點一下才拿掉遮罩、開始操作地圖；滑鼠離開地圖就恢復遮罩。
 export function ChapterMap({ project }: { project: Project }) {
   const coords = project.coordinates;
-  const mapRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!coords || !mapRef.current) return;
-    let cancelled = false;
-    let map: import("leaflet").Map | undefined;
-
-    import("leaflet").then((L) => {
-      if (cancelled || !mapRef.current) return;
-      map = L.map(mapRef.current, {
-        zoomControl: true,
-        scrollWheelZoom: false,
-        dragging: !L.Browser.mobile,
-        attributionControl: true,
-      }).setView([coords.lat, coords.lng], coords.zoom ?? 14);
-
-      // 國土測繪中心 PHOTO2：免金鑰的台灣正射影像圖磚，跟 Internal-Pages（as-studio001/Internal-Pages
-      // 的 js/render.js renderMap）同一個圖資來源——是台灣官方測繪資料，比全球通用的衛星圖層更貼合
-      // 台灣基地的精細度，也不像商用圖磚服務有速率限制的疑慮。
-      L.tileLayer("https://wmts.nlsc.gov.tw/wmts/PHOTO2/default/GoogleMapsCompatible/{z}/{y}/{x}", {
-        maxZoom: 19,
-        attribution: "圖資來源：內政部國土測繪中心",
-      }).addTo(map);
-
-      // 水滴形圖標＋脈動白環，造型照 Internal-Pages 的 .site-pin，顏色換成這個站的螢光綠點綴色
-      // （project.accent）而不是它原本的橘色，維持全站單一點綴色的規則。
-      const pinIcon = L.divIcon({
-        className: "",
-        html: `<div class="site-pin" style="--pin-color:${project.accent}"><div class="site-pin__shadow"></div><div class="site-pin__drop"><div class="site-pin__ring"></div></div></div>`,
-        iconSize: [34, 46],
-        iconAnchor: [17, 44],
-      });
-      L.marker([coords.lat, coords.lng], { icon: pinIcon }).addTo(map);
-    });
-
-    return () => {
-      cancelled = true;
-      map?.remove();
-    };
-  }, [coords, project.accent]);
+  const [active, setActive] = useState(false);
 
   return (
     <div className={`mt-4 sm:mt-6 ${TEXT_PAD}`}>
       {coords ? (
         <>
-          <div ref={mapRef} className="site-map-canvas h-52 w-full sm:h-72" />
+          <div className="group relative h-52 w-full overflow-hidden sm:h-72" onMouseLeave={() => setActive(false)}>
+            <iframe
+              title={`${project.name} 基地位置`}
+              src={`https://maps.google.com/maps?q=${coords.lat},${coords.lng}&t=k&z=${coords.zoom ?? 15}&hl=zh-TW&output=embed`}
+              className="h-full w-full border-0"
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              allowFullScreen
+            />
+            {!active && (
+              <button
+                type="button"
+                aria-label="點一下操作地圖"
+                onClick={() => setActive(true)}
+                className="absolute inset-0 flex cursor-pointer items-end justify-center pb-3"
+              >
+                <span className="rounded-full bg-black/60 px-3 py-1 font-mono text-[10px] tracking-wide text-white opacity-0 transition-opacity group-hover:opacity-100">
+                  點一下操作地圖
+                </span>
+              </button>
+            )}
+          </div>
           <div className="mt-3 text-center">
             {coords.address && (
               <p className={`text-[10px] sm:text-[11px] ${TEXT_BODY}`}>{coords.address}</p>

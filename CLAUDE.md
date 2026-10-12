@@ -56,7 +56,7 @@
 | 樣式 | Tailwind CSS v4 |
 | 動畫 | Framer Motion（`^13`） |
 | PDF 翻頁 | pdfjs-dist + react-pageflip（見「組裝說明書」章節） |
-| 地圖 | leaflet（「基地」章節） |
+| 地圖 | Google 地圖嵌入 iframe（衛星圖、免 API 金鑰，「基地」章節，`ChapterExtras.tsx` 的 `ChapterMap`）；地圖上蓋透明遮罩，點一下才能操作，避免滾輪被 iframe 吃掉 |
 | 部署 | Vercel（`https://bamboo-sage.vercel.app/`），push 到 `main` 自動部署 |
 | 內容存放 | **git-based CMS**：`content/projects/<slug>.json`（不是資料庫），前台建置時直接 `import` 這兩個 JSON 檔 |
 | 後台驗證 | Supabase Auth——**跟 as-studio001/Internal-Pages 共用同一個 Supabase 專案／同一批登入使用者**，這個專案自己沒有申請新的 Supabase 帳號 |
@@ -79,7 +79,7 @@
 1. **展覽首頁 `/`** — 現在是**兩個滿版畫面疊起來、用整頁 `scroll-snap` 切換**（2026-08-28 新增）：
    - 第一畫面：**策展宣言**（`CuratorialManifesto.tsx`）——純文字、非對稱靠左，不用任何一案的照片當背景（避免偏袒觀感），底部有捲動提示
    - 第二畫面：**兩欄展覽**（`SplitExhibition.tsx`）——兩棟建築案左右並列，各自獨立的封面／照片索引／基地地圖，滑鼠滾輪在欄位內是自訂的慣性捲動物理（`usePanelWheelScroll`），跟整頁的 scroll-snap 是兩層獨立的捲動範圍（欄位內的 wheel handler 會 `preventDefault()`，不會漏出去影響整頁捲動）
-   - 第三畫面：**活動**（`EventsSection.tsx`，2026-10-12 新增）——整個展覽**共用一份**（不屬於任何案例），內容存在 `content/events.json`（由 `lib/events.ts` 讀入）。頂部選單「基地」右邊的「活動」捲到這裡；案例內頁（獨立頁面／彈出視窗）最尾端、基地後面也會顯示同一份。後台案例列表下方有「展覽共用區塊 → 活動」入口，**目前欄位還沒規劃、只是留白的佔位畫面，還不能存檔**
+   - 第三畫面：**活動**（`EventsSection.tsx`，2026-10-12 新增）——整個展覽**共用一份**（不屬於任何案例），內容存在 `content/events.json`（由 `lib/events.ts` 讀入）。頂部選單「基地」右邊的「活動」捲到這裡；案例內頁（獨立頁面／彈出視窗）最尾端、基地後面也會顯示同一份。後台案例列表下方有「展覽共用區塊 → 活動」入口，可以編輯標題、活動文字（空白行分段，網址會自動變成可點的連結）跟海報（`posters`，上傳到 `public/images/events/`，前台用原比例完整顯示、不裁切）
 2. **建築案內頁** — 兩種進入方式共用同一套內容元件（`ProjectDetail.tsx`）：
    - `/projects/[slug]` 獨立頁面（分享連結／SEO 用，自己畫左側章節導覽 `ChapterEdgeNav`）
    - 從首頁點照片進來的**彈出視窗**（Parallel + Intercepting Routes：`@modal/(.)projects/[slug]/page.tsx`，`DetailModal.tsx` 包一層液態玻璃質感的殼），首頁在背後維持掛載、章節標籤列共用首頁那份 `TopChapterNav`，不重複做

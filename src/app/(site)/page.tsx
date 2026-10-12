@@ -1,6 +1,7 @@
 import { getPublishedProjects } from "@/lib/projects";
 import { SplitExhibition } from "@/components/SplitExhibition";
 import { CuratorialManifesto } from "@/components/CuratorialManifesto";
+import { EventsSection } from "@/components/EventsSection";
 
 // 首頁現在是兩個滿版畫面疊在一起、用整頁捲動切換（見 (site)/layout.tsx 的 main）：
 // 先進「策展宣言」（CuratorialManifesto），向下捲動（或點宣言頁底部的捲動提示）才進到
@@ -18,6 +19,8 @@ export default function Home() {
       <div id="exhibition" className="h-[100dvh] w-full shrink-0 snap-start">
         <SplitExhibition projects={[a, b]} />
       </div>
+      {/* 第三個畫面：整個展覽共用的「活動」資訊，網頁最尾端，頂部選單「活動」捲到這裡 */}
+      <EventsSection variant="screen" id="events-screen" />
     </>
   );
 }

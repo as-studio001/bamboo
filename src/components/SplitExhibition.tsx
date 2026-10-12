@@ -8,6 +8,7 @@ import { PhotoStream } from "@/components/PhotoStream";
 import { ChapterMap } from "@/components/ChapterExtras";
 import { AdminAccessLink } from "@/components/AdminAccessLink";
 import { useImageTextColor } from "@/lib/useImageTextColor";
+import { exhibitionEvents, EVENTS_KEY } from "@/lib/events";
 import { PANEL_BG, TEXT_PRIMARY, TEXT_PAD } from "@/components/theme";
 
 type Focus = "a" | "b" | null;
@@ -265,6 +266,16 @@ function TopChapterNav({ projects }: { projects: [Project, Project] }) {
     scrollChapterIntoView(`${b.slug}-${key}`);
   }
 
+  // 「活動」不是章節，是整個展覽共用的一份（見 lib/events.ts）：視窗開著時捲到視窗內容最尾端
+  // 的活動區塊（id="events"），沒開視窗時整頁捲到首頁最尾端的活動畫面（id="events-screen"）。
+  function goToEvents() {
+    if (document.querySelector(`[role="dialog"] #${EVENTS_KEY}`)) {
+      scrollChapterIntoView(EVENTS_KEY);
+      return;
+    }
+    document.getElementById("events-screen")?.scrollIntoView({ behavior: "smooth" });
+  }
+
   return (
     <div className="flex h-[52px] shrink-0 items-center justify-center gap-6 sm:h-[76px] sm:gap-10">
       {a.chapters.map((chapter) => (
@@ -276,6 +287,12 @@ function TopChapterNav({ projects }: { projects: [Project, Project] }) {
           {chapter.title}
         </button>
       ))}
+      <button
+        onClick={goToEvents}
+        className="font-black text-[10px] tracking-wide uppercase text-foreground sm:text-sm"
+      >
+        {exhibitionEvents.title}
+      </button>
     </div>
   );
 }

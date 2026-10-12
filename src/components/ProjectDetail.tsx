@@ -8,6 +8,8 @@ import { ImagePlaceholder } from "@/components/ImagePlaceholder";
 import { ChapterMap, ChapterVideo } from "@/components/ChapterExtras";
 import { AssemblyBook } from "@/components/AssemblyBook";
 import { useImageTextColor } from "@/lib/useImageTextColor";
+import { EventsSection } from "@/components/EventsSection";
+import { exhibitionEvents, EVENTS_KEY } from "@/lib/events";
 import { PANEL_BG, TEXT_PRIMARY, TEXT_BODY } from "@/components/theme";
 
 // 案例內頁：架構直接照抄 Internal-Pages（as-studio001/Internal-Pages 的 js/render.js）的順序——
@@ -81,6 +83,9 @@ export function ProjectDetail({
               <ChapterMap project={project} />
             </div>
           </div>
+
+          {/* 整個展覽共用的「活動」資訊（見 lib/events.ts），接在基地後面、內頁最尾端 */}
+          <EventsSection variant="inline" id={EVENTS_KEY} />
         </div>
       </div>
     </div>
@@ -139,6 +144,13 @@ function ChapterEdgeNav({ chapters, accent }: { chapters: Chapter[]; accent: str
           {chapter.title}
         </button>
       ))}
+      <button
+        onClick={() => goTo(EVENTS_KEY)}
+        className="[writing-mode:vertical-rl] font-mono text-[9px] tracking-[0.15em] uppercase sm:text-[10px]"
+        style={{ color: accent }}
+      >
+        {exhibitionEvents.title}
+      </button>
     </nav>
   );
 }

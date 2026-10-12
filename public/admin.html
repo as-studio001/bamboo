@@ -62,6 +62,7 @@ input,textarea,select{ font-family:inherit; font-size:14px; }
 }
 .login-screen input:focus{ outline:none; border-color:var(--ink); }
 
+.list-section-title{ font-family:var(--f-heading); font-weight:700; font-size:13px; letter-spacing:.02em; margin-bottom:14px; color:var(--ink); }
 .item-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(190px, 1fr)); gap:20px; padding-bottom:60px; }
 .item-card{
   border:1px solid var(--line); border-radius:8px; overflow:hidden; cursor:pointer;
@@ -387,6 +388,7 @@ const state = {
   user: null,
   cases: null, // [{slug, name, published, thumb}]
   editingCase: null, // { slug, item, sha, isNew }
+  editingEvents: false, // 「活動」（整個展覽共用，content/events.json）編輯畫面
 };
 
 async function loadCaseList(){
@@ -410,6 +412,7 @@ function render(){
   if(AUTH_LINK_TYPE && !state.user){ renderSetPassword(); return; }
   if(!authSession || !state.user){ renderLogin(); return; }
   if(state.editingCase){ renderCaseEditor(); return; }
+  if(state.editingEvents){ renderEventsEditor(); return; }
   renderList();
 }
 
@@ -556,11 +559,53 @@ function renderList(){
           </div>
         `).join("")}
       </div>
+
+      <div class="list-section-title">展覽共用區塊</div>
+      <div class="item-grid">
+        <div class="item-card" id="eventsCard">
+          <div class="thumb empty">活動</div>
+          <div class="info">
+            <div class="t">活動</div>
+            <div class="m"><span>content/events.json</span></div>
+          </div>
+        </div>
+      </div>
     </div>
   `;
   document.getElementById("logoutBtn").addEventListener("click", logout);
-  document.querySelectorAll(".item-card").forEach(el => {
+  document.querySelectorAll(".item-card[data-slug]").forEach(el => {
     el.addEventListener("click", () => openCaseEditor(el.dataset.slug));
+  });
+  document.getElementById("eventsCard").addEventListener("click", () => {
+    state.editingEvents = true;
+    render();
+  });
+}
+
+/* ============================================================
+   活動（整個展覽共用一份，不屬於任何案例）
+   ============================================================
+   對應 content/events.json（前台 src/lib/events.ts 讀這個檔案），顯示在
+   首頁最尾端的活動畫面、以及案例內頁最尾端。欄位還沒規劃，這一區先留白——
+   之後要加欄位時，照案例編輯器的模式用 ghGetFile／ghPutFile 讀寫這個檔案。
+*/
+function renderEventsEditor(){
+  app.innerHTML = `
+    ${renderTopBar()}
+    <div class="wrap editor">
+      <div class="editor-head">
+        <button type="button" class="back-link" id="backBtn">← 回案例列表</button>
+      </div>
+      <div class="field-block">
+        <div class="label">活動</div>
+        <div class="field-hint">此區塊內容待規劃。目前前台的活動區塊會顯示「活動資訊即將公布」。</div>
+      </div>
+    </div>
+  `;
+  document.getElementById("logoutBtn").addEventListener("click", logout);
+  document.getElementById("backBtn").addEventListener("click", () => {
+    state.editingEvents = false;
+    render();
   });
 }
 

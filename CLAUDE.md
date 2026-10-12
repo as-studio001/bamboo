@@ -79,6 +79,7 @@
 1. **展覽首頁 `/`** — 現在是**兩個滿版畫面疊起來、用整頁 `scroll-snap` 切換**（2026-08-28 新增）：
    - 第一畫面：**策展宣言**（`CuratorialManifesto.tsx`）——純文字、非對稱靠左，不用任何一案的照片當背景（避免偏袒觀感），底部有捲動提示
    - 第二畫面：**兩欄展覽**（`SplitExhibition.tsx`）——兩棟建築案左右並列，各自獨立的封面／照片索引／基地地圖，滑鼠滾輪在欄位內是自訂的慣性捲動物理（`usePanelWheelScroll`），跟整頁的 scroll-snap 是兩層獨立的捲動範圍（欄位內的 wheel handler 會 `preventDefault()`，不會漏出去影響整頁捲動）
+   - 第三畫面：**活動**（`EventsSection.tsx`，2026-10-12 新增）——整個展覽**共用一份**（不屬於任何案例），內容存在 `content/events.json`（由 `lib/events.ts` 讀入）。頂部選單「基地」右邊的「活動」捲到這裡；案例內頁（獨立頁面／彈出視窗）最尾端、基地後面也會顯示同一份。後台案例列表下方有「展覽共用區塊 → 活動」入口，**目前欄位還沒規劃、只是留白的佔位畫面，還不能存檔**
 2. **建築案內頁** — 兩種進入方式共用同一套內容元件（`ProjectDetail.tsx`）：
    - `/projects/[slug]` 獨立頁面（分享連結／SEO 用，自己畫左側章節導覽 `ChapterEdgeNav`）
    - 從首頁點照片進來的**彈出視窗**（Parallel + Intercepting Routes：`@modal/(.)projects/[slug]/page.tsx`，`DetailModal.tsx` 包一層液態玻璃質感的殼），首頁在背後維持掛載、章節標籤列共用首頁那份 `TopChapterNav`，不重複做

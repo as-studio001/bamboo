@@ -349,7 +349,10 @@ function Panel({
     <div
       style={{ width }}
       onClick={onActivate}
-      className="relative flex min-h-0 min-w-0 shrink-0 grow-0 flex-col overflow-hidden transition-[width] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
+      // isolate：欄位自成一個疊層範圍，裡面的案名標頭（z-20）只在欄位內比高低。不加的話標頭會
+      // 跟全頁比，高過案例彈出視窗後面那層蓋住首頁的白色遮罩（DetailModal.tsx，z-0），開案例時
+      // 標頭會從視窗上緣露出來殘留在畫面上。
+      className="relative isolate flex min-h-0 min-w-0 shrink-0 grow-0 flex-col overflow-hidden transition-[width] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
     >
       {/* 這個欄位的滾輪捲動由 usePanelWheelScroll 自己接管（見上方），不再依賴瀏覽器原生捲動／
           scroll-behavior／scroll-snap 這些各家實作不一致的機制——全程用 rAF 逐格推進，幀數密集、

@@ -104,7 +104,9 @@ function PhotoItem({
       prefetch={false}
       data-snap
       data-photo-anchor
-      className={`group block px-14 sm:px-20 lg:px-24 ${isFirst ? "pt-0" : "pt-8 sm:pt-12"}`}
+      // 手機版（<640px）不留左右空白、照片撐滿整欄——手機上每欄本來就只有半個螢幕寬，
+      // 再扣掉左右留白照片會小到看不清楚；sm 以上維持原本的留白。
+      className={`group block px-0 sm:px-20 lg:px-24 ${isFirst ? "pt-0" : "pt-8 sm:pt-12"}`}
     >
       {photo.src ? (
         <>
@@ -150,7 +152,7 @@ function AssemblyCoverItem({ project, chapter, isFirst }: { project: Project; ch
       prefetch={false}
       data-snap
       data-photo-anchor
-      className={`group block px-14 sm:px-20 lg:px-24 ${isFirst ? "pt-0" : "pt-8 sm:pt-12"}`}
+      className={`group block px-0 sm:px-20 lg:px-24 ${isFirst ? "pt-0" : "pt-8 sm:pt-12"}`}
     >
       <motion.div layoutId={id} transition={SHARED_ELEMENT_TRANSITION} className="aspect-[3/4] w-full overflow-hidden">
         {coverSrc && (

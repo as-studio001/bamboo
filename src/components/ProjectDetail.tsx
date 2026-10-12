@@ -51,6 +51,9 @@ export function ProjectDetail({
   );
   const assembly = project.chapters.find((c) => c.key === "assembly");
   const insetX = variant === "modal" ? "px-8 sm:px-12 lg:px-16" : "px-4 sm:px-8 lg:px-12";
+  // 手機版（<640px）內文照片用負邊距抵掉上面 insetX 的左右內距，貼齊面板／邊框兩側，
+  // 拿到螢幕能給的最大寬度；文字維持原本的內距。sm 以上不動。
+  const photoBleed = variant === "modal" ? "-mx-8 sm:mx-0" : "-mx-4 sm:mx-0";
   // 整個案例頁共用一份橫幅配對輪替狀態，見 photoLayout.ts 的 RatioState 說明。
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const ratioState = useMemo(() => createRatioState(), [project.slug]);
@@ -62,7 +65,9 @@ export function ProjectDetail({
 
       <div className={`pt-10 pb-24 sm:pt-16 ${insetX}`}>
         <div className="min-w-0">
-          {design && <NarrativeSection chapter={design} accent={project.accent} ratioState={ratioState} />}
+          {design && (
+            <NarrativeSection chapter={design} accent={project.accent} ratioState={ratioState} photoBleed={photoBleed} />
+          )}
 
           {narrativeChapters.map((chapter) => (
             <NarrativeSection
@@ -71,6 +76,7 @@ export function ProjectDetail({
               title={chapterLabel(chapter.key)}
               accent={project.accent}
               ratioState={ratioState}
+              photoBleed={photoBleed}
             />
           ))}
 
@@ -179,11 +185,13 @@ function NarrativeSection({
   title,
   accent,
   ratioState,
+  photoBleed,
 }: {
   chapter: Chapter;
   title?: string;
   accent: string;
   ratioState: RatioState;
+  photoBleed: string;
 }) {
   const paragraphs = useMemo(() => (chapter.text ?? "").split("\n\n"), [chapter.text]);
   // 這章最多顯示幾張照片，由文字長度決定（見 photoLayout.ts 的 maxPhotosForText）——
@@ -224,7 +232,7 @@ function NarrativeSection({
         if (block.type === "photo-solo") {
           const { photo } = block;
           return (
-            <div key={i} id={photo.id} data-photo-anchor className={`${topGap} scroll-mt-4`}>
+            <div key={i} id={photo.id} data-photo-anchor className={`${topGap} ${photoBleed} scroll-mt-4`}>
               <ImagePlaceholder image={photo} layoutId={photo.id} natural aspect="aspect-[16/9]" />
             </div>
           );
@@ -240,12 +248,15 @@ function NarrativeSection({
         // 決定：單獨一排預設底部切齊；連續兩排以上中間沒有文字隔開時會交替方向，讓兩排矮的
         // 那張都貼向彼此中間的接縫，留白被推到最外側（緊接段落文字的地方），不會卡在兩排
         // 照片正中間顯得莫名其妙——這裡不用另外判斷，照 row.align 給對應的 Tailwind class 就好。
+        //
+        // 手機版（<640px）不並排——兩張擠在一行每張只剩一百多 px 寬，改成上下各佔一整行
+        // （grid-cols-1），sm 以上才套用演算法算出來的欄寬（透過 --row-cols 變數）。
         const { row } = block;
         return (
           <div
             key={i}
-            className={`${topGap} grid gap-3 sm:gap-4 ${row.align === "start" ? "items-start" : "items-end"}`}
-            style={{ gridTemplateColumns: row.columns.map((c) => `${c}fr`).join(" ") }}
+            className={`${topGap} ${photoBleed} grid grid-cols-1 gap-3 sm:[grid-template-columns:var(--row-cols)] sm:gap-4 ${row.align === "start" ? "items-start" : "items-end"}`}
+            style={{ "--row-cols": row.columns.map((c) => `${c}fr`).join(" ") } as React.CSSProperties}
           >
             {row.photos.map((photo) => (
               <div key={photo.id} id={photo.id} data-photo-anchor className="scroll-mt-4">
@@ -294,7 +305,8 @@ function ReadMoreGallery({ images, accent }: { images: Chapter["moreImages"]; ac
         // 更多張，份量上更明顯跟上面的主要論述圖片區隔開來。
         <div className="mt-5 flex flex-wrap gap-3 sm:mt-6 sm:gap-4">
           {images.map((image) => (
-            <div key={image.id} className="w-[calc(33.333%-8px)] sm:w-[calc(20%-13px)]">
+            // 手機 2 欄（原本 3 欄，縮圖太小看不清楚）／桌機 5 欄
+            <div key={image.id} className="w-[calc(50%-6px)] sm:w-[calc(20%-13px)]">
               <ImagePlaceholder image={image} aspect="aspect-[4/3]" />
               {image.caption && (
                 <p className={`mt-2 text-[10px] leading-relaxed sm:text-[11px] ${TEXT_BODY}`}>{image.caption}</p>

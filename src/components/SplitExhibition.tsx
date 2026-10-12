@@ -352,18 +352,25 @@ function Panel({
       {/* 這個欄位的滾輪捲動由 usePanelWheelScroll 自己接管（見上方），不再依賴瀏覽器原生捲動／
           scroll-behavior／scroll-snap 這些各家實作不一致的機制——全程用 rAF 逐格推進，幀數密集、
           跟手自由，停下來才會吸附對齊最近的照片（data-snap，見下方）。 */}
+      {/* （2026-10-12 再修正）案名標頭改成疊在圖片上、貼齊圖片上緣：灰白大字案名＋下方小字地點／年份／
+          類型。疊在捲動容器上面（absolute，不佔版面、pointer-events-none 不擋點擊），往下捲照片時
+          一直留在欄位頂端。往下會捲到白底的圖面，灰白字加一層很淡的陰影，淺色圖上也看得到。 */}
       {showHeader && (
         <div
-          className={`shrink-0 truncate pb-2 font-black text-base leading-tight tracking-tight uppercase ${TEXT_PRIMARY} ${PANEL_BG} ${project.titleAlign === "right" ? "text-right" : ""}`}
+          className={`pointer-events-none absolute inset-x-0 top-0 z-20 px-3 pt-3 ${project.titleAlign === "right" ? "text-right" : ""}`}
+          style={{ textShadow: "0 1px 6px rgba(0,0,0,0.45)" }}
         >
-          {project.name}
+          <h2 className="truncate text-3xl leading-[0.95] font-black tracking-tight text-[#ecebe8] uppercase">{project.name}</h2>
+          <p className="mt-2 truncate font-mono text-[10px] tracking-wide text-[#ecebe8]/90 uppercase">
+            {project.location} · {project.year} · {project.type}
+          </p>
         </div>
       )}
       <div ref={scrollerRef} className={`no-scrollbar flex min-h-0 flex-1 flex-col overflow-y-auto ${PANEL_BG}`}>
         {isCompact ? (
-          // 窄條：小封面跟直書案名綁成一組、一起靠在頂端，跟隔壁大圖的關係才不會被誤讀。
-          // 頂端留 pt-[28px]＝放大那一案頂端標頭的高度，讓小封面跟大圖的上緣切齊。
-          <div className="flex flex-1 flex-col items-center pt-[28px]">
+          // 窄條：小封面跟直書案名綁成一組、一起靠在頂端，小封面上緣跟隔壁大圖的上緣切齊，
+          // 跟隔壁大圖的關係才不會被誤讀。
+          <div className="flex flex-1 flex-col items-center">
             <div className="aspect-[3/4] w-full">
               <ImagePlaceholder image={finalImage ?? project.coverImages[0]} />
             </div>
@@ -399,24 +406,24 @@ function Panel({
                   手機版底部留 pb-20（電腦版 pb-10）：手機上左下角的齒輪（AdminAccessLink）、右下角的
                   深色模式按鈕（ThemeToggle）固定在畫面角落，畫面太窄、沒有別的空位可以放，改成把
                   案名／地點往上挪，不被兩顆按鈕蓋住。 */}
-              <div
-                className={`relative z-10 pb-20 sm:pb-10 ${TEXT_PAD} ${project.titleAlign === "right" ? "text-right" : ""}`}
-              >
-                {/* 手機放大狀態時案名已經在欄位頂端的標頭裡，封面上不重複，只留地點／年份／類型 */}
-                {!showHeader && (
+              {/* 手機放大狀態時案名與地點／年份／類型都在欄位頂端的標頭裡，封面底部不重複顯示 */}
+              {!showHeader && (
+                <div
+                  className={`relative z-10 pb-20 sm:pb-10 ${TEXT_PAD} ${project.titleAlign === "right" ? "text-right" : ""}`}
+                >
                   <h2
                     className={`font-black leading-[0.95] tracking-tight uppercase text-3xl sm:text-6xl lg:text-7xl ${heroTitleColor}`}
                   >
                     {project.name}
                   </h2>
-                )}
-                <p
-                  className="mt-2 font-mono text-[10px] tracking-wide uppercase sm:text-xs"
-                  style={{ color: project.accent }}
-                >
-                  {project.location} · {project.year} · {project.type}
-                </p>
-              </div>
+                  <p
+                    className="mt-2 font-mono text-[10px] tracking-wide uppercase sm:text-xs"
+                    style={{ color: project.accent }}
+                  >
+                    {project.location} · {project.year} · {project.type}
+                  </p>
+                </div>
+              )}
             </Link>
 
             {/* 首頁雙欄現在只留「圖片＋簡短說明」的照片索引，跟基地地圖。整體論述、六個章節的完整

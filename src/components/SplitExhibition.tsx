@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef, type MouseEvent } from "react";
+import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import type { Project } from "@/lib/projects";
 import { ImagePlaceholder } from "@/components/ImagePlaceholder";
@@ -45,23 +45,13 @@ function useIsMobile() {
 }
 
 export function SplitExhibition({ projects }: { projects: [Project, Project] }) {
-  const [focus, setFocus] = useState<Focus>(null);
+  // 主從切換（85/15）只在手機上啟用；電腦版固定兩案 50/50 靜態並列，不做寬度動畫。
+  // （2026-10-12 修正）手機上預設就是作品一放大、作品二收成右側窄條——原本預設 50/50 時每欄
+  // 只有半個螢幕寬，封面大圖被裁成很細長的直條。切換只認「點了哪一欄」（見 Panel 的 onClick），
+  // 拿掉原本依手指點在畫面左半／右半判斷的 mousemove 邏輯：85/15 時作品一的欄位會跨過畫面中線，
+  // 用左右半邊判斷會把「點作品一右側」誤判成要切到作品二。
+  const [focus, setFocus] = useState<Exclude<Focus, null>>("a");
   const isMobile = useIsMobile();
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  // 主從切換（80/20、85/15 那套）只在手機上啟用；電腦版固定兩案 50/50 靜態並列，不做寬度動畫。
-  function handleMouseMove(e: MouseEvent<HTMLDivElement>) {
-    if (!isMobile) return;
-    const rect = containerRef.current?.getBoundingClientRect();
-    if (!rect) return;
-    const x = e.clientX - rect.left;
-    setFocus(x < rect.width / 2 ? "a" : "b");
-  }
-
-  function handleMouseLeave() {
-    if (!isMobile) return;
-    setFocus(null);
-  }
 
   function activate(id: "a" | "b") {
     if (!isMobile) return;
@@ -71,7 +61,6 @@ export function SplitExhibition({ projects }: { projects: [Project, Project] }) 
   const [a, b] = projects;
   const roleFor = (id: "a" | "b"): Role => {
     if (!isMobile) return "neutral";
-    if (focus === null) return "neutral";
     return focus === id ? "dominant" : "secondary";
   };
 
@@ -79,12 +68,7 @@ export function SplitExhibition({ projects }: { projects: [Project, Project] }) 
     <div className="flex h-full w-full flex-col">
       <AdminAccessLink />
       <TopChapterNav projects={projects} />
-      <div
-        ref={containerRef}
-        onMouseMove={handleMouseMove}
-        onMouseLeave={handleMouseLeave}
-        className="flex w-full min-h-0 flex-1 items-stretch"
-      >
+      <div className="flex w-full min-h-0 flex-1 items-stretch">
         <Panel project={a} role={roleFor("a")} onActivate={() => activate("a")} />
         <div className="shrink-0 bg-[var(--background)]" style={{ width: DIVIDER_WIDTH }} />
         <Panel project={b} role={roleFor("b")} onActivate={() => activate("b")} />
@@ -308,7 +292,11 @@ function TopChapterNav({ projects }: { projects: [Project, Project] }) {
   ]
     .filter(Boolean)
     .join("");
-  const labelClass = "font-black text-[10px] tracking-wide uppercase text-[var(--nav-label,var(--foreground))] sm:text-sm";
+  // 手機上字只有 10px，按鈕本身只有約 20×15px，手指很難點中——用 ::before 往四周擴大可點範圍
+  // （左右各 12px＝剛好跟隔壁的間距 gap-6 接上、上下各 16px，接近整條選單列高度），畫面上的字
+  // 大小與間距完全不變。
+  const labelClass =
+    "relative font-black text-[10px] tracking-wide uppercase text-[var(--nav-label,var(--foreground))] before:absolute before:-inset-x-3 before:-inset-y-4 before:content-[''] sm:text-sm";
 
   return (
     <div className="flex h-[52px] shrink-0 items-center justify-center gap-6 sm:h-[76px] sm:gap-10">
@@ -362,7 +350,8 @@ function Panel({
           跟手自由，停下來才會吸附對齊最近的照片（data-snap，見下方）。 */}
       <div ref={scrollerRef} className={`no-scrollbar flex min-h-0 flex-1 flex-col overflow-y-auto ${PANEL_BG}`}>
         {isCompact ? (
-          <div className="flex flex-1 flex-col items-center justify-between py-6 sm:py-10">
+          // 手機版底部多留 pb-20，讓窄條底部的小封面避開固定在左下／右下角的齒輪與深色模式按鈕
+          <div className="flex flex-1 flex-col items-center justify-between pt-6 pb-20 sm:py-10">
             <span
               className={`[writing-mode:vertical-rl] font-black tracking-[0.2em] uppercase leading-none text-base sm:text-xl lg:text-2xl ${TEXT_PRIMARY}`}
             >
@@ -394,9 +383,12 @@ function Panel({
                 <ImagePlaceholder image={finalImage} fill layoutId={finalImage?.id} />
               </div>
               {/* project.titleAlign（見 projects.ts）讓「一籌」的標題／副標靠右對齊，跟「常民竹小屋」
-                  靠左對齊左右呼應——兩案各自獨立的視覺語言，不用套同一套排版。 */}
+                  靠左對齊左右呼應——兩案各自獨立的視覺語言，不用套同一套排版。
+                  手機版底部留 pb-20（電腦版 pb-10）：手機上左下角的齒輪（AdminAccessLink）、右下角的
+                  深色模式按鈕（ThemeToggle）固定在畫面角落，畫面太窄、沒有別的空位可以放，改成把
+                  案名／地點往上挪，不被兩顆按鈕蓋住。 */}
               <div
-                className={`relative z-10 pb-6 sm:pb-10 ${TEXT_PAD} ${project.titleAlign === "right" ? "text-right" : ""}`}
+                className={`relative z-10 pb-20 sm:pb-10 ${TEXT_PAD} ${project.titleAlign === "right" ? "text-right" : ""}`}
               >
                 <h2
                   className={`font-black leading-[0.95] tracking-tight uppercase text-3xl sm:text-6xl lg:text-7xl ${heroTitleColor}`}

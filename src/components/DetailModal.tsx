@@ -114,7 +114,10 @@ export function DetailModal({ children }: { children: React.ReactNode }) {
         const homeScroller = homeEl?.closest(".overflow-y-auto");
         if (homeEl && homeScroller instanceof HTMLElement) {
           const offset = homeEl.getBoundingClientRect().top - homeScroller.getBoundingClientRect().top;
-          homeScroller.scrollTop = homeScroller.scrollTop + offset - 16;
+          // 電腦版首頁是一張一頁（每張照片佔滿一整屏），要剛好對齊照片上緣，不然會露出上一張的尾巴；
+          // 手機版維持原本留 16px。
+          const gap = window.matchMedia("(min-width: 640px)").matches ? 0 : 16;
+          homeScroller.scrollTop = homeScroller.scrollTop + offset - gap;
         }
       }
     }

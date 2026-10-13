@@ -9,7 +9,7 @@ import { ChapterMap } from "@/components/ChapterExtras";
 import { AdminAccessLink } from "@/components/AdminAccessLink";
 import { EVENTS_KEY } from "@/lib/events";
 import { chapterLabel, navColor } from "@/lib/chapters";
-import { isPastCover } from "@/lib/coverReveal";
+import { exhibitionScrollers, isPastCover } from "@/lib/coverReveal";
 import { PANEL_BG, TEXT_PRIMARY } from "@/components/theme";
 
 type Focus = "a" | "b" | null;
@@ -114,51 +114,28 @@ function animateScrollTo(scroller: HTMLElement, target: number, duration?: numbe
   scrollAnimations.set(scroller, requestAnimationFrame(step));
 }
 
-// 每張想被吸附對齊的照片外層都加 data-snap 屬性（開場首圖、照片索引裡的每一張、地圖），
-// 慣性滾動停下來後，如果剛好離某一張夠近，就補一小段短動畫把它精準對齊到欄位頂端。
-// 只在「夠近」的時候才吸附（PROXIMITY_PX），離所有照片都還遠、停在文字段落中間時完全不動，
-// 修正距離本身也很短，所以用比章節標籤跳轉更短的固定時長，不會有「暴衝」的大幅位移感。
-const SNAP_PROXIMITY_PX = 96;
-
-function snapToNearestPhoto(scroller: HTMLElement) {
-  const targets = Array.from(scroller.querySelectorAll<HTMLElement>("[data-snap]"));
-  if (targets.length === 0) return;
-
-  const scrollerTop = scroller.getBoundingClientRect().top;
-  let closest: HTMLElement | null = null;
-  let closestOffset = Infinity;
-
-  for (const t of targets) {
-    const offset = t.getBoundingClientRect().top - scrollerTop;
-    if (Math.abs(offset) < Math.abs(closestOffset)) {
-      closest = t;
-      closestOffset = offset;
-    }
-  }
-
-  if (closest && Math.abs(closestOffset) > 1 && Math.abs(closestOffset) <= SNAP_PROXIMITY_PX) {
-    animateScrollTo(scroller, scroller.scrollTop + closestOffset, 260);
-  }
-}
-
-// 用滑鼠滾輪／觸控板的 wheel 事件自己算物理慣性，取代瀏覽器原生捲動——原生捲動對「一次送一個固定
-// deltaY」的滑鼠滾輪來說是逐格瞬間跳過去；先前試過 CSS scroll-behavior:smooth／scroll-snap，
-// 前者連續滾動時像一格一格頓，後者則是吸附修正時常常補一大段距離、感覺像「暴衝」。改成完全自己控制：
-// 每次 wheel 事件只把 deltaY 疊加成一份「速度」，之後每一影格（用 requestAnimationFrame，幀數跟著
-// 螢幕更新率走）用速度推進 scrollTop、速度再依時間指數衰減，直到幾乎停下來才觸發上面的吸附對齊。
-// 這樣滑動全程都是連續、密集更新的，不會有離散的跳格，吸附時的位移量也很小、不會暴衝。
-// FRICTION 越接近 1，速度衰減得越慢、拖尾拖得越久，就是「輕飄飄、一直漂」的感覺；調低讓它
-// 更快收斂，滑完會比較俐落地「停住」而不是慢慢飄到停，手感會更扎實、有重量感。
-const WHEEL_FRICTION = 0.82; // 每 1/60 秒的速度衰減比例，數字越小停得越快、越有煞車感
-const WHEEL_STOP_THRESHOLD = 0.08; // 速度低於這個值視為已經停止
-// 滾輪的 deltaY 沒縮放的話，一格的「總移動距離」是 deltaY / (1 - FRICTION)（等比級數加總）。
-// WHEEL_SCALE 直接縮小每次疊加的速度量，兩者搭配讓一格的總移動距離落在合理範圍（deltaY 100 時約 200px），
-// 同時因為 FRICTION 調低了，同樣的總距離會在更短時間內滑完、停得更乾脆，不會有拖尾的漂浮感。
-const WHEEL_SCALE = 0.36;
-const MAX_VELOCITY = 45; // 速度上限，避免快速連續滾動時越疊越快、衝過頭
-// 兩次 wheel 事件間隔超過這個時間，才算「停下來之後重新開始的一次滾動」——欄位靠慣性滑到頂／底時，
-// 同一串滾動（尤其觸控板的慣性事件）不會順勢衝到上一屏／下一屏，要停一下再滾才會交給整頁捲動。
+// 一張一頁的滾輪捲動（2026-10-13 改，取代原本的自訂慣性捲動）：
+// 電腦版首頁每張照片（封面、照片索引的每一張、最後的基地地圖）都佔滿欄位一整屏的高度（見 Panel
+// 的 --slot-h、PhotoStream.tsx），外層掛 data-snap。滾輪不再自由慣性滑動，而是「一次滾動手勢＝
+// 換一頁」：往下就對齊到下一個 data-snap 的上緣、往上對齊到上一個，畫面上永遠只有一張，不會切到
+// 上下其他圖。原本的慣性捲動停下來時常常同時露出上一張的尾巴跟下一張的開頭，這是改掉的原因。
+//
+// 「一次手勢」的判斷：兩次 wheel 事件間隔超過 WHEEL_GESTURE_GAP_MS 才算新的一次——觸控板一次
+// 撥動會連續送出一長串事件（含放手後的慣性事件），這些都只算一次、只換一頁；換頁動畫進行中的
+// 滾輪也不會再疊加。
 const WHEEL_GESTURE_GAP_MS = 200;
+const PAGE_DURATION_MS = 550;
+
+// 欄位裡所有翻頁停靠點（相對捲動容器頂端的 scrollTop 值），由上到下、去重。
+function pageStops(scroller: HTMLElement) {
+  const top = scroller.getBoundingClientRect().top;
+  const max = scroller.scrollHeight - scroller.clientHeight;
+  const stops = Array.from(scroller.querySelectorAll<HTMLElement>("[data-snap]")).map((el) =>
+    Math.min(max, Math.max(0, Math.round(scroller.scrollTop + el.getBoundingClientRect().top - top))),
+  );
+  stops.push(0, max);
+  return Array.from(new Set(stops)).sort((a, b) => a - b);
+}
 
 // 欄位已經在最頂還往上滾、或在最底還往下滾時，不攔截這次滾輪，讓它照瀏覽器原生行為往上傳給整頁
 // 捲動容器（(site)/layout.tsx 的 main，scroll-snap），切到「策展宣言」或「活動」那一屏——
@@ -168,87 +145,51 @@ function usePanelWheelScroll(ref: React.RefObject<HTMLDivElement | null>) {
     const el = ref.current;
     if (!el) return;
 
-    let velocity = 0;
-    let rafId: number | null = null;
-    let lastTime = 0;
     let lastWheelTime = 0;
     let handingOff = false; // 這一串滾動已經交給整頁捲動，連續事件就繼續交出去，不中途又被欄位攔下
-
-    function normalizeDelta(e: WheelEvent) {
-      if (e.deltaMode === 1) return e.deltaY * 16; // line 模式概略換算成 px
-      if (e.deltaMode === 2) return e.deltaY * el!.clientHeight; // page 模式
-      return e.deltaY;
-    }
-
-    function loop(now: number) {
-      const elapsed = lastTime ? now - lastTime : 1000 / 60;
-      lastTime = now;
-      // 分頁被瀏覽器節流（切到背景分頁、視窗縮小等）時，rAF 可能隔很久才又觸發一次，這時 elapsed
-      // 會突然變得很大；如果直接拿來當倍率乘上速度，會在恢復的那一影格瞬間暴衝一大段距離。這裡把
-      // 單次影格能推進的量上限設在 4 個影格份（約 67ms），節流恢復後改成溫和地接著滑，不會補一大段。
-      const frames = Math.min(4, elapsed / (1000 / 60));
-
-      const max = el!.scrollHeight - el!.clientHeight;
-      const next = el!.scrollTop + velocity * frames;
-      if (next <= 0 || next >= max) {
-        el!.scrollTop = Math.max(0, Math.min(max, next));
-        velocity = 0;
-      } else {
-        el!.scrollTop = next;
-      }
-
-      velocity *= Math.pow(WHEEL_FRICTION, frames);
-
-      if (Math.abs(velocity) > WHEEL_STOP_THRESHOLD) {
-        rafId = requestAnimationFrame(loop);
-      } else {
-        velocity = 0;
-        rafId = null;
-        lastTime = 0;
-        snapToNearestPhoto(el!);
-      }
-    }
 
     function onWheel(e: WheelEvent) {
       const now = performance.now();
       const isNewGesture = now - lastWheelTime > WHEEL_GESTURE_GAP_MS;
       lastWheelTime = now;
+      if (e.deltaY === 0) return;
 
-      const delta = normalizeDelta(e);
+      const dir = Math.sign(e.deltaY);
+      const current = el!.scrollTop;
       const max = el!.scrollHeight - el!.clientHeight;
-      const pushingPastEdge = (delta < 0 && el!.scrollTop <= 0) || (delta > 0 && el!.scrollTop >= max - 1);
-      if (pushingPastEdge && rafId === null && (handingOff || isNewGesture)) {
+      const animating = scrollAnimations.has(el!);
+      const pushingPastEdge = (dir < 0 && current <= 1) || (dir > 0 && current >= max - 1);
+      if (pushingPastEdge && !animating && (handingOff || isNewGesture)) {
         handingOff = true;
         return;
       }
       handingOff = false;
 
       e.preventDefault();
-      velocity += delta * WHEEL_SCALE;
-      velocity = Math.max(-MAX_VELOCITY, Math.min(MAX_VELOCITY, velocity));
-      if (rafId === null) {
-        lastTime = 0;
-        rafId = requestAnimationFrame(loop);
-      }
+      if (!isNewGesture || animating) return; // 同一次手勢只換一頁
+
+      const stops = pageStops(el!);
+      const target =
+        dir > 0 ? (stops.find((s) => s > current + 2) ?? max) : ([...stops].reverse().find((s) => s < current - 2) ?? 0);
+      animateScrollTo(el!, target, PAGE_DURATION_MS);
     }
 
     el.addEventListener("wheel", onWheel, { passive: false });
-    return () => {
-      el.removeEventListener("wheel", onWheel);
-      if (rafId !== null) cancelAnimationFrame(rafId);
-    };
+    return () => el.removeEventListener("wheel", onWheel);
   }, [ref]);
 }
 
 // 只捲動目標所在的那個欄位自己的捲動容器（.overflow-y-auto），不用瀏覽器內建的
 // scrollIntoView——它預設會把沿路所有「可捲動」的祖先都一起捲（main 雖然設了
 // overflow-hidden，但程式仍能捲它），結果連標籤列所在的外層框都被捲走、消失不見。
-function scrollChapterIntoView(id: string) {
+// gap：目標上緣離捲動容器頂端留多少空間。首頁欄位是一張一頁，要剛好對齊（0），不然會露出上一張
+// 的尾巴；案例彈出視窗裡是一般長文，留 16px 呼吸空間。
+function scrollChapterIntoView(id: string, gap = 16) {
   const el = document.getElementById(id);
   const scroller = el?.closest(".overflow-y-auto");
   if (!el || !(scroller instanceof HTMLElement)) return;
   const offset = el.getBoundingClientRect().top - scroller.getBoundingClientRect().top;
-  animateScrollTo(scroller, scroller.scrollTop + offset - 16);
+  animateScrollTo(scroller, scroller.scrollTop + offset - gap);
 }
 
 // 頂部標籤列：只出現一次，貼在邊框內、兩欄的共用頂部，橫向排列，跟案例內頁彈出視窗
@@ -263,13 +204,24 @@ function TopChapterNav({ projects }: { projects: [Project, Project] }) {
   const [a, b] = projects;
 
   function goTo(key: string) {
+    // （2026-10-13）「設計」（design）是第一個章節，點了回到最上面的封面大圖（scrollTop 0），
+    // 不是捲到封面下面的第一張設計照片；案例彈出視窗開著時，也是把視窗捲回最上面的封面。
+    if (key === "design") {
+      const modalScroller = document.querySelector('[role="dialog"] .overflow-y-auto');
+      if (modalScroller instanceof HTMLElement) {
+        animateScrollTo(modalScroller, 0);
+        return;
+      }
+      exhibitionScrollers().forEach((s) => animateScrollTo(s, 0));
+      return;
+    }
     const modalTarget = document.querySelector(`[role="dialog"] #${CSS.escape(key)}`);
     if (modalTarget) {
       scrollChapterIntoView(key);
       return;
     }
-    scrollChapterIntoView(`${a.slug}-${key}`);
-    scrollChapterIntoView(`${b.slug}-${key}`);
+    scrollChapterIntoView(`${a.slug}-${key}`, 0);
+    scrollChapterIntoView(`${b.slug}-${key}`, 0);
   }
 
   // 「活動」不是章節，是整個展覽共用的一份（見 lib/events.ts）：視窗開著時捲到視窗內容最尾端
@@ -333,7 +285,9 @@ function Panel({
   const heroImages = project.coverImages.filter((img) => img.src);
   const finalImage = heroImages[heroImages.length - 1] ?? project.coverImages[0];
 
-  // 電腦版封面遮罩：欄位還停在封面時顯示，往下捲超過門檻就淡出（見 lib/coverReveal.ts）。
+  // 電腦版封面上的案名：欄位還停在封面時顯示，往下捲超過門檻就淡出（見 lib/coverReveal.ts）。
+  // 同時把欄位可見高度寫進 CSS 變數 --slot-h：電腦版每張照片（PhotoStream.tsx）與最後的基地地圖
+  // 都用這個高度佔滿一整屏，配合 usePanelWheelScroll 一張一頁。用 ResizeObserver 跟著視窗大小更新。
   const [pastCover, setPastCover] = useState(false);
   useEffect(() => {
     const el = scrollerRef.current;
@@ -341,7 +295,12 @@ function Panel({
     const update = () => setPastCover(isPastCover(el));
     update();
     el.addEventListener("scroll", update, { passive: true });
-    return () => el.removeEventListener("scroll", update);
+    const resize = new ResizeObserver(() => el.style.setProperty("--slot-h", `${el.clientHeight}px`));
+    resize.observe(el);
+    return () => {
+      el.removeEventListener("scroll", update);
+      resize.disconnect();
+    };
   }, []);
 
   return (
@@ -427,9 +386,15 @@ function Panel({
 
             {/* 首頁雙欄現在只留「圖片＋簡短說明」的照片索引，跟基地地圖。整體論述、六個章節的完整
                 文字都移到 /projects/[slug] 案例內頁（見 ProjectDetail.tsx），這裡不重複放。 */}
-            <div className="pt-8 pb-24 sm:pt-12">
+            {/* 電腦版一張一頁：照片之間、上下都不留空白，基地地圖也佔滿一整屏（置中）、掛 data-snap
+                當最後一頁，翻到底不會露出半張照片。手機版維持原本的間距。 */}
+            <div className="pt-8 pb-24 sm:p-0">
               <PhotoStream project={project} />
-              <div id={`${project.slug}-site`} className="scroll-mt-4 pt-8 sm:pt-12">
+              <div
+                id={`${project.slug}-site`}
+                data-snap
+                className="scroll-mt-4 pt-8 sm:flex sm:h-[var(--slot-h)] sm:flex-col sm:justify-center sm:px-10 sm:pt-0"
+              >
                 <ChapterMap project={project} />
               </div>
             </div>

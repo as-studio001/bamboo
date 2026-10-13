@@ -6,6 +6,8 @@ export type ProjectImage = {
   ratio?: number; // 手動指定寬高比（width/height）——通常不用填，交錯排版演算法
   // （lib/photoLayout.ts）預設會在瀏覽器端量測真實照片的 naturalWidth/naturalHeight
   // 自動算出來；只有沒有 src 的示意色塊，或想強制覆蓋量測結果時才需要手動填這個欄位。
+  kind?: "photo" | "drawing"; // 照片或圖說（首頁電腦版版型用，見 lib/photoTemplate.ts）。不填＝依圖片內容
+  // 自動判斷；後台每張圖有「自動／照片／圖說」可以手動指定。
 };
 
 export type ChapterKey = "design" | "module" | "structure" | "construction" | "assembly" | "site";

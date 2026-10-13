@@ -52,6 +52,17 @@ body {
 }
 
 /* 隱藏捲軸視覺樣式，捲動功能不受影響（用在兩案各自獨立捲動的欄位上） */
+/* 首頁電腦版照片索引的版型框（見 PhotoStream.tsx、lib/photoTemplate.ts）：固定比例 --tpl-r，
+   寬度取「欄寬」跟「一整屏高度扣掉圖說後能放下的寬度」兩者較小的那個，所以不管橫式直式都完整
+   落在一屏裡。手機版不套用。 */
+@media (min-width: 640px) {
+  .tpl-frame {
+    aspect-ratio: var(--tpl-r);
+    width: min(100%, calc((var(--slot-h) - var(--cap-h, 0px)) * var(--tpl-r)));
+    flex: none;
+  }
+}
+
 .no-scrollbar {
   scrollbar-width: none;
   -ms-overflow-style: none;

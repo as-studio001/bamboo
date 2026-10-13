@@ -1,7 +1,9 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { TEMPLATES, detectImageKind, templateRatio, type ImageKind } from "@/lib/photoTemplate";
 import type { Chapter, Project, ProjectImage } from "@/lib/projects";
 import { visibleImages } from "@/lib/photoLayout";
 import { usePdfCover } from "@/lib/usePdfCover";
@@ -15,8 +17,8 @@ import { TEXT_BODY, SHARED_ELEMENT_TRANSITION } from "@/components/theme";
 // 跟「原始比例」這個需求本身衝突。沒有 src 的佔位圖仍用固定比例的灰階色塊（跟 caption
 // 文字疊在一起顯示，比照現有 ImagePlaceholder 沒圖時的作法），避免版面在補圖前後跳動。
 //
-// 照片故意比封面小一號、左右留白（px-14~24），不要跟封面一樣滿版貼邊——用留白區隔「封面」
-// 跟「內文照片」的份量差異；圖說文字置中對齊，跟縮小後置中的照片本身呼應。
+// （已改）照片原本比封面小一號、左右留白；2026-10-12／13 改成撐滿欄寬，電腦版更進一步改成
+// 一張佔一整屏、置中完整顯示（見 PhotoItem）。圖說文字置中對齊。
 //
 // 每張照片整塊（圖＋圖說）都是連到該案例內頁的連結——首頁只留圖片索引，完整內容在內頁，
 // 照片本身就是「看下去」的入口；hover 用跟全站一致的輕微縮放（scale 1.02）當互動回饋。
@@ -97,6 +99,23 @@ function PhotoItem({
   photo: ProjectImage;
   isFirst: boolean;
 }) {
+  // 版型（只有電腦版套用，見 lib/photoTemplate.ts）：照片／圖說 × 橫式／直式。圖片載入前先用
+  // 「照片、橫式」，載入後依真實寬高與內容（白底比例）切換；後台有指定 photo.kind 就以後台為準。
+  // 每張圖的格子高度固定是一整屏，切換版型不會讓捲動位置跳動。
+  const imgRef = useRef<HTMLImageElement>(null);
+  const [measured, setMeasured] = useState<{ ratio: number; kind: ImageKind } | null>(null);
+  const measure = (img: HTMLImageElement) => {
+    if (!img.naturalWidth) return;
+    setMeasured({ ratio: img.naturalWidth / img.naturalHeight, kind: detectImageKind(img) });
+  };
+  useEffect(() => {
+    // 圖片在 React 接上 onLoad 之前就載好（快取）時不會觸發 onLoad，這裡補量一次
+    if (imgRef.current?.complete) measure(imgRef.current);
+  }, [photo.src]);
+  const kind: ImageKind = photo.kind ?? measured?.kind ?? "photo";
+  const ratio = templateRatio(kind, measured?.ratio ?? photo.ratio ?? 4 / 3);
+  const frameVars = { "--tpl-r": ratio, "--cap-h": photo.caption ? "44px" : "0px" } as React.CSSProperties;
+
   return (
     <Link
       id={photo.id}
@@ -104,29 +123,39 @@ function PhotoItem({
       prefetch={false}
       data-snap
       data-photo-anchor
-      // 照片不留左右空白、撐滿整欄寬度，跟最上面的封面一樣滿版（手機 2026-10-12、電腦版 2026-10-13
-      // 改；原本電腦版左右各留 80～96px）。照片之間的上下間距保留。
-      className={`group block ${isFirst ? "pt-0" : "pt-8 sm:pt-12"}`}
+      // 照片不留左右空白、撐滿整欄寬度（手機 2026-10-12、電腦版 2026-10-13 改）。
+      // （2026-10-13）電腦版一張一頁：每張照片佔滿欄位一整屏的高度（--slot-h，由 SplitExhibition.tsx
+      // 的 Panel 量欄位可見高度寫入），照片之間不再留間距；配合滾輪一次換一頁，畫面上永遠只有一張。
+      // 照片放在固定比例的版型框裡（.tpl-frame，globals.css），框在格子裡置中。手機版維持原本的
+      // 原比例＋上下間距。
+      className={`group block sm:flex sm:h-[var(--slot-h)] sm:flex-col sm:items-center sm:justify-center sm:pt-0 ${isFirst ? "pt-0" : "pt-8"}`}
+      style={frameVars}
     >
       {photo.src ? (
         <>
-          <motion.div layoutId={photo.id} transition={SHARED_ELEMENT_TRANSITION} className="overflow-hidden">
+          <motion.div layoutId={photo.id} transition={SHARED_ELEMENT_TRANSITION} className="tpl-frame overflow-hidden">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
+              ref={imgRef}
               src={photo.src}
               alt={photo.caption ?? ""}
               loading="lazy"
               decoding="async"
-              className="block h-auto w-full transition-transform duration-700 ease-out group-hover:scale-[1.02]"
+              onLoad={(e) => measure(e.currentTarget)}
+              className={`block h-auto w-full transition-transform duration-700 ease-out group-hover:scale-[1.02] sm:h-full ${
+                TEMPLATES[kind].fit === "cover" ? "sm:object-cover" : "sm:object-contain"
+              }`}
             />
           </motion.div>
-          {photo.caption && <p className={`mt-2 text-center text-[11px] sm:text-xs ${TEXT_BODY}`}>{photo.caption}</p>}
+          {photo.caption && (
+            <p className={`mt-2 text-center text-[11px] sm:mt-0 sm:shrink-0 sm:py-3 sm:text-xs ${TEXT_BODY}`}>{photo.caption}</p>
+          )}
         </>
       ) : (
         <motion.div
           layoutId={photo.id}
           transition={SHARED_ELEMENT_TRANSITION}
-          className={`flex aspect-[4/3] w-full items-center justify-center overflow-hidden ${photo.tone}`}
+          className={`tpl-frame flex aspect-[4/3] w-full items-center justify-center overflow-hidden ${photo.tone}`}
         >
           <span className="font-mono text-[11px] tracking-widest text-black/40 uppercase transition-transform duration-700 ease-out group-hover:scale-[1.02]">
             {photo.caption ?? "image"}
@@ -152,9 +181,16 @@ function AssemblyCoverItem({ project, chapter, isFirst }: { project: Project; ch
       prefetch={false}
       data-snap
       data-photo-anchor
-      className={`group block ${isFirst ? "pt-0" : "pt-8 sm:pt-12"}`}
+      // 電腦版一張一頁，跟 PhotoItem 相同（佔滿 --slot-h、版型框置中）。組裝說明書的 PDF 封面固定套
+      // 「圖說直式」版型（5:7，不裁切）。
+      className={`group block sm:flex sm:h-[var(--slot-h)] sm:flex-col sm:items-center sm:justify-center sm:pt-0 ${isFirst ? "pt-0" : "pt-8"}`}
+      style={{ "--tpl-r": TEMPLATES.drawing.portrait, "--cap-h": chapter.pdf?.label ? "44px" : "0px" } as React.CSSProperties}
     >
-      <motion.div layoutId={id} transition={SHARED_ELEMENT_TRANSITION} className="aspect-[3/4] w-full overflow-hidden">
+      <motion.div
+        layoutId={id}
+        transition={SHARED_ELEMENT_TRANSITION}
+        className="tpl-frame aspect-[3/4] w-full overflow-hidden"
+      >
         {coverSrc && (
           // PDF 頁面是完整版面，用 object-cover 會裁掉四周——改 object-contain，圖不裁切、
           // 按長寬比縮放置中（跟 AssemblyBook.tsx 內文放大版同一個處理方式）。
@@ -167,7 +203,7 @@ function AssemblyCoverItem({ project, chapter, isFirst }: { project: Project; ch
         )}
       </motion.div>
       {chapter.pdf?.label && (
-        <p className={`mt-2 text-center text-[11px] sm:text-xs ${TEXT_BODY}`}>{chapter.pdf.label}</p>
+        <p className={`mt-2 text-center text-[11px] sm:mt-0 sm:shrink-0 sm:py-3 sm:text-xs ${TEXT_BODY}`}>{chapter.pdf.label}</p>
       )}
     </Link>
   );

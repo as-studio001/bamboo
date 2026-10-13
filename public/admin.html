@@ -119,6 +119,7 @@ input,textarea,select{ font-family:inherit; font-size:14px; }
 .photo-row .thumb img{ width:100%; height:100%; object-fit:cover; }
 .photo-row .fields{ flex:1; min-width:0; display:flex; flex-direction:column; gap:6px; }
 .photo-row .fields input{ width:100%; padding:7px 10px; border:1px solid var(--line); border-radius:5px; font-size:12.5px; }
+.photo-row .fields select{ width:100%; padding:7px 10px; border:1px solid var(--line); border-radius:5px; font-size:12.5px; background:#fff; }
 .row-remove-btn{
   flex-shrink:0; width:32px; height:32px; border-radius:50%; border:1px solid var(--line);
   background:#fff; color:var(--muted); font-size:16px; line-height:1;
@@ -976,6 +977,12 @@ function renderPhotoList(containerId, images, opts){
           <div class="fields">
             <input type="text" data-field="caption" placeholder="圖說（選填）" value="${esc(img.caption || "")}">
             <input type="text" data-field="src" placeholder="圖片網址（用下面「上傳」按鈕自動填入，也可以手動貼）" value="${esc(img.src || "")}">
+            ${opts.kind ? `
+            <select data-field="kind" title="首頁電腦版的版型：照片會裁切填滿框、圖說完整顯示不裁切">
+              <option value="" ${!img.kind ? "selected" : ""}>類型：自動判斷</option>
+              <option value="photo" ${img.kind === "photo" ? "selected" : ""}>類型：照片（裁切填滿）</option>
+              <option value="drawing" ${img.kind === "drawing" ? "selected" : ""}>類型：圖說（完整不裁切）</option>
+            </select>` : ""}
           </div>
           <button type="button" class="row-remove-btn" data-remove="${i}" title="移除這張">✕</button>
         </div>
@@ -1081,7 +1088,7 @@ function renderCaseEditor(){
             ${def.kind === "narrative" ? `<div class="photo-cap-hint ${(chapter.images || []).length > cap(chapter) ? "over" : ""}">
               目前文字份量最多支援顯示 ${cap(chapter)} 張（超過的會自動只在「More in Detail」顯示）。
             </div>` : ""}
-            ${renderPhotoList(`chapterImages_${def.key}`, chapter.images)}
+            ${renderPhotoList(`chapterImages_${def.key}`, chapter.images, { kind: true })}
           </div>
           ` : `
           <div class="field-block">
@@ -1161,6 +1168,8 @@ function wirePhotoList(containerId, getList, setList, slug){
     if(!field) return;
     const list = getList().slice();
     list[idx] = Object.assign({}, list[idx], { [field]: e.target.value });
+    // 「類型：自動判斷」不存欄位（前台沒有 kind 就自動判斷），避免 JSON 裡留一堆空字串
+    if(field === "kind" && !e.target.value) delete list[idx].kind;
     setList(list);
   });
   container.addEventListener("click", (e) => {

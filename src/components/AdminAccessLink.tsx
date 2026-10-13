@@ -10,9 +10,8 @@
 // 只放在首頁（SplitExhibition.tsx 裡引用），不是全站 layout 的一部分——只有使用者要求「首頁
 // 加入」，案例內頁沒有這個入口，維持原本乾淨的內頁導覽（ChapterEdgeNav／EdgeTitle）不受影響。
 //
-// 樣式比照 ThemeToggle.tsx 的固定圓形按鈕（同樣的 fixed／z-index／陰影邏輯），改放左下角
-// （ThemeToggle 佔用右下角），預設半透明、hover 才轉全不透明——這是給知道要找的人用的入口，
-// 不需要跟深色模式切換鈕一樣隨時明顯。
+// 固定在左下角的圓形按鈕，預設半透明、hover 才轉全不透明——這是給知道要找的人用的入口，
+// 不需要隨時明顯。（右下角原本是深色模式切換鈕，2026-10-13 取消深色模式後已拿掉。）
 export function AdminAccessLink() {
   return (
     <a

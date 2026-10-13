@@ -7,10 +7,10 @@ import { ImagePlaceholder } from "@/components/ImagePlaceholder";
 import { PhotoStream } from "@/components/PhotoStream";
 import { ChapterMap } from "@/components/ChapterExtras";
 import { AdminAccessLink } from "@/components/AdminAccessLink";
-import { useImageTextColor } from "@/lib/useImageTextColor";
 import { EVENTS_KEY } from "@/lib/events";
 import { chapterLabel, navColor } from "@/lib/chapters";
-import { PANEL_BG, TEXT_PRIMARY, TEXT_PAD } from "@/components/theme";
+import { isPastCover } from "@/lib/coverReveal";
+import { PANEL_BG, TEXT_PRIMARY } from "@/components/theme";
 
 type Focus = "a" | "b" | null;
 type Role = "neutral" | "dominant" | "secondary";
@@ -69,9 +69,9 @@ export function SplitExhibition({ projects }: { projects: [Project, Project] }) 
       <AdminAccessLink />
       <TopChapterNav projects={projects} />
       <div className="flex w-full min-h-0 flex-1 items-stretch">
-        <Panel project={a} role={roleFor("a")} onActivate={() => activate("a")} />
+        <Panel project={a} side="left" role={roleFor("a")} onActivate={() => activate("a")} />
         <div className="shrink-0 bg-[var(--background)]" style={{ width: DIVIDER_WIDTH }} />
-        <Panel project={b} role={roleFor("b")} onActivate={() => activate("b")} />
+        <Panel project={b} side="right" role={roleFor("b")} onActivate={() => activate("b")} />
       </div>
     </div>
   );
@@ -282,33 +282,25 @@ function TopChapterNav({ projects }: { projects: [Project, Project] }) {
     document.getElementById("events-screen")?.scrollIntoView({ behavior: "smooth" });
   }
 
-  // 名稱跟文字顏色都由後台「章節標題」設定（content/chapters.json，見 lib/chapters.ts）。
-  // 顏色淺色／深色模式各一個，用 --nav-label 這個 CSS 變數跟著 <html data-theme> 切換；
-  // 沒設定的模式就沿用主題文字色。
-  const colorCss = [
-    navColor.light && `:root{--nav-label:${navColor.light}}`,
-    navColor.dark && `:root[data-theme="dark"]{--nav-label:${navColor.dark}}`,
-    navColor.light && !navColor.dark && `:root[data-theme="dark"]{--nav-label:var(--foreground)}`,
-  ]
-    .filter(Boolean)
-    .join("");
+  // 名稱跟文字顏色都由後台「章節標題」設定（content/chapters.json，見 lib/chapters.ts）；
+  // 沒設定顏色就沿用頁面文字色。
+  const navStyle = navColor ? { color: navColor } : undefined;
   // 手機上字只有 10px，按鈕本身只有約 20×15px，手指很難點中——用 ::before 往四周擴大可點範圍
   // （左右各半個間距，剛好跟隔壁接上；上下各 16px，接近整條選單列高度），畫面上的字大小不變。
   // （2026-10-12 修正）寬度 400px 以下的手機（例如 Pixel）原本間距 gap-6 時整排放不下，最右邊的
   // 「活動」會被擠到右側邊框的直書標示（EdgeTitle，也是連結、疊在上層）底下，點「活動」右半邊
   // 其實點到的是 EdgeTitle、被帶回策展宣言。400px 以下間距縮成 gap-4，可點範圍也跟著縮成左右各 8px。
   const labelClass =
-    "relative font-black text-[10px] tracking-wide uppercase text-[var(--nav-label,var(--foreground))] before:absolute before:-inset-x-2 before:-inset-y-4 before:content-[''] min-[400px]:before:-inset-x-3 sm:text-sm";
+    "relative font-black text-[10px] tracking-wide uppercase text-foreground before:absolute before:-inset-x-2 before:-inset-y-4 before:content-[''] min-[400px]:before:-inset-x-3 sm:text-sm";
 
   return (
     <div className="flex h-[52px] shrink-0 items-center justify-center gap-4 min-[400px]:gap-6 sm:h-[76px] sm:gap-10">
-      {colorCss && <style>{colorCss}</style>}
       {a.chapters.map((chapter) => (
-        <button key={chapter.key} onClick={() => goTo(chapter.key)} className={labelClass}>
+        <button key={chapter.key} onClick={() => goTo(chapter.key)} className={labelClass} style={navStyle}>
           {chapterLabel(chapter.key)}
         </button>
       ))}
-      <button onClick={goToEvents} className={labelClass}>
+      <button onClick={goToEvents} className={labelClass} style={navStyle}>
         {chapterLabel("events")}
       </button>
     </div>
@@ -317,10 +309,12 @@ function TopChapterNav({ projects }: { projects: [Project, Project] }) {
 
 function Panel({
   project,
+  side,
   role,
   onActivate,
 }: {
   project: Project;
+  side: "left" | "right";
   role: Role;
   onActivate: () => void;
 }) {
@@ -338,12 +332,17 @@ function Panel({
   // 只有那張才是持續存在的封面。
   const heroImages = project.coverImages.filter((img) => img.src);
   const finalImage = heroImages[heroImages.length - 1] ?? project.coverImages[0];
-  const finalHeroSrc = finalImage?.src;
 
-  // 開場首圖的標題顏色：不加漸層／陰影，改成直接分析封面照片底部（文字疊放處）的平均亮度，
-  // 自動決定用白字還是深字，之後換照片也不用手動再調。
-  const heroIsDark = useImageTextColor(finalHeroSrc);
-  const heroTitleColor = finalHeroSrc ? (heroIsDark === false ? "text-white" : "text-white") : TEXT_PRIMARY; //讓兩個案子的標題顏色一樣，前者"text-[#141414]"都改成白色，保留if，之後可依照片再調整 
+  // 電腦版封面遮罩：欄位還停在封面時顯示，往下捲超過門檻就淡出（見 lib/coverReveal.ts）。
+  const [pastCover, setPastCover] = useState(false);
+  useEffect(() => {
+    const el = scrollerRef.current;
+    if (!el) return;
+    const update = () => setPastCover(isPastCover(el));
+    update();
+    el.addEventListener("scroll", update, { passive: true });
+    return () => el.removeEventListener("scroll", update);
+  }, []);
 
   return (
     <div
@@ -359,8 +358,7 @@ function Panel({
           跟手自由，停下來才會吸附對齊最近的照片（data-snap，見下方）。 */}
       {/* （2026-10-12 再修正）案名標頭改成疊在圖片上、貼齊圖片上緣：大字案名＋下方小字地點／年份／
           類型。疊在捲動容器上面（absolute，不佔版面、pointer-events-none 不擋點擊），往下捲照片時
-          一直留在欄位頂端。原本用灰白字，往下捲到白底圖面時看不清楚，改成黑字（不跟深色模式切換——
-          文字是疊在照片上，不是疊在頁面底色上）。 */}
+          一直留在欄位頂端。原本用灰白字，往下捲到白底圖面時看不清楚，改成黑字。 */}
       {showHeader && (
         <div
           className={`pointer-events-none absolute inset-x-0 top-0 z-20 px-3 pt-3 ${project.titleAlign === "right" ? "text-right" : ""}`}
@@ -406,29 +404,25 @@ function Panel({
               <div className="absolute inset-0">
                 <ImagePlaceholder image={finalImage} fill layoutId={finalImage?.id} />
               </div>
-              {/* project.titleAlign（見 projects.ts）讓「一籌」的標題／副標靠右對齊，跟「常民竹小屋」
-                  靠左對齊左右呼應——兩案各自獨立的視覺語言，不用套同一套排版。
-                  手機版底部留 pb-20（電腦版 pb-10）：手機上左下角的齒輪（AdminAccessLink）、右下角的
-                  深色模式按鈕（ThemeToggle）固定在畫面角落，畫面太窄、沒有別的空位可以放，改成把
-                  案名／地點往上挪，不被兩顆按鈕蓋住。 */}
-              {/* 手機放大狀態時案名與地點／年份／類型都在欄位頂端的標頭裡，封面底部不重複顯示 */}
-              {!showHeader && (
-                <div
-                  className={`relative z-10 pb-20 sm:pb-10 ${TEXT_PAD} ${project.titleAlign === "right" ? "text-right" : ""}`}
-                >
-                  <h2
-                    className={`font-black leading-[0.95] tracking-tight uppercase text-3xl sm:text-6xl lg:text-7xl ${heroTitleColor}`}
-                  >
-                    {project.name}
-                  </h2>
-                  <p
-                    className="mt-2 font-mono text-[10px] tracking-wide uppercase sm:text-xs"
-                    style={{ color: project.accent }}
-                  >
-                    {project.location} · {project.year} · {project.type}
-                  </p>
-                </div>
-              )}
+              {/* （2026-10-13 改，只有電腦版）封面上的案名大標＋地點／年份／類型：
+                  - 兩案的文字都靠向中間分隔線——左欄靠右、右欄靠左（side），兩案的案名在畫面中央相對
+                  - 大標是原本的 0.8 倍（60/72px → 48/58px）；資訊小字 18px（原本的 1.5 倍），改用跟大標
+                    同一套字體（原本是等寬字），但不用粗體
+                  - 欄位往下捲離開封面後文字淡出，同一側邊框的「2026常民竹小屋」同時換成案名（見
+                    EdgeTitle.tsx、lib/coverReveal.ts）；捲回頂端文字再出現
+                  同日曾試過在封面上加一層灰色半透明遮罩，不好看已拿掉。
+                  手機版不顯示（手機的案名在欄位頂端的標頭裡，見上方 showHeader）。 */}
+              <div
+                aria-hidden={pastCover || undefined}
+                className={`pointer-events-none absolute inset-0 z-10 hidden flex-col justify-end px-10 pb-10 transition-opacity duration-500 sm:flex ${
+                  pastCover ? "opacity-0" : "opacity-100"
+                } ${side === "left" ? "items-end text-right" : "items-start text-left"}`}
+              >
+                <h2 className="text-5xl leading-[0.95] font-black tracking-tight text-white uppercase lg:text-[57.6px]">{project.name}</h2>
+                <p className="mt-3 text-[18px] font-normal tracking-wide uppercase" style={{ color: project.accent }}>
+                  {project.location} · {project.year} · {project.type}
+                </p>
+              </div>
             </Link>
 
             {/* 首頁雙欄現在只留「圖片＋簡短說明」的照片索引，跟基地地圖。整體論述、六個章節的完整

@@ -1,5 +1,5 @@
 import { EdgeTitle } from "@/components/EdgeTitle";
-import { ThemeToggle } from "@/components/ThemeToggle";
+import { getPublishedProjects } from "@/lib/projects";
 
 // （已修正）main 從「整頁鎖死在一個畫面、不能捲動」（h-full overflow-hidden）改成
 // 「用整頁捲動在幾個滿版畫面之間切換」（overflow-y-auto + snap-y snap-mandatory）——
@@ -14,14 +14,22 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 // 展覽」，內容都固定跟 EdgeTitle 左右兩側的直書標題保持一樣的留白，視覺上像同一個相框
 // 貫穿全程；上內距只需要在最上面（策展宣言開頭）出現一次，兩個畫面之間不留額外空隙，
 // 才會有「捲一整屏換下一屏」的感覺，不是「捲一段距離、中間卡一截空白」。
+//
+// （2026-10-13）電腦版左右不留白邊（內容直接貼到視窗左右邊緣），兩側的直書標示改成直接壓在
+// 圖上（見 EdgeTitle.tsx）；上邊框維持 30px（DetailModal 的面板位置依賴這個高度）。手機版維持 18px 白邊。
+// 整頁捲軸隱藏（no-scrollbar，跟兩欄內部的捲動容器一樣，滾輪／觸控照常能捲）：不隱藏的話捲軸貼在
+// 最右邊，右側的直書標示會疊到捲軸上，或因為捲軸佔掉寬度而跟左側不對稱。
 export default function SiteLayout({ children }: { children: React.ReactNode }) {
+  const [a, b] = getPublishedProjects();
+
   return (
     <div className="relative h-[100dvh]">
-      <EdgeTitle />
-      <main className="h-full snap-y snap-mandatory overflow-y-auto pt-[18px] pr-[18px] pl-[18px] sm:pt-[30px] sm:pr-[30px] sm:pl-[30px]">
+      <EdgeTitle
+        projects={a && b ? [{ name: a.name, slug: a.slug }, { name: b.name, slug: b.slug }] : undefined}
+      />
+      <main className="no-scrollbar h-full snap-y snap-mandatory overflow-y-auto pt-[18px] pr-[18px] pl-[18px] sm:pt-[30px] sm:pr-0 sm:pl-0">
         {children}
       </main>
-      <ThemeToggle />
     </div>
   );
 }

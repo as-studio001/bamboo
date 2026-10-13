@@ -13,21 +13,6 @@
   --panel-elevation-shadow: rgb(0 0 0 / 0.32);
 }
 
-/* 深色模式：透過 <html data-theme="dark"> 手動切換（見 ThemeToggle 元件），
-   不是單純跟隨系統設定，使用者可以自己切換。 */
-:root[data-theme="dark"] {
-  --background: #111110;
-  --foreground: #f2f1ee;
-  --foreground-muted: rgb(242 241 238 / 0.6);
-  --panel-bg: #111110;
-  --panel-text: #f2f1ee;
-  --panel-text-muted: rgb(242 241 238 / 0.75);
-  --border-subtle: rgb(255 255 255 / 0.12);
-  --edge-glass-bg: rgb(17 17 16 / 0.14);
-  --edge-glass-border: rgb(255 255 255 / 0.18);
-  --panel-elevation-shadow: rgb(0 0 0 / 0.6);
-}
-
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);

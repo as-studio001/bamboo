@@ -612,8 +612,9 @@ function renderList(){
    對應 content/chapters.json（前台 src/lib/chapters.ts 讀這個檔案）。
    labels：六個章節＋「活動」的名稱，首頁頂部選單、案例內頁小標、獨立頁
    左側直書導覽、活動區塊標題都用這一份；留空就用預設名稱。
-   navColor：只套用在首頁頂部選單的文字顏色，淺色／深色模式各一個，
-   空字串＝沿用主題本身的文字色。
+   navColor：只套用在首頁頂部選單的文字顏色，空字串＝沿用頁面本身的黑色。
+   （2026-10-13 取消深色模式後只剩一個顏色，為了相容已存的資料仍存在
+   navColor.light；舊資料裡的 navColor.dark 下次存檔時會被拿掉。）
 */
 const LABEL_DEFS = [
   { key: "design", label: "建築設計" },
@@ -625,8 +626,7 @@ const LABEL_DEFS = [
   { key: "events", label: "活動" },
 ];
 const NAV_COLOR_DEFS = [
-  { key: "light", label: "淺色模式", fallback: "#171412" },
-  { key: "dark", label: "深色模式", fallback: "#f2f1ee" },
+  { key: "light", label: "文字顏色", fallback: "#171412" },
 ];
 
 async function openChaptersEditor(){
@@ -635,7 +635,7 @@ async function openChaptersEditor(){
     const { json, sha } = (await ghGetFileOrNull("content/chapters.json")) || { json: {}, sha: undefined };
     const labels = {};
     LABEL_DEFS.forEach(d => { labels[d.key] = (json.labels && json.labels[d.key]) || d.label; });
-    const navColor = Object.assign({ light: "", dark: "" }, json.navColor);
+    const navColor = { light: (json.navColor && json.navColor.light) || "" };
     state.editingChapters = { item: { labels, navColor }, sha };
     render();
   }catch(err){
@@ -670,7 +670,7 @@ function renderChaptersEditor(){
 
       <div class="field-block">
         <div class="label">首頁頂部選單的文字顏色</div>
-        <div class="field-hint" style="margin-top:0; margin-bottom:10px;">只影響首頁頂部那一排選單。淺色、深色模式分開設定；勾「跟隨主題」就維持原本的黑／白。</div>
+        <div class="field-hint" style="margin-top:0; margin-bottom:10px;">只影響首頁頂部那一排選單；勾「使用預設」就維持原本的黑色。</div>
         <div class="two-col">
           ${NAV_COLOR_DEFS.map(d => {
             const value = item.navColor[d.key];
@@ -678,7 +678,7 @@ function renderChaptersEditor(){
             <div class="field-block">
               <label>${esc(d.label)}</label>
               <input type="color" data-color="${d.key}" value="${esc(value || d.fallback)}" ${value ? "" : "disabled"} style="height:48px; padding:4px; cursor:pointer;">
-              <label class="checkbox-row" style="margin-top:8px;"><input type="checkbox" data-color-default="${d.key}" ${value ? "" : "checked"}> 跟隨主題（預設）</label>
+              <label class="checkbox-row" style="margin-top:8px;"><input type="checkbox" data-color-default="${d.key}" ${value ? "" : "checked"}> 使用預設（黑色）</label>
             </div>`;
           }).join("")}
         </div>

@@ -1,16 +1,14 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import type { Chapter, Project } from "@/lib/projects";
+import { orderedChapters, type Chapter, type ChapterKey, type Project } from "@/lib/projects";
 import { layoutChapter, createRatioState, visibleImages, type RatioState } from "@/lib/photoLayout";
 import { usePhotosWithRatio } from "@/lib/usePhotosWithRatio";
 import { ImagePlaceholder } from "@/components/ImagePlaceholder";
 import { ChapterMap, ChapterVideo } from "@/components/ChapterExtras";
 import { AssemblyBook } from "@/components/AssemblyBook";
 import { useImageTextColor } from "@/lib/useImageTextColor";
-import { EventsSection } from "@/components/EventsSection";
-import { EVENTS_KEY } from "@/lib/events";
-import { chapterLabel } from "@/lib/chapters";
+import { chapterTitle } from "@/lib/chapters";
 import { PANEL_BG, TEXT_PRIMARY, TEXT_BODY } from "@/components/theme";
 
 // 案例內頁：架構直接照抄 Internal-Pages（as-studio001/Internal-Pages 的 js/render.js）的順序——
@@ -45,11 +43,11 @@ export function ProjectDetail({
   project: Project;
   variant?: "page" | "modal";
 }) {
-  const design = project.chapters.find((c) => c.key === "design");
-  const narrativeChapters = project.chapters.filter(
-    (c) => c.key === "module" || c.key === "structure" || c.key === "construction",
-  );
-  const assembly = project.chapters.find((c) => c.key === "assembly");
+  // （2026-10-14）8 個章節照固定順序排（projects.ts 的 CHAPTER_ORDER）：團隊介紹 → 設計概念 → 建築設計
+  // → 細部設計 → 結構設計 → 施工細節 → 組裝說明書 → 基地位置。除了組裝說明書（PDF 翻頁書）跟基地位置
+  // （地圖）之外都是同一套圖文交錯排版（NarrativeSection）。還沒填內容的章節整個跳過，不會出現只有
+  // 標題的空章節；基地位置一律顯示（沒座標時顯示「地圖待補」）。活動區塊只放在首頁，內頁不再顯示。
+  const chapters = orderedChapters(project).filter((c) => c.key !== "site" && hasContent(c));
   const insetX = variant === "modal" ? "px-8 sm:px-12 lg:px-16" : "px-4 sm:px-8 lg:px-12";
   // 手機版（<640px）內文照片用負邊距抵掉上面 insetX 的左右內距，貼齊面板／邊框兩側，
   // 拿到螢幕能給的最大寬度；文字維持原本的內距。sm 以上不動。
@@ -60,39 +58,39 @@ export function ProjectDetail({
 
   return (
     <div className={`flex min-h-full w-full flex-col ${PANEL_BG} ${TEXT_PRIMARY}`}>
-      {variant === "page" && <ChapterEdgeNav chapters={project.chapters} accent={project.accent} />}
+      {variant === "page" && <ChapterEdgeNav keys={[...chapters.map((c) => c.key), "site"]} accent={project.accent} />}
       <DetailHero project={project} insetX={insetX} />
 
       <div className={`pt-10 pb-24 sm:pt-16 ${insetX}`}>
         <div className="min-w-0">
-          {design && (
-            <NarrativeSection chapter={design} accent={project.accent} ratioState={ratioState} photoBleed={photoBleed} />
+          {chapters.map((chapter, i) =>
+            chapter.key === "assembly" ? (
+              <AssemblySection key={chapter.key} project={project} chapter={chapter} accent={project.accent} first={i === 0} />
+            ) : (
+              <NarrativeSection
+                key={chapter.key}
+                chapter={chapter}
+                title={chapterTitle(chapter.key)}
+                first={i === 0}
+                accent={project.accent}
+                ratioState={ratioState}
+                photoBleed={photoBleed}
+              />
+            ),
           )}
 
-          {narrativeChapters.map((chapter) => (
-            <NarrativeSection
-              key={chapter.key}
-              chapter={chapter}
-              title={chapterLabel(chapter.key)}
-              accent={project.accent}
-              ratioState={ratioState}
-              photoBleed={photoBleed}
-            />
-          ))}
-
-          {assembly && <AssemblySection project={project} chapter={assembly} accent={project.accent} />}
-
-          <div id="site" className="scroll-mt-10 border-t pt-10 sm:pt-14" style={{ borderColor: "var(--border-subtle)" }}>
+          <div
+            id="site"
+            className={`scroll-mt-10 ${chapters.length ? "border-t pt-10 sm:pt-14" : ""}`}
+            style={{ borderColor: "var(--border-subtle)" }}
+          >
             <h3 className={`font-serif-tc text-lg font-bold tracking-wide uppercase sm:text-xl ${TEXT_PRIMARY}`}>
-              {chapterLabel("site")}
+              {chapterTitle("site")}
             </h3>
             <div className="mt-4">
               <ChapterMap project={project} />
             </div>
           </div>
-
-          {/* 整個展覽共用的「活動」資訊（見 lib/events.ts），接在基地後面、內頁最尾端 */}
-          <EventsSection variant="inline" id={EVENTS_KEY} />
         </div>
       </div>
     </div>
@@ -133,32 +131,36 @@ function DetailHero({ project, insetX }: { project: Project; insetX: string }) {
 
 // 章節導覽直接取代左側邊框原本的「2026林鐵構築」品牌文字（見 EdgeTitle.tsx 的 side prop、
 // projects/[slug]/layout.tsx 只畫右側），定位跟 EdgeTitle 完全對齊（fixed inset-y-0 left-0，
-// 同樣寬度），六個章節直書標籤垂直置中排列，點擊捲到內頁對應區塊。
-function ChapterEdgeNav({ chapters, accent }: { chapters: Chapter[]; accent: string }) {
+// 同樣寬度），內頁實際有內容的章節直書標籤垂直置中排列（用完整章節名稱），點擊捲到內頁對應區塊。
+function ChapterEdgeNav({ keys, accent }: { keys: ChapterKey[]; accent: string }) {
   function goTo(key: string) {
     document.getElementById(key)?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
   return (
-    <nav className="fixed inset-y-0 left-0 z-40 flex w-[18px] flex-col items-center justify-center gap-6 sm:w-[30px] sm:gap-8">
-      {chapters.map((chapter) => (
+    <nav className="fixed inset-y-0 left-0 z-40 flex w-[18px] flex-col items-center justify-center gap-5 sm:w-[30px] sm:gap-7">
+      {keys.map((key) => (
         <button
-          key={chapter.key}
-          onClick={() => goTo(chapter.key)}
+          key={key}
+          onClick={() => goTo(key)}
           className="[writing-mode:vertical-rl] font-mono text-[9px] tracking-[0.15em] uppercase sm:text-[10px]"
           style={{ color: accent }}
         >
-          {chapterLabel(chapter.key)}
+          {chapterTitle(key)}
         </button>
       ))}
-      <button
-        onClick={() => goTo(EVENTS_KEY)}
-        className="[writing-mode:vertical-rl] font-mono text-[9px] tracking-[0.15em] uppercase sm:text-[10px]"
-        style={{ color: accent }}
-      >
-        {chapterLabel("events")}
-      </button>
     </nav>
+  );
+}
+
+// 章節有沒有內容可以顯示（文字、照片、More in Detail、影片、PDF 任一樣）
+function hasContent(chapter: Chapter) {
+  return !!(
+    chapter.text?.trim() ||
+    chapter.images?.length ||
+    chapter.moreImages?.length ||
+    chapter.video ||
+    chapter.pdf?.url
   );
 }
 
@@ -172,9 +174,10 @@ function ChapterEdgeNav({ chapters, accent }: { chapters: Chapter[]; accent: str
 // 資料只需要提供 text（純文字）＋images（一組照片），怎麼交錯完全自動算出來；同一組照片、
 // 同一段文字，每次算出來的結果都一樣（不會重新整理就跳動），不同章節因為圖片形狀、張數
 // 不同，節奏自然不同，「篇章差異、有呼吸感」的來源就是這個，不需要額外加隨機種子。
-// 「建築設計」是開頭主要論述、緊接在 hero 之後，不重複顯示自己的標題；其餘三章有 title 就
-// 加一條分隔線＋小標，作為子章節之間的視覺斷點，圖文編輯邏輯完全相同。「組裝說明書」不用
-// 這套（見下面的 AssemblySection）——它的主要內容是可翻閱的 PDF，不是穿插圖片的論述文字。
+// 每一章都顯示自己的標題（2026-10-14 起：原本開頭的「建築設計」不顯示標題，章節擴充成 8 個、前面
+// 多了「團隊介紹」後改成每章都有標題）；第一章（first）緊接在 hero 之後不加分隔線，其餘每章上方加
+// 一條分隔線作為章節之間的視覺斷點，圖文編輯邏輯完全相同。「組裝說明書」不用這套（見下面的
+// AssemblySection）——它的主要內容是可翻閱的 PDF，不是穿插圖片的論述文字。
 //
 // 段落最後接一個「MORE IN DETAIL」可展開區塊（ReadMoreGallery），比照 Internal-Pages 同名
 // 區塊——放設計過程的手稿、模型、圖面這類輔助素材，預設收合、不會一開始就佔掉版面，讀者
@@ -183,12 +186,14 @@ function ChapterEdgeNav({ chapters, accent }: { chapters: Chapter[]; accent: str
 function NarrativeSection({
   chapter,
   title,
+  first = false,
   accent,
   ratioState,
   photoBleed,
 }: {
   chapter: Chapter;
   title?: string;
+  first?: boolean;
   accent: string;
   ratioState: RatioState;
   photoBleed: string;
@@ -207,8 +212,8 @@ function NarrativeSection({
   return (
     <div
       id={chapter.key}
-      className={title ? "scroll-mt-10 border-t pt-10 sm:pt-14" : "scroll-mt-10"}
-      style={title ? { borderColor: "var(--border-subtle)" } : undefined}
+      className={first ? "scroll-mt-10" : "scroll-mt-10 border-t pt-10 sm:pt-14"}
+      style={first ? undefined : { borderColor: "var(--border-subtle)" }}
     >
       {title && (
         <h3 className={`font-serif-tc text-lg font-bold tracking-wide uppercase sm:text-xl ${TEXT_PRIMARY}`}>
@@ -322,17 +327,27 @@ function ReadMoreGallery({ images, accent }: { images: Chapter["moreImages"]; ac
 // 「組裝說明書」只留標題＋一段文字＋PDF 上架元件（AssemblyBook.tsx：封面縮圖＋線上翻閱＋
 // 下載），不再用縮圖列——這一章的內容本質是操作手冊，PDF 本身才是主要內容，原本那排縮圖
 // 反而是重複資訊。只取 chapter.text 的第一段，不管資料裡實際存了幾段，維持排版簡潔。
-function AssemblySection({ project, chapter, accent }: { project: Project; chapter: Chapter; accent: string }) {
+function AssemblySection({
+  project,
+  chapter,
+  accent,
+  first = false,
+}: {
+  project: Project;
+  chapter: Chapter;
+  accent: string;
+  first?: boolean;
+}) {
   const [firstParagraph] = (chapter.text ?? "").split("\n\n");
 
   return (
     <div
       id={chapter.key}
-      className="scroll-mt-10 border-t pt-10 sm:pt-14"
-      style={{ borderColor: "var(--border-subtle)" }}
+      className={first ? "scroll-mt-10" : "scroll-mt-10 border-t pt-10 sm:pt-14"}
+      style={first ? undefined : { borderColor: "var(--border-subtle)" }}
     >
       <h3 className={`font-serif-tc text-lg font-bold tracking-wide uppercase sm:text-xl ${TEXT_PRIMARY}`}>
-        {chapterLabel(chapter.key)}
+        {chapterTitle(chapter.key)}
       </h3>
 
       <p className={`mt-4 max-w-2xl text-sm leading-relaxed sm:text-base ${TEXT_BODY}`}>{firstParagraph}</p>

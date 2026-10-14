@@ -95,7 +95,10 @@
 ```ts
 ProjectImage = { id, caption?, tone, src?, ratio? }
 Chapter = { key, title, text?, images?, moreImages?, video?, pdf? }
-ChapterKey = "design" | "module" | "structure" | "construction" | "assembly" | "site"
+ChapterKey = "team" | "design" | "module" | "structure" | "engineering" | "construction" | "assembly" | "site"
+// 2026-10-14 起 8 章、固定順序（CHAPTER_ORDER）：團隊介紹／設計概念／建築設計／細部設計／結構設計／施工細節／
+// 組裝說明書／基地位置。team、engineering 只在案例內頁（首頁用 HOME_CHAPTER_KEYS），一律用 orderedChapters() 取，
+// 不要直接用 project.chapters 的陣列順序。名稱：chapterTitle()＝內頁完整名、chapterLabel()＝首頁選單短名（lib/chapters.ts）
 Project = { slug, shortLabel, name, location, year, type, intro, accent, titleAlign?,
             coverImages, chapters, coordinates?, published }
 ```
@@ -124,7 +127,7 @@ Project = { slug, shortLabel, name, location, year, type, intro, accent, titleAl
 
 **寫回機制**：`ghGetFile`／`ghListDir`（讀，先試 GitHub 公開 API 直接讀，失敗才 fallback 到 `github-proxy`）、`ghPutFile`／`ghDeleteFile`／`uploadAsset`（寫，一定要透過 `github-proxy`，因為要用藏在 Netlify 環境變數裡的服務帳號 `GITHUB_TOKEN`）。每個呼叫都明確帶 `repo: "bamboo"`。
 
-**涵蓋範圍**：案例列表（上架狀態一覽、新增／刪除案例）＋案例編輯器（基本資料、封面照片、六個固定章節的文字／照片／MORE IN DETAIL／PDF／影片／基地座標——基地座標欄位直接嵌在「基地」章節區塊裡，不是放在最上面）。圖片／GIF／影片上傳都支援（依副檔名判斷用 `<img>` 還是 `<video>` 預覽）。
+**涵蓋範圍**：案例列表（上架狀態一覽、新增／刪除案例）＋案例編輯器（基本資料、封面照片、8 個固定章節（2026-10-14 起，原本 6 個）的文字／照片／MORE IN DETAIL／PDF／影片／基地座標——基地座標欄位直接嵌在「基地」章節區塊裡，不是放在最上面）。圖片／GIF／影片上傳都支援（依副檔名判斷用 `<img>` 還是 `<video>` 預覽）。每個圖片清單（封面、章節主要照片、More in Detail、活動海報）都可以調整順序：拖曳每列左側的把手（⠿），或用右側 ↑↓ 按鈕（2026-10-14 新增）。清單有變動（排序／移除／上傳）時整頁重畫，`rerenderKeepingEdits()` 會先把畫面上還沒存檔的文字讀回資料、保留捲動位置，不會洗掉正在打的字。
 
 **跨後台登入交接**：頂列各有一個連結可以切到對面的後台（bamboo → 原型建築後台、原型建築 → bamboo 後台）。點連結時 `crossAdminUrl()` 會把目前手上的 Supabase session（access token／refresh token）用網址 hash（`#handoff_at=...&handoff_rt=...`）帶過去，對面偵測到就直接 `setSession()` 換上，不用重新輸入帳密——效果是「同一次登入兩邊直接通用」。做法沿用 Supabase 自己邀請信／忘記密碼連結本來就在用的「hash 帶 token」模式。接收端讀完立刻清掉 hash，不留在網址列／瀏覽紀錄裡；帶過去的 token 失效就正常退回登入畫面。**這個機制兩邊（bamboo 的 `public/admin.html`、Internal-Pages 的 `admin/index.html`）都要同步維護，改一邊要記得改另一邊。**
 

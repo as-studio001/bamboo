@@ -10,11 +10,25 @@ export type ProjectImage = {
   // 自動判斷；後台每張圖有「自動／照片／圖說」可以手動指定。
 };
 
-export type ChapterKey = "design" | "module" | "structure" | "construction" | "assembly" | "site";
+// （2026-10-14）章節從 6 個擴充成 8 個，固定順序如下（CHAPTER_ORDER）。key 沿用原本的英文代號，
+// 現有資料不用搬；名稱改成：team 團隊介紹（新）、design 設計概念、module 建築設計、structure 細部設計、
+// engineering 結構設計（新）、construction 施工細節、assembly 組裝說明書、site 基地位置（見 lib/chapters.ts）。
+// 新增的 team、engineering 只出現在案例內頁，首頁的頂部選單跟照片索引不放（HOME_CHAPTER_KEYS）。
+export type ChapterKey = "team" | "design" | "module" | "structure" | "engineering" | "construction" | "assembly" | "site";
+
+export const CHAPTER_ORDER: ChapterKey[] = ["team", "design", "module", "structure", "engineering", "construction", "assembly", "site"];
+
+export const HOME_CHAPTER_KEYS: ChapterKey[] = ["design", "module", "structure", "construction", "assembly", "site"];
+
+// 依固定順序取出這個案例有的章節（JSON 裡的陣列順序不算數；資料裡沒有的章節就跳過）。
+// keys 可以限定只取哪些章節（例如首頁只取 HOME_CHAPTER_KEYS）。
+export function orderedChapters(project: Project, keys: ChapterKey[] = CHAPTER_ORDER): Chapter[] {
+  return keys.map((key) => project.chapters.find((c) => c.key === key)).filter((c): c is Chapter => !!c);
+}
 
 export type Chapter = {
   key: ChapterKey;
-  title: string; // 已不再使用——章節名稱改成兩案共用一份，見 lib/chapters.ts 的 chapterLabel()
+  title: string; // 已不再使用——章節名稱改成兩案共用一份，見 lib/chapters.ts 的 chapterLabel()／chapterTitle()
   // （舊資料跟後台仍會寫這個欄位，留著無妨）
   text?: string; // 段落文字，用 \n\n 分段——「建築設計／模矩／構造／施工」這四章會自動排版
   // （見 lib/photoLayout.ts 的 layoutChapter），不用自己決定圖片插在哪裡；「組裝說明書」

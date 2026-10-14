@@ -125,6 +125,22 @@ input,textarea,select{ font-family:inherit; font-size:14px; }
   background:#fff; color:var(--muted); font-size:16px; line-height:1;
 }
 .row-remove-btn:hover{ color:var(--danger); border-color:var(--danger); }
+/* 調整順序：左側拖曳把手＋右側上／下移按鈕 */
+.row-drag-handle{
+  flex-shrink:0; width:20px; align-self:stretch; display:flex; align-items:center; justify-content:center;
+  color:var(--muted); font-size:16px; cursor:grab; user-select:none;
+}
+.row-drag-handle:hover{ color:var(--ink); }
+.row-move{ flex-shrink:0; display:flex; flex-direction:column; gap:4px; }
+.row-move-btn{
+  width:28px; height:22px; border-radius:5px; border:1px solid var(--line);
+  background:#fff; color:var(--muted); font-size:12px; line-height:1;
+}
+.row-move-btn:hover:not(:disabled){ color:var(--ink); border-color:var(--ink); }
+.row-move-btn:disabled{ opacity:.3; cursor:default; }
+.photo-row.dragging{ opacity:.4; }
+.photo-row.drop-before{ box-shadow:0 -3px 0 var(--ink); }
+.photo-row.drop-after{ box-shadow:0 3px 0 var(--ink); }
 .add-photo-btn{
   align-self:flex-start; display:inline-flex; align-items:center; gap:8px;
   padding:9px 14px; border-radius:6px; border:1.5px dashed var(--line); background:none; color:var(--muted); font-size:13px; font-weight:600;
@@ -611,21 +627,27 @@ function renderList(){
    章節標題（兩案共用一份）
    ============================================================
    對應 content/chapters.json（前台 src/lib/chapters.ts 讀這個檔案）。
-   labels：六個章節＋「活動」的名稱，首頁頂部選單、案例內頁小標、獨立頁
-   左側直書導覽、活動區塊標題都用這一份；留空就用預設名稱。
+   兩組名稱（2026-10-14 起）：
+   labels：首頁頂部選單的短名（只有會出現在首頁的章節＋「活動」），活動區塊標題也用這裡的「活動」
+   titles：案例內頁的完整章節名稱（8 章），案例內頁標題、獨立頁左側直書導覽用
+   留空就用預設名稱。
    navColor：只套用在首頁頂部選單的文字顏色，空字串＝沿用頁面本身的黑色。
    （2026-10-13 取消深色模式後只剩一個顏色，為了相容已存的資料仍存在
    navColor.light；舊資料裡的 navColor.dark 下次存檔時會被拿掉。）
 */
+// 首頁選單短名：label 是預設值，chapter 是對應到哪一章（顯示在欄位標題，方便對照）
 const LABEL_DEFS = [
-  { key: "design", label: "建築設計" },
-  { key: "module", label: "模矩" },
-  { key: "structure", label: "構造" },
-  { key: "construction", label: "施工" },
-  { key: "assembly", label: "組裝說明書" },
-  { key: "site", label: "基地" },
-  { key: "events", label: "活動" },
+  { key: "design", label: "設計", chapter: "設計概念" },
+  { key: "module", label: "模矩", chapter: "建築設計" },
+  { key: "structure", label: "構造", chapter: "細部設計" },
+  { key: "construction", label: "施工", chapter: "施工細節" },
+  { key: "assembly", label: "組裝", chapter: "組裝說明書" },
+  { key: "site", label: "位置", chapter: "基地位置" },
+  { key: "events", label: "活動", chapter: "首頁活動畫面" },
 ];
+// 案例內頁完整名稱：預設值跟案例編輯器的章節名稱（CHAPTER_DEFS）相同。寫成函式而不是常數——
+// CHAPTER_DEFS 在檔案後面才宣告，頂層直接讀會在載入時出錯（const 的暫時性死區）。
+function titleDefs(){ return CHAPTER_DEFS.map(d => ({ key: d.key, label: d.label })); }
 const NAV_COLOR_DEFS = [
   { key: "light", label: "文字顏色", fallback: "#171412" },
 ];
@@ -636,8 +658,10 @@ async function openChaptersEditor(){
     const { json, sha } = (await ghGetFileOrNull("content/chapters.json")) || { json: {}, sha: undefined };
     const labels = {};
     LABEL_DEFS.forEach(d => { labels[d.key] = (json.labels && json.labels[d.key]) || d.label; });
+    const titles = {};
+    titleDefs().forEach(d => { titles[d.key] = (json.titles && json.titles[d.key]) || d.label; });
     const navColor = { light: (json.navColor && json.navColor.light) || "" };
-    state.editingChapters = { item: { labels, navColor }, sha };
+    state.editingChapters = { item: { labels, titles, navColor }, sha };
     render();
   }catch(err){
     toast(err.message || "載入失敗", true);
@@ -657,13 +681,26 @@ function renderChaptersEditor(){
       </div>
 
       <div class="field-block">
-        <div class="label">章節名稱</div>
-        <div class="field-hint" style="margin-top:0; margin-bottom:10px;">兩個案例共用。首頁頂部選單、案例內頁的章節小標、獨立頁左側直書導覽都會一起改；留空會用預設名稱。</div>
+        <div class="label">首頁頂部選單（短名）</div>
+        <div class="field-hint" style="margin-top:0; margin-bottom:10px;">兩個案例共用，只影響首頁頂部那一排選單（「活動」也是首頁活動畫面的標題）。「團隊介紹」「結構設計」只在案例內頁，首頁選單沒有。留空會用預設名稱。</div>
         <div class="two-col">
           ${LABEL_DEFS.map(d => `
             <div class="field-block">
-              <label>${esc(d.label)}</label>
+              <label>${esc(d.chapter)} → 首頁顯示</label>
               <input type="text" data-label="${d.key}" value="${esc(item.labels[d.key] || "")}">
+            </div>
+          `).join("")}
+        </div>
+      </div>
+
+      <div class="field-block">
+        <div class="label">案例內頁的章節名稱（完整）</div>
+        <div class="field-hint" style="margin-top:0; margin-bottom:10px;">兩個案例共用，用在案例內頁每一章的標題、獨立頁左側的直書導覽。章節順序固定。留空會用預設名稱。</div>
+        <div class="two-col">
+          ${titleDefs().map((d, i) => `
+            <div class="field-block">
+              <label>${i + 1}. ${esc(d.label)}</label>
+              <input type="text" data-title="${d.key}" value="${esc(item.titles[d.key] || "")}">
             </div>
           `).join("")}
         </div>
@@ -699,6 +736,9 @@ function renderChaptersEditor(){
   document.querySelectorAll("[data-label]").forEach(el => {
     el.addEventListener("input", (e) => { item.labels[el.dataset.label] = e.target.value; });
   });
+  document.querySelectorAll("[data-title]").forEach(el => {
+    el.addEventListener("input", (e) => { item.titles[el.dataset.title] = e.target.value; });
+  });
   document.querySelectorAll("[data-color]").forEach(el => {
     el.addEventListener("input", (e) => { item.navColor[el.dataset.color] = e.target.value; });
   });
@@ -717,6 +757,7 @@ async function saveChaptersEditor(ed){
   const statusEl = document.getElementById("saveStatus");
   const item = ed.item;
   LABEL_DEFS.forEach(d => { item.labels[d.key] = (item.labels[d.key] || "").trim() || d.label; });
+  titleDefs().forEach(d => { item.titles[d.key] = (item.titles[d.key] || "").trim() || d.label; });
   try{
     setLoading(true, "儲存中…");
     statusEl.classList.remove("err");
@@ -923,18 +964,23 @@ async function saveEventsEditor(ed){
 /* ============================================================
    案例編輯器
    ============================================================
-   六個章節固定是 design／module／structure／construction／assembly／site
-   這六個 key，跟前台 ProjectDetail.tsx／PhotoStream.tsx 認的順序與數量
-   綁死（見 src/lib/projects.ts 的型別定義），這裡不做「新增／刪除章節」
-   這種自由度，只能編輯這六章各自的內容。
+   章節固定是 CHAPTER_DEFS 這 8 個 key（2026-10-14 起，原本 6 個），跟前台
+   ProjectDetail.tsx／PhotoStream.tsx 認的順序與數量綁死（見 src/lib/projects.ts
+   的 CHAPTER_ORDER），這裡不做「新增／刪除章節」這種自由度，只能編輯各章的內容。
 */
+// （2026-10-14）章節擴充成 8 個、固定順序，跟前台 src/lib/projects.ts 的 CHAPTER_ORDER 一致。
+// key 沿用原本的英文代號（現有資料不用搬），label 是後台顯示的名稱（前台案例內頁的章節標題
+// 另外由「章節標題」編輯畫面設定，預設跟這裡相同）。home 標示這章會不會出現在首頁選單／照片索引。
+// 存檔時 chapters 陣列也會照這個順序重排。
 const CHAPTER_DEFS = [
-  { key: "design", label: "建築設計", kind: "narrative" },
-  { key: "module", label: "模矩", kind: "narrative" },
-  { key: "structure", label: "構造", kind: "narrative" },
-  { key: "construction", label: "施工", kind: "narrative" },
-  { key: "assembly", label: "組裝說明書", kind: "assembly" },
-  { key: "site", label: "基地", kind: "site" },
+  { key: "team", label: "團隊介紹", kind: "narrative", home: false },
+  { key: "design", label: "設計概念", kind: "narrative", home: true },
+  { key: "module", label: "建築設計", kind: "narrative", home: true },
+  { key: "structure", label: "細部設計", kind: "narrative", home: true },
+  { key: "engineering", label: "結構設計", kind: "narrative", home: false },
+  { key: "construction", label: "施工細節", kind: "narrative", home: true },
+  { key: "assembly", label: "組裝說明書", kind: "assembly", home: true },
+  { key: "site", label: "基地位置", kind: "site", home: true },
 ];
 
 function emptyChapter(key, label){
@@ -945,7 +991,8 @@ async function openCaseEditor(slug){
   try{
     setLoading(true, "載入案例中…");
     const { json, sha } = await ghGetFile(`content/projects/${slug}.json`);
-    // 補齊六個固定章節（萬一資料裡缺了某一章，畫面上還是要看得到、能補上去）
+    // 補齊固定章節（新增的「團隊介紹」「結構設計」、或資料裡缺了某一章，畫面上還是要看得到、能補上去），
+    // 順序照 CHAPTER_DEFS；存檔時 chapters 陣列就會是這個順序
     const chapters = CHAPTER_DEFS.map(def => {
       const existing = (json.chapters || []).find(c => c.key === def.key);
       return existing || emptyChapter(def.key, def.label);
@@ -971,8 +1018,9 @@ function renderPhotoList(containerId, images, opts){
   opts = opts || {};
   return `
     <div class="photo-list" id="${containerId}">
-      ${(images || []).map((img, i) => `
+      ${(images || []).map((img, i, all) => `
         <div class="photo-row" data-idx="${i}">
+          <div class="row-drag-handle" data-drag-handle title="拖曳調整順序">⠿</div>
           <div class="thumb">${img.src ? `<img src="${esc(img.src)}" alt="">` : "沒有圖"}</div>
           <div class="fields">
             <input type="text" data-field="caption" placeholder="圖說（選填）" value="${esc(img.caption || "")}">
@@ -983,6 +1031,10 @@ function renderPhotoList(containerId, images, opts){
               <option value="photo" ${img.kind === "photo" ? "selected" : ""}>類型：照片（裁切填滿）</option>
               <option value="drawing" ${img.kind === "drawing" ? "selected" : ""}>類型：圖說（完整不裁切）</option>
             </select>` : ""}
+          </div>
+          <div class="row-move">
+            <button type="button" class="row-move-btn" data-move="${i}" data-dir="-1" title="往前移" ${i === 0 ? "disabled" : ""}>↑</button>
+            <button type="button" class="row-move-btn" data-move="${i}" data-dir="1" title="往後移" ${i === all.length - 1 ? "disabled" : ""}>↓</button>
           </div>
           <button type="button" class="row-remove-btn" data-remove="${i}" title="移除這張">✕</button>
         </div>
@@ -1074,11 +1126,11 @@ function renderCaseEditor(){
           <div class="chapter-section-head">
             <span class="num">${i + 1}</span>
             <h3>${esc(def.label)}</h3>
-            <span class="key">key: ${def.key}</span>
+            <span class="key">key: ${def.key}${def.home ? "" : "｜只在案例內頁顯示"}</span>
           </div>
 
           <div class="field-block">
-            <label>內文（用空白行分段，「建築設計／模矩／構造／施工」四章會自動排版圖文）</label>
+            <label>內文（用空白行分段；圖文會自動交錯排版。整章文字、照片都空白時，案例內頁不顯示這一章）</label>
             <textarea class="tall" data-cfield="text">${esc(chapter.text || "")}</textarea>
           </div>
 
@@ -1154,7 +1206,8 @@ function renderCaseEditor(){
   });
 }
 
-/* 幫一個 photo-list 容器接上：文字欄位即時同步回資料、移除按鈕、上傳按鈕。
+/* 幫一個 photo-list 容器接上：文字欄位即時同步回資料、移除按鈕、調整順序（拖曳把手＋上下移按鈕）、
+   上傳按鈕。
    getList/setList 讓呼叫端決定這份清單實際存在資料的哪個位置（coverImages
    或某一章的 images／moreImages），這裡不用知道細節，只管清單本身怎麼編輯。*/
 function wirePhotoList(containerId, getList, setList, slug){
@@ -1172,14 +1225,75 @@ function wirePhotoList(containerId, getList, setList, slug){
     if(field === "kind" && !e.target.value) delete list[idx].kind;
     setList(list);
   });
-  container.addEventListener("click", (e) => {
-    const btn = e.target.closest("[data-remove]");
-    if(!btn) return;
-    const idx = Number(btn.dataset.remove);
-    const list = getList().slice();
-    list.splice(idx, 1);
+  // 把清單裡第 from 張移到第 to 個位置（to 是移除之後的索引），再重畫
+  function moveItem(from, to){
+    const list = (getList() || []).slice();
+    if(from === to || from < 0 || from >= list.length) return;
+    const [item] = list.splice(from, 1);
+    list.splice(Math.max(0, Math.min(list.length, to)), 0, item);
     setList(list);
-    render();
+    rerenderKeepingEdits();
+  }
+
+  container.addEventListener("click", (e) => {
+    const removeBtn = e.target.closest("[data-remove]");
+    if(removeBtn){
+      const list = (getList() || []).slice();
+      list.splice(Number(removeBtn.dataset.remove), 1);
+      setList(list);
+      rerenderKeepingEdits();
+      return;
+    }
+    const moveBtn = e.target.closest("[data-move]");
+    if(moveBtn && !moveBtn.disabled){
+      const idx = Number(moveBtn.dataset.move);
+      moveItem(idx, idx + Number(moveBtn.dataset.dir));
+    }
+  });
+
+  // 拖曳排序：只有按住左側把手（⠿）時整列才可拖，避免在輸入框裡選字時誤觸拖曳。
+  // 放下的位置依滑鼠在目標列的上半部／下半部決定插在它前面或後面，拖曳中用一條粗線提示。
+  let dragFrom = null;
+  const clearMarks = () => container.querySelectorAll(".drop-before, .drop-after").forEach(r => r.classList.remove("drop-before", "drop-after"));
+  container.addEventListener("mousedown", (e) => {
+    const handle = e.target.closest("[data-drag-handle]");
+    if(handle) handle.closest(".photo-row").draggable = true;
+  });
+  container.addEventListener("dragstart", (e) => {
+    const row = e.target.closest(".photo-row");
+    if(!row || !row.draggable){ e.preventDefault(); return; }
+    dragFrom = Number(row.dataset.idx);
+    row.classList.add("dragging");
+    e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.setData("text/plain", String(dragFrom));
+  });
+  container.addEventListener("dragover", (e) => {
+    if(dragFrom === null) return;
+    const row = e.target.closest(".photo-row");
+    if(!row) return;
+    e.preventDefault();
+    clearMarks();
+    const r = row.getBoundingClientRect();
+    row.classList.add(e.clientY < r.top + r.height / 2 ? "drop-before" : "drop-after");
+  });
+  container.addEventListener("drop", (e) => {
+    if(dragFrom === null) return;
+    const row = e.target.closest(".photo-row");
+    if(!row) return;
+    e.preventDefault();
+    const target = Number(row.dataset.idx);
+    const r = row.getBoundingClientRect();
+    let to = e.clientY < r.top + r.height / 2 ? target : target + 1;
+    if(dragFrom < to) to -= 1; // 先拿掉自己，後面的索引往前退一格
+    const from = dragFrom;
+    dragFrom = null;
+    clearMarks();
+    moveItem(from, to);
+  });
+  container.addEventListener("dragend", () => {
+    dragFrom = null;
+    clearMarks();
+    container.querySelectorAll(".photo-row").forEach(r => { r.draggable = false; r.classList.remove("dragging"); });
   });
   const uploadBtn = document.querySelector(`[data-upload-target="${containerId}"]`);
   const uploadInput = document.querySelector(`[data-upload-input="${containerId}"]`);
@@ -1190,14 +1304,14 @@ function wirePhotoList(containerId, getList, setList, slug){
       if(files.length === 0) return;
       try{
         setLoading(true, `上傳中… 0 / ${files.length}`);
-        const list = getList().slice();
+        const list = (getList() || []).slice();
         for(let i = 0; i < files.length; i++){
           setLoading(true, `上傳中… ${i + 1} / ${files.length}`);
           const src = await uploadAsset(files[i], slug);
           list.push({ id: `${slug}-${uid()}`, tone: "bg-neutral-300", caption: "", src });
         }
         setList(list);
-        render();
+        rerenderKeepingEdits();
         toast(`已上傳 ${files.length} 個檔案`);
       }catch(err){
         toast(err.message || "上傳失敗", true);
@@ -1206,6 +1320,17 @@ function wirePhotoList(containerId, getList, setList, slug){
       }
     });
   }
+}
+
+/* 照片清單有變動（調整順序、移除、上傳）時整頁重畫，但要保住兩件事：
+   1. 案例編輯器裡還沒存檔、只存在畫面上的文字（案名、內文、章節文字等只在存檔時才從畫面讀
+      回資料，見 collectEditorFields）——重畫前先讀回去，不然會被洗掉
+   2. 捲動位置——不然每排一次順序就跳回頁面最上面 */
+function rerenderKeepingEdits(){
+  if(state.editingCase && document.getElementById("f_name")) collectEditorFields(state.editingCase);
+  const y = window.scrollY;
+  render();
+  window.scrollTo(0, y);
 }
 
 function collectEditorFields(ed){

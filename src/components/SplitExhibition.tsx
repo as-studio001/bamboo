@@ -2,12 +2,11 @@
 
 import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
-import type { Project } from "@/lib/projects";
+import { HOME_CHAPTER_KEYS, orderedChapters, type Project } from "@/lib/projects";
 import { ImagePlaceholder } from "@/components/ImagePlaceholder";
 import { PhotoStream } from "@/components/PhotoStream";
 import { ChapterMap } from "@/components/ChapterExtras";
 import { AdminAccessLink } from "@/components/AdminAccessLink";
-import { EVENTS_KEY } from "@/lib/events";
 import { chapterLabel, navColor } from "@/lib/chapters";
 import { exhibitionScrollers, isPastCover } from "@/lib/coverReveal";
 import { PANEL_BG, TEXT_PRIMARY } from "@/components/theme";
@@ -224,13 +223,9 @@ function TopChapterNav({ projects }: { projects: [Project, Project] }) {
     scrollChapterIntoView(`${b.slug}-${key}`, 0);
   }
 
-  // 「活動」不是章節，是整個展覽共用的一份（見 lib/events.ts）：視窗開著時捲到視窗內容最尾端
-  // 的活動區塊（id="events"），沒開視窗時整頁捲到首頁最尾端的活動畫面（id="events-screen"）。
+  // 「活動」不是章節，是整個展覽共用的一份（見 lib/events.ts），只放在首頁（2026-10-14 起案例內頁
+  // 不再顯示活動區塊）：整頁捲到首頁最尾端的活動畫面（id="events-screen"）。
   function goToEvents() {
-    if (document.querySelector(`[role="dialog"] #${EVENTS_KEY}`)) {
-      scrollChapterIntoView(EVENTS_KEY);
-      return;
-    }
     document.getElementById("events-screen")?.scrollIntoView({ behavior: "smooth" });
   }
 
@@ -247,7 +242,8 @@ function TopChapterNav({ projects }: { projects: [Project, Project] }) {
 
   return (
     <div className="flex h-[52px] shrink-0 items-center justify-center gap-4 min-[400px]:gap-6 sm:h-[76px] sm:gap-10">
-      {a.chapters.map((chapter) => (
+      {/* 只列首頁會出現的章節（團隊介紹、結構設計只在案例內頁），照固定順序 */}
+      {orderedChapters(a, HOME_CHAPTER_KEYS).map((chapter) => (
         <button key={chapter.key} onClick={() => goTo(chapter.key)} className={labelClass} style={navStyle}>
           {chapterLabel(chapter.key)}
         </button>

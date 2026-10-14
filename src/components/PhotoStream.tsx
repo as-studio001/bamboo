@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { TEMPLATES, detectImageKind, templateRatio, type ImageKind } from "@/lib/photoTemplate";
-import type { Chapter, Project, ProjectImage } from "@/lib/projects";
+import { HOME_CHAPTER_KEYS, orderedChapters, type Chapter, type Project, type ProjectImage } from "@/lib/projects";
 import { visibleImages } from "@/lib/photoLayout";
 import { usePdfCover } from "@/lib/usePdfCover";
 import { pdfCoverId } from "@/lib/pdfPages";
@@ -61,7 +61,9 @@ export function PhotoStream({ project }: { project: Project }) {
   // 這裡跟案例內頁（ProjectDetail.tsx 的 NarrativeSection）共用同一個 visibleImages()
   // （見 lib/photoLayout.ts）——首頁索引跟內頁排版看到的是同一批「文字份量撐得起」的照片，
   // 不會出現首頁列了一堆內頁其實沒顯示的照片、點進去卻找不到對應段落的狀況。
-  const groups = project.chapters.filter(
+  //
+  // （2026-10-14）只取首頁會出現的章節（團隊介紹、結構設計只在案例內頁），照固定順序（見 projects.ts）。
+  const groups = orderedChapters(project, HOME_CHAPTER_KEYS).filter(
     (chapter) => chapter.key !== "site" && (visibleImages(chapter.text, chapter.images).length > 0 || chapter.pdf),
   );
 

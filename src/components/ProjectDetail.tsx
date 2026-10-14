@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment, useMemo, useState } from "react";
+import { Fragment, useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import {
   accentOnLight,
@@ -118,6 +118,7 @@ export function ProjectDetail({
           })}
 
           <ChapterFrame
+            sticky={false}
             id="site"
             number={chapterNumber(chapters.length)}
             title={chapterTitle("site")}
@@ -178,8 +179,30 @@ function ChapterEdgeNav({ keys }: { keys: ChapterKey[] }) {
       ?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
+  // （2026-10-14）封面、目錄的時候還不顯示，第一章的「01」捲到畫面正中間才淡入；捲回去再淡出
+  const [visible, setVisible] = useState(false);
+  const firstKey = keys[0];
+  useEffect(() => {
+    // 以第一章開頭的大編號「01」為準（章節框上面還有一段留白，用框的上緣會太早出現）：01 捲到畫面正中間才出現
+    const first = document.getElementById(firstKey)?.querySelector("header");
+    if (!first) return;
+    const update = () => setVisible(first.getBoundingClientRect().top <= window.innerHeight / 2);
+    update();
+    window.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", update);
+    return () => {
+      window.removeEventListener("scroll", update);
+      window.removeEventListener("resize", update);
+    };
+  }, [firstKey]);
+
   return (
-    <nav className="fixed inset-y-0 left-0 z-40 flex w-[18px] flex-col items-center justify-center gap-5 sm:w-[30px] sm:gap-7">
+    <nav
+      aria-hidden={!visible || undefined}
+      className={`fixed inset-y-0 left-0 z-40 flex w-[18px] flex-col items-center justify-center gap-5 transition-opacity duration-500 sm:w-[30px] sm:gap-7 ${
+        visible ? "opacity-100" : "pointer-events-none opacity-0"
+      }`}
+    >
       {/* 每個直書章節名稱上方加章節編號（01、02…，跟目錄、章節開頭的大編號同一套），編號橫排不轉向。
           字體、字級、字距、顏色跟右側邊框的「2026常民竹小屋」（EdgeTitle.tsx）一樣：襯線字 10／12px、
           字距 0.2em、主文字色 */}
@@ -214,7 +237,9 @@ const BODY_TEXT = `text-sm leading-relaxed sm:font-serif-tc sm:text-base sm:lead
 //   "title" 章節標題（左欄沒有內文時，例如基地位置）：編號＋20px＝68／80px
 // 這幾個數字依賴下面固定的高度：編號 h-12／lg:h-[60px]、標題 leading-8、內文 mt-6、單位 mt-10。
 const RIGHT_OFFSET = {
-  text: "sm:pt-[124px] lg:pt-[136px]",
+  // ＋8px：對齊內文「字」的上緣，不是段落框的上緣——內文行高 1.95（31.2px）比字大，第一行的字實際在框頂
+  // 往下約 8px（行距多出來的 4.1px＋字型本身字身框上方 4px，2026-10-14 用 canvas 量的）
+  text: "sm:pt-[132px] lg:pt-[144px]",
   unit: "sm:pt-[140px] lg:pt-[152px]",
   title: "sm:pt-[68px] lg:pt-[80px]",
 } as const;
@@ -228,6 +253,7 @@ function ChapterFrame({
   right,
   alignTo = "text",
   rows,
+  sticky = true,
 }: {
   id: string;
   number: string;
@@ -237,6 +263,9 @@ function ChapterFrame({
   right?: React.ReactNode;
   alignTo?: keyof typeof RIGHT_OFFSET;
   rows?: { left: React.ReactNode; right: React.ReactNode }[];
+  // sticky：左欄（編號＋標題＋文字）捲動時固定在畫面上（預設）。false＝左右兩欄一起捲動，圖片跟文字不會錯開
+  // （團隊介紹的 rows 模式本來就不固定；組裝說明書、影片、基地位置也設成 false）
+  sticky?: boolean;
 }) {
   const sectionClass = `flex scroll-mt-10 flex-col ${first ? "" : "border-t pt-10"} sm:grid sm:min-h-screen sm:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] sm:items-start sm:gap-x-12 sm:border-0 sm:pt-28 sm:pb-28 lg:gap-x-20`;
   const sectionStyle = first
@@ -279,7 +308,7 @@ function ChapterFrame({
     // （原本還加了捲動吸附到章節開頭，會跟滑鼠滾輪搶捲動、造成卡頓，已拿掉。）
     // 右欄上緣跟左欄的哪個東西切齊見上面的 RIGHT_OFFSET。
     <section id={id} className={sectionClass} style={sectionStyle}>
-      <div className="contents sm:sticky sm:top-28 sm:block sm:self-start">
+      <div className={`contents sm:block sm:self-start ${sticky ? "sm:sticky sm:top-28" : ""}`}>
         {header}
         {left}
       </div>
@@ -304,9 +333,11 @@ function TableOfContents({
       aria-label="目錄"
       className="hidden sm:grid sm:min-h-screen sm:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] sm:items-start sm:gap-x-12 sm:pt-28 sm:pb-28 lg:gap-x-20"
     >
+      {/* （2026-10-14）「目錄」改成小字標籤（襯線 12px、字距 0.2em、灰色，跟左側章節小標同一套），像書的
+          頁眉標示，不跟章節開頭的大編號（01、02…）搶；跟清單第一項「01 團隊介紹」的文字底線（baseline）對齊——往下推 25.5px 是用 canvas 量出來的 */}
       <div>
         <p
-          className="font-serif-tc text-5xl leading-none font-light lg:text-6xl"
+          className="font-serif-tc text-xs tracking-[0.2em] sm:pt-[25.5px]"
           style={{ color: "var(--foreground-muted)" }}
         >
           目錄
@@ -391,7 +422,8 @@ function TeamSection({
       number={number}
       title={chapterTitle(chapter.key)}
       first={first}
-      // 每個單位一列：左邊小標＋內文、右邊圖片。右邊往下推「小標高度 24px＋小標跟內文的間距 12px」＝36px，
+      // 每個單位一列：左邊小標＋內文、右邊圖片。右邊圖片上緣貼齊單位名稱那一行「字」的上緣：
+      // 小標行高 24px、字的上緣在行框內往下 4.5px（canvas 量的），所以右邊往下推 4.5px（沒有小標的單位改對齊內文的字，推 8px），
       // 圖片上緣就跟這個單位的內文第一行切齊；沒有小標的單位就不推。左欄不固定，圖片跟文字一起捲動。
       rows={shown.map((unit) => {
         const hasHeading = !!(unit.title || unit.name?.trim());
@@ -422,7 +454,7 @@ function TeamSection({
           ),
           right: images.length ? (
             <div
-              className={`mt-6 flex flex-col gap-3 sm:mt-10 sm:ml-auto sm:w-1/2 sm:gap-4 ${hasHeading ? "sm:pt-9" : ""}`}
+              className={`mt-6 flex flex-col gap-3 sm:mt-10 sm:ml-auto sm:w-[30%] sm:gap-4 ${hasHeading ? "sm:pt-[4.5px]" : "sm:pt-2"}`}
             >
               {images.map((img) => (
                 // next/image 自動縮圖、轉 WebP（不直接載原圖，捲動比較順）；電腦版裁成正方形
@@ -459,6 +491,7 @@ function VideoSection({
   const videos = (chapter.videos ?? []).filter((v) => v.url?.trim());
   return (
     <ChapterFrame
+      sticky={false}
       id={chapter.key}
       number={number}
       title={chapterTitle(chapter.key)}
@@ -739,6 +772,7 @@ function AssemblySection({
 
   return (
     <ChapterFrame
+      sticky={false}
       id={chapter.key}
       number={number}
       title={chapterTitle(chapter.key)}

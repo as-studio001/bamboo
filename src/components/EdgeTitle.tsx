@@ -33,17 +33,24 @@ type Tone = "dark" | "light";
 // 首頁電腦版左右不留白邊，字直接壓在圖上、不墊底色；字色依背後實際看到的畫面亮度在深灰／淺灰
 // 之間切換（見 lib/backdropLuminance.ts），亮背景用深灰、暗背景用淺灰，切換時淡入淡出。
 // 手機版維持原本 18px 白邊＋「2026常民竹小屋」。
+// （2026-10-14）在案例內頁時，右側的「2026常民竹小屋」後面接「 × 案名」，例如「2026常民竹小屋 × 竹輕亭 | 簇樂」：
+// - 案例獨立頁：projects/[slug]/layout.tsx 傳 projectName
+// - 首頁上開著的案例彈出視窗：網址是 /projects/<slug>，從首頁傳進來的 projects 裡找出案名
+// 這時右側固定顯示這串字（不套首頁兩欄的「封面隱藏／換成案名」規則），點了照舊回到策展宣言。
 export function EdgeTitle({
   side = "both",
   projects,
+  projectName,
 }: {
   side?: "left" | "right" | "both";
   projects?: [EdgeProject, EdgeProject];
+  projectName?: string;
 }) {
   const pathname = usePathname();
   const leftRef = useRef<HTMLAnchorElement>(null);
   const rightRef = useRef<HTMLAnchorElement>(null);
   const { modes, tones, adaptive } = useHomeEdgeState(!!projects, [leftRef, rightRef]);
+  const currentProjectName = projectName ?? projects?.find((p) => pathname === `/projects/${p.slug}`)?.name;
 
   function handleClick(e: React.MouseEvent<HTMLAnchorElement>) {
     const manifesto = document.getElementById("manifesto");
@@ -55,13 +62,14 @@ export function EdgeTitle({
   function renderSide(index: 0 | 1) {
     const isLeft = index === 0;
     const project = projects?.[index];
-    const mode = modes[index];
+    const withProject = !isLeft && !!currentProjectName;
+    const mode = withProject ? "brand" : modes[index];
     const showName = mode === "name" && project;
-    const label = showName ? project.name : TITLE;
+    const label = withProject ? `${TITLE} × ${currentProjectName}` : showName ? project.name : TITLE;
     const frame = projects
       ? `w-[18px] sm:w-auto ${isLeft ? "left-0 sm:left-2" : "right-0 sm:right-2"}`
       : `w-[18px] sm:w-[30px] ${isLeft ? "left-0" : "right-0"}`;
-    const color = adaptive ? (tones[index] === "dark" ? "#222222" : "#eeeeee") : "var(--foreground)";
+    const color = adaptive && !withProject ? (tones[index] === "dark" ? "#222222" : "#eeeeee") : "var(--foreground)";
     // 首頁整頁捲軸已隱藏（見 (site)/layout.tsx），左右兩側標示都離圖片邊緣 8px，完全對稱。
 
     return (

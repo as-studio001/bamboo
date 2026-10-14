@@ -14,11 +14,58 @@ export type ProjectImage = {
 // 現有資料不用搬；名稱改成：team 團隊介紹（新）、design 設計概念、module 建築設計、structure 細部設計、
 // engineering 結構設計（新）、construction 施工細節、assembly 組裝說明書、site 基地位置（見 lib/chapters.ts）。
 // 新增的 team、engineering 只出現在案例內頁，首頁的頂部選單跟照片索引不放（HOME_CHAPTER_KEYS）。
-export type ChapterKey = "team" | "design" | "module" | "structure" | "engineering" | "construction" | "assembly" | "site";
+// （同日）再加一個「影片」（video）章節，放在組裝說明書之後、基地位置之前，只在案例內頁出現；影片一律放
+// 這裡（chapter.videos，可以多支、各自有標題），其他章節不再有單一影片欄位。
+export type ChapterKey =
+  | "team"
+  | "design"
+  | "module"
+  | "structure"
+  | "engineering"
+  | "construction"
+  | "assembly"
+  | "video"
+  | "site";
 
-export const CHAPTER_ORDER: ChapterKey[] = ["team", "design", "module", "structure", "engineering", "construction", "assembly", "site"];
+export type ChapterVideoItem = { id: string; url: string; title?: string };
+
+// 「團隊介紹」（team）分成兩個固定單位（2026-10-14）：設計單位、業主單位，各自有文字跟圖片，存在
+// chapter.units。文字照後台輸入的換行顯示、不切段落；圖片排在文字右邊（見 ProjectDetail.tsx 的
+// TeamSection）。
+export type TeamUnitKey = "designer" | "owner";
+// name：單位名稱（例如「初樸建築師事務所」），顯示在小標「設計單位」右邊；text 是下面的介紹內文
+export type TeamUnit = { key: TeamUnitKey; name?: string; text?: string; images?: ProjectImage[] };
+export const TEAM_UNITS: { key: TeamUnitKey; title: string }[] = [
+  { key: "designer", title: "設計單位" },
+  { key: "owner", title: "業主單位" },
+];
+
+export const CHAPTER_ORDER: ChapterKey[] = [
+  "team",
+  "design",
+  "module",
+  "structure",
+  "engineering",
+  "construction",
+  "assembly",
+  "video",
+  "site",
+];
 
 export const HOME_CHAPTER_KEYS: ChapterKey[] = ["design", "module", "structure", "construction", "assembly", "site"];
+
+// 主色（accent）同時用在「疊在封面照片上的地點／年份字」跟「白色頁面上的按鈕、導覽字」（More in Detail、
+// 左側章節導覽、組裝說明書按鈕、地圖待補提示…）。後台把主色設成白色或很淺的顏色時，前者看得清楚、後者
+// 會跟白底融在一起消失（2026-10-14 實際發生：兩案主色都是 #ffffff，More in Detail 按鈕整個不見）。
+// 白底上的元素一律用這個函式：主色夠深就照用，太淺（亮度 > 0.6）就改用深灰。
+export function accentOnLight(accent: string): string {
+  const hex = accent?.trim().replace(/^#/, "");
+  const full = hex?.length === 3 ? hex.split("").map((c) => c + c).join("") : hex;
+  if (!full || !/^[0-9a-fA-F]{6}$/.test(full)) return accent;
+  const [r, g, b] = [0, 2, 4].map((i) => parseInt(full.slice(i, i + 2), 16) / 255);
+  const lum = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  return lum > 0.6 ? "#555555" : accent;
+}
 
 // 依固定順序取出這個案例有的章節（JSON 裡的陣列順序不算數；資料裡沒有的章節就跳過）。
 // keys 可以限定只取哪些章節（例如首頁只取 HOME_CHAPTER_KEYS）。
@@ -44,8 +91,10 @@ export type Chapter = {
   // 也是 images 超過上限時多出來的照片該去的地方），只有「建築設計／模矩／構造／施工」會
   // 用到（見 ProjectDetail.tsx 的 ReadMoreGallery）。跟 images 分開存放——這批圖只在內頁
   // 展開後才看得到，不算進首頁雙欄的照片索引。
-  video?: string; // 影片路徑（可選，每個章節都能放）
+  video?: string; // 舊欄位（已停用）：原本每個章節都能放一支影片，2026-10-14 起影片改放「影片」章節的 videos
+  videos?: ChapterVideoItem[]; // 只有「影片」章節用：多支影片，各自網址（YouTube 或影片檔）＋選填標題
   pdf?: { url: string; label: string }; // 可下載檔案（目前只有「組裝說明書」會用到）
+  units?: TeamUnit[]; // 只有「團隊介紹」用：設計單位、業主單位（見上方 TEAM_UNITS）
 };
 
 // 欄位對齊 Internal-Pages（as-studio001/Internal-Pages）content/projects/*.json 的 map 欄位設計，

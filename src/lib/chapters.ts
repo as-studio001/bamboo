@@ -29,6 +29,7 @@ const DEFAULT_LABELS: Record<LabelKey, string> = {
   engineering: "結構",
   construction: "施工",
   assembly: "組裝",
+  video: "影片",
   site: "位置",
   events: "活動",
 };
@@ -41,6 +42,7 @@ const DEFAULT_TITLES: Record<ChapterKey, string> = {
   engineering: "結構設計",
   construction: "施工細節",
   assembly: "組裝說明書",
+  video: "影片",
   site: "基地位置",
 };
 

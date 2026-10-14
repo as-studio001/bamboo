@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import type { Project } from "@/lib/projects";
+import { accentOnLight, type Project } from "@/lib/projects";
 import { PdfFlipbook } from "@/components/PdfFlipbook";
 import { pdfCoverId } from "@/lib/pdfPages";
 import { usePdfCover } from "@/lib/usePdfCover";
@@ -20,6 +20,9 @@ export function AssemblyBook({ project, pdf, accent }: { project: Project; pdf: 
   const [open, setOpen] = useState(false);
   const coverSrc = usePdfCover(pdf.url);
   const id = pdfCoverId(project);
+  // 下面兩個連結在白底上，主色太淺時改用深灰（見 projects.ts 的 accentOnLight）；
+  // 翻頁書本身是深色背景，照用原本的主色
+  const linkColor = accentOnLight(accent);
 
   return (
     <div className="mt-6 sm:mt-8">
@@ -51,7 +54,7 @@ export function AssemblyBook({ project, pdf, accent }: { project: Project; pdf: 
         <button
           onClick={() => setOpen(true)}
           className="font-mono text-[10px] tracking-wide uppercase underline underline-offset-2 sm:text-xs"
-          style={{ color: accent }}
+          style={{ color: linkColor }}
         >
           線上翻閱
         </button>
@@ -59,7 +62,7 @@ export function AssemblyBook({ project, pdf, accent }: { project: Project; pdf: 
           href={pdf.url}
           download
           className="font-mono text-[10px] tracking-wide uppercase underline underline-offset-2 sm:text-xs"
-          style={{ color: accent }}
+          style={{ color: linkColor }}
         >
           下載 PDF
         </a>

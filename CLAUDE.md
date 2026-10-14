@@ -174,7 +174,7 @@ npm run build  # 正式建置，驗證型別與 lint
 
 啟動 `npm run dev` 前注意：這台機器的系統 PATH 是在安裝 Node.js「之後」才更新，若某個終端機階段開啟得比安裝早，`node`/`npm` 可能抓不到，開新的終端機視窗即可。
 
-`/admin` 本機測試：`npm run dev` 之後直接訪問 `http://localhost:3000/admin`，會走真正的 Supabase／Netlify 後端（不是 mock），登入跟存檔都是對 production 資源操作，測試時要注意。
+`/admin` 本機模式（2026-10-14 新增）：`npm run dev` 之後訪問 `http://localhost:3000/admin`，後台會自動進入「本機模式」（頂端綠色提示條）——登入一樣走 Supabase，但**存檔、上傳都改寫這台電腦上的 `content/`、`public/images/`**（`src/app/api/local-content/route.ts`，只在 `NODE_ENV === "development"` 時運作，正式網站回 404；路徑限定 content／public/images／public/files），不上傳 GitHub、不觸發 Vercel 部署，本機網站自動更新。適合「先在本機把後台跟網頁都調整好，再一起 commit／push」。正式網站的 `/admin`（bamboo-sage.vercel.app/admin）照舊寫 GitHub。注意：本機模式改的內容檔要記得 commit；反過來，如果有人在正式後台存檔，要先 pull 回本機再繼續改，不然 push 時會衝突。
 
 ## 給未來的我（或其他協作者）的提醒
 

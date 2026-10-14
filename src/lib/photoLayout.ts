@@ -137,7 +137,7 @@ function makePhotoChunks(photos: PhotoWithRatio[]): PhotoWithRatio[][] {
   return chunks;
 }
 
-function chunkToRow(chunk: PhotoWithRatio[], ratioState: RatioState): PhotoRow {
+function chunkToRow(chunk: PhotoWithRatio[], ratioState: RatioState, equalPairs = false): PhotoRow {
   // align 這裡先給預設值，實際結果由下面的 applyRowAlignment() 統一決定
   // （要看整個章節的區塊序列、不是單一組照片自己能判斷的）。
   if (chunk.length === 1) {
@@ -152,6 +152,9 @@ function chunkToRow(chunk: PhotoWithRatio[], ratioState: RatioState): PhotoRow {
     return { photos: chunk, columns: chunk.map(() => 1), portrait: true, align: "end" };
   }
   if (allNonPortrait && chunk.length === 2) {
+    // equalPairs：這一章的兩張並排一律等寬（1:1），不套下面的寬窄輪替（2026-10-14，「建築設計」的
+    // 圖說要兩張等大），也不佔用輪替的順序，其他章節的節奏不受影響
+    if (equalPairs) return { photos: chunk, columns: [1, 1], portrait: false, align: "end" };
     let idx = ratioState.next % PAIR_RATIOS.length;
     if (idx === ratioState.last) idx = (idx + 1) % PAIR_RATIOS.length;
     ratioState.last = idx;
@@ -199,10 +202,20 @@ export function layoutChapter(
   paragraphs: string[],
   photos: PhotoWithRatio[],
   ratioState: RatioState = createRatioState(),
+  options: { equalPairs?: boolean } = {},
 ): ContentBlock[] {
   const cleanParagraphs = paragraphs.map((t) => t.trim()).filter(Boolean);
 
-  const rows = makePhotoChunks(photos).map((chunk) => chunkToRow(chunk, ratioState));
+  // equalPairs（建築設計、細部設計這類圖說章節）：不看直式橫式，一律照順序兩張一組並排、等寬；
+  // 落單的最後一張自己一排。其他章節照原本的規則依真實比例分組。
+  const chunks = options.equalPairs
+    ? Array.from({ length: Math.ceil(photos.length / 2) }, (_, i) => photos.slice(i * 2, i * 2 + 2))
+    : makePhotoChunks(photos);
+  const rows = chunks.map((chunk) =>
+    options.equalPairs && chunk.length === 2
+      ? { photos: chunk, columns: [1, 1], portrait: false, align: "end" as const }
+      : chunkToRow(chunk, ratioState, options.equalPairs),
+  );
 
   if (cleanParagraphs.length === 0) {
     const blocks = rows.map(rowToBlock);

@@ -25,7 +25,12 @@ function measureOne(image: ProjectImage): Promise<number> {
       resolve(ratio);
     };
     img.onerror = () => resolve(4 / 3);
-    img.src = image.src!;
+    // （2026-10-14）只是要量寬高比，不用載原圖（原始截圖／渲染圖常常 300KB～4MB，捲動時一起下載會卡）：
+    // 本站自己的圖片改量 Next.js 圖片服務縮成 640px 寬的版本（比例完全一樣、通常只有幾十 KB）。
+    // 640、品質 75 都是 Next.js 預設允許的值；外部網址照舊直接量原圖。
+    img.src = image.src!.startsWith("/")
+      ? `/_next/image?url=${encodeURIComponent(image.src!)}&w=640&q=75`
+      : image.src!;
   });
 }
 

@@ -41,12 +41,17 @@ export function ImagePlaceholder({
         transition={SHARED_ELEMENT_TRANSITION}
         className={`group relative w-full overflow-hidden ${className}`}
       >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
+        {/* （2026-10-14）改用 next/image 的「原比例」寫法（width/height 給 0、CSS 寬 100%／高 auto）：
+            比例照樣由照片本身決定，但會依螢幕寬度自動縮成合適尺寸、轉成 WebP 再送出，不再直接載入
+            1～4MB 的原始截圖／渲染圖——原圖太大，捲動時解碼會造成卡頓。原始檔案不受影響。 */}
+        {/* 已經知道比例（image.ratio，案例內頁的圖片會先量好）就用真實比例當寬高：圖片還沒載入前瀏覽器
+            就先保留正確的高度，載入時版面不會往下跳（原本高度 0，每載入一張整頁就跳一次，捲動感覺卡） */}
+        <Image
           src={image.src}
           alt={image.caption ?? ""}
-          loading="lazy"
-          decoding="async"
+          width={image.ratio ? 1600 : 0}
+          height={image.ratio ? Math.round(1600 / image.ratio) : 0}
+          sizes="(max-width: 640px) 100vw, 60vw"
           className="block h-auto w-full transition-transform duration-700 ease-out group-hover:scale-[1.02]"
         />
       </motion.div>

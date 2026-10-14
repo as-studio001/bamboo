@@ -125,6 +125,14 @@ input,textarea,select{ font-family:inherit; font-size:14px; }
   background:#fff; color:var(--muted); font-size:16px; line-height:1;
 }
 .row-remove-btn:hover{ color:var(--danger); border-color:var(--danger); }
+/* 「影片」章節的影片清單：每支影片之間留間距、加分隔線，才看得出哪個標題配哪個網址 */
+.video-list{ display:flex; flex-direction:column; gap:14px; }
+.video-list .photo-row + .photo-row{ border-top:1px solid var(--line); padding-top:14px; }
+/* 本機模式提示條（見 LOCAL_MODE） */
+.local-mode-banner{
+  background:#1f6f43; color:#fff; font-size:13px; font-weight:600; text-align:center;
+  padding:8px 16px; letter-spacing:.02em;
+}
 /* 調整順序：左側拖曳把手＋右側上／下移按鈕 */
 .row-drag-handle{
   flex-shrink:0; width:20px; align-self:stretch; display:flex; align-items:center; justify-content:center;
@@ -223,6 +231,12 @@ const SUPABASE_URL = "https://enjbqfgepvkpwlfqbldi.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVuamJxZmdlcHZrcHdsZnFibGRpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODcyOTUyODQsImV4cCI6MjEwMjg3MTI4NH0.7YAlMUGocaXenA6RPdDPNu60g48GgW0Nq8xAwxThilo";
 const FUNCTIONS_BASE = "https://zingy-bonbon-36e6c9.netlify.app/.netlify/functions";
 
+// 本機模式（2026-10-14）：在自己電腦上用 npm run dev 開 localhost:3000/admin 時，讀寫、上傳都改走
+// 本機的 /api/local-content（src/app/api/local-content/route.ts），直接改這台電腦上的 content/ 跟
+// public/images——不上傳 GitHub、不觸發 Vercel 重新部署；本機網站自動更新，後台跟網頁即時連動。
+// 正式網站（bamboo-sage.vercel.app/admin）不受影響，照舊寫 GitHub。登入還是一樣要登入。
+const LOCAL_MODE = ["localhost", "127.0.0.1"].includes(location.hostname);
+
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 function esc(str){
@@ -258,7 +272,9 @@ let authSession = null;
 sb.auth.onAuthStateChange((_event, session) => { authSession = session; });
 
 async function callFunction(name, payload){
-  const res = await fetch(`${FUNCTIONS_BASE}/${name}`, {
+  // 本機模式：github-proxy 的讀寫動作改送本機 API（格式相同）
+  const url = LOCAL_MODE && name === "github-proxy" ? "/api/local-content" : `${FUNCTIONS_BASE}/${name}`;
+  const res = await fetch(url, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -296,6 +312,7 @@ function decodeGhFileData(data){
   return { sha: data.sha, content };
 }
 async function ghFetchPublic(path){
+  if(LOCAL_MODE) return null; // 本機模式不讀 GitHub，一律走 callFunction → 本機 API
   const url = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${path.split("/").map(encodeURIComponent).join("/")}?ref=${REPO_BRANCH}&_=${Date.now()}`;
   try{ return await fetch(url, { cache: "no-store" }); }catch(e){ return null; }
 }
@@ -308,6 +325,10 @@ async function ghGetFile(path){
 // 跟 ghGetFile 一樣，但檔案在 GitHub 上還不存在（404）時回傳 null，不丟錯——給「展覽共用
 // 區塊」這類單一 JSON 檔用：檔案還沒建立時用預設值打開編輯畫面，存檔時（不帶 sha）會新建檔案。
 async function ghGetFileOrNull(path){
+  if(LOCAL_MODE){
+    try{ return await ghGetFile(path); }
+    catch(e){ if(/找不到檔案/.test(e.message)) return null; throw e; }
+  }
   const res = await ghFetchPublic(path);
   if(res && res.status === 404) return null;
   return ghGetFile(path);
@@ -549,8 +570,16 @@ function crossAdminUrl(baseUrl){
 
 const INTERNAL_PAGES_ADMIN_URL = "https://as-studio001.github.io/Internal-Pages/admin/";
 
+// 存檔成功的提示：本機模式下說明檔案只存在這台電腦
+function toastSaved(){
+  toast(LOCAL_MODE
+    ? "已存到這台電腦（本機模式）：重新整理本機網站就看得到；還沒上傳 GitHub，正式網站不會變"
+    : "已儲存並發布，網站會在下一次部署後更新");
+}
+
 function renderTopBar(){
   return `
+    ${LOCAL_MODE ? `<div class="local-mode-banner">本機模式｜存檔、上傳都只寫進這台電腦的檔案，不會上傳 GitHub，正式網站不會變。確認沒問題後再 commit／push 上線。</div>` : ""}
     <div class="top-bar">
       <div class="wrap">
         <div class="site-title">後台管理<a href="/" target="_blank">↗ 查看網站</a><a href="${crossAdminUrl(INTERNAL_PAGES_ADMIN_URL)}" target="_blank">↗ 原型建築後台</a></div>
@@ -643,6 +672,7 @@ const LABEL_DEFS = [
   { key: "construction", label: "施工", chapter: "施工細節" },
   { key: "assembly", label: "組裝", chapter: "組裝說明書" },
   { key: "site", label: "位置", chapter: "基地位置" },
+  // 「影片」只在案例內頁，首頁選單沒有，所以這裡不列（內頁名稱在下方「案例內頁的章節名稱」）
   { key: "events", label: "活動", chapter: "首頁活動畫面" },
 ];
 // 案例內頁完整名稱：預設值跟案例編輯器的章節名稱（CHAPTER_DEFS）相同。寫成函式而不是常數——
@@ -767,7 +797,7 @@ async function saveChaptersEditor(ed){
     ed.sha = result.content ? result.content.sha : ed.sha;
     render();
     document.getElementById("saveStatus").textContent = "已儲存 " + new Date().toLocaleTimeString("zh-TW");
-    toast("已儲存並發布，網站會在下一次部署後更新");
+    toastSaved();
   }catch(err){
     statusEl.classList.add("err");
     statusEl.textContent = "儲存失敗";
@@ -859,7 +889,7 @@ async function saveManifestoEditor(ed){
     ed.sha = result.content ? result.content.sha : ed.sha;
     render();
     document.getElementById("saveStatus").textContent = "已儲存 " + new Date().toLocaleTimeString("zh-TW");
-    toast("已儲存並發布，網站會在下一次部署後更新");
+    toastSaved();
   }catch(err){
     statusEl.classList.add("err");
     statusEl.textContent = "儲存失敗";
@@ -951,7 +981,7 @@ async function saveEventsEditor(ed){
     ed.sha = result.content ? result.content.sha : ed.sha;
     render();
     document.getElementById("saveStatus").textContent = "已儲存 " + new Date().toLocaleTimeString("zh-TW");
-    toast("已儲存並發布，網站會在下一次部署後更新");
+    toastSaved();
   }catch(err){
     statusEl.classList.add("err");
     statusEl.textContent = "儲存失敗";
@@ -973,15 +1003,32 @@ async function saveEventsEditor(ed){
 // 另外由「章節標題」編輯畫面設定，預設跟這裡相同）。home 標示這章會不會出現在首頁選單／照片索引。
 // 存檔時 chapters 陣列也會照這個順序重排。
 const CHAPTER_DEFS = [
-  { key: "team", label: "團隊介紹", kind: "narrative", home: false },
+  { key: "team", label: "團隊介紹", kind: "team", home: false },
   { key: "design", label: "設計概念", kind: "narrative", home: true },
   { key: "module", label: "建築設計", kind: "narrative", home: true },
   { key: "structure", label: "細部設計", kind: "narrative", home: true },
   { key: "engineering", label: "結構設計", kind: "narrative", home: false },
   { key: "construction", label: "施工細節", kind: "narrative", home: true },
   { key: "assembly", label: "組裝說明書", kind: "assembly", home: true },
+  { key: "video", label: "影片", kind: "video", home: false },
   { key: "site", label: "基地位置", kind: "site", home: true },
 ];
+
+// 「團隊介紹」的兩個固定單位（跟前台 src/lib/projects.ts 的 TEAM_UNITS 一致），存在 chapter.units：
+// [{ key, text, images }]。文字照輸入的換行顯示、不切段落；圖片排在文字右邊。
+const TEAM_UNITS = [
+  { key: "designer", label: "設計單位" },
+  { key: "owner", label: "業主單位" },
+];
+function teamUnit(chapter, key){
+  chapter.units = chapter.units || [];
+  let unit = chapter.units.find(u => u.key === key);
+  if(!unit){
+    unit = { key, name: "", text: "", images: [] };
+    chapter.units.push(unit);
+  }
+  return unit;
+}
 
 function emptyChapter(key, label){
   return { key, title: label, text: "", images: [], moreImages: [] };
@@ -1121,6 +1168,57 @@ function renderCaseEditor(){
 
       ${CHAPTER_DEFS.map((def, i) => {
         const chapter = item.chapters[i];
+        if(def.kind === "team") return `
+        <div class="chapter-section" data-chapter="${def.key}">
+          <div class="chapter-section-head">
+            <span class="num">${i + 1}</span>
+            <h3>${esc(def.label)}</h3>
+            <span class="key">key: ${def.key}｜只在案例內頁顯示</span>
+          </div>
+          <div class="field-hint" style="margin-top:0; margin-bottom:14px;">分成設計單位、業主單位。「名稱」會跟「設計單位／業主單位」排在同一行；介紹文字照你輸入的換行顯示（按 Enter 就換行，空白行也會保留），不會切成段落；圖片顯示在文字右邊，多張由上往下排。兩個單位都空白時，案例內頁不顯示這一章。</div>
+          ${TEAM_UNITS.map(u => {
+            const unit = teamUnit(chapter, u.key);
+            return `
+          <div class="field-block">
+            <div class="label">${esc(u.label)}</div>
+            <input type="text" data-uname="${u.key}" placeholder="名稱（顯示在「${esc(u.label)}」右邊，例如：初樸建築師事務所）" value="${esc(unit.name || "")}" style="margin-bottom:8px;">
+            <textarea class="tall" data-ufield="${u.key}" placeholder="${esc(u.label)}的介紹文字">${esc(unit.text || "")}</textarea>
+            <div class="label" style="margin-top:14px;">${esc(u.label)}的圖片（顯示在文字右邊）</div>
+            ${renderPhotoList(`teamImages_${u.key}`, unit.images)}
+          </div>`;
+          }).join("")}
+        </div>`;
+        if(def.kind === "video"){
+          const videos = chapter.videos || [];
+          return `
+        <div class="chapter-section" data-chapter="${def.key}">
+          <div class="chapter-section-head">
+            <span class="num">${i + 1}</span>
+            <h3>${esc(def.label)}</h3>
+            <span class="key">key: ${def.key}｜只在案例內頁顯示</span>
+          </div>
+          <div class="field-hint" style="margin-top:0; margin-bottom:14px;">影片都放在這裡（其他章節已經沒有影片欄位）。網址可以貼 YouTube 連結（youtu.be/… 或 youtube.com/watch?v=…），或影片檔網址；標題選填，會顯示在影片上方。多支影片由上往下排，可以用 ↑↓ 調整順序。沒有任何影片時，案例內頁不顯示這一章。</div>
+          <div class="field-block">
+            <label>說明文字（選填，顯示在所有影片上方）</label>
+            <textarea data-cfield="text">${esc(chapter.text || "")}</textarea>
+          </div>
+          <div class="video-list" id="videoList">
+            ${videos.map((v, vi) => `
+            <div class="photo-row" data-vidx="${vi}">
+              <div class="fields">
+                <input type="text" data-vfield="title" placeholder="影片標題（選填）" value="${esc(v.title || "")}">
+                <input type="text" data-vfield="url" placeholder="影片網址（YouTube 連結或影片檔網址）" value="${esc(v.url || "")}">
+              </div>
+              <div class="row-move">
+                <button type="button" class="row-move-btn" data-vmove="${vi}" data-dir="-1" title="往前移" ${vi === 0 ? "disabled" : ""}>↑</button>
+                <button type="button" class="row-move-btn" data-vmove="${vi}" data-dir="1" title="往後移" ${vi === videos.length - 1 ? "disabled" : ""}>↓</button>
+              </div>
+              <button type="button" class="row-remove-btn" data-vremove="${vi}" title="移除這支影片">✕</button>
+            </div>`).join("") || `<div class="field-hint">目前沒有影片。</div>`}
+          </div>
+          <button type="button" class="add-photo-btn" id="addVideoBtn" style="margin-top:10px;">＋ 新增影片</button>
+        </div>`;
+        }
         return `
         <div class="chapter-section" data-chapter="${def.key}">
           <div class="chapter-section-head">
@@ -1176,11 +1274,6 @@ function renderCaseEditor(){
             </div>
           </div>
           ` : ""}
-
-          <div class="field-block">
-            <label>影片路徑（選填）</label>
-            <input type="text" data-cfield="video" value="${esc(chapter.video || "")}">
-          </div>
         </div>
       `;}).join("")}
 
@@ -1199,10 +1292,55 @@ function renderCaseEditor(){
   wirePhotoList("coverImages", () => ed.item.coverImages, (next) => { ed.item.coverImages = next; }, ed.slug);
   CHAPTER_DEFS.forEach((def, i) => {
     const chapter = ed.item.chapters[i];
+    if(def.kind === "team"){
+      TEAM_UNITS.forEach(u => {
+        wirePhotoList(`teamImages_${u.key}`, () => teamUnit(chapter, u.key).images, (next) => { teamUnit(chapter, u.key).images = next; }, ed.slug);
+      });
+      return;
+    }
+    if(def.kind === "video"){
+      wireVideoList(chapter);
+      return;
+    }
     wirePhotoList(`chapterImages_${def.key}`, () => chapter.images, (next) => { chapter.images = next; }, ed.slug);
     if(def.kind === "narrative"){
       wirePhotoList(`chapterMore_${def.key}`, () => chapter.moreImages, (next) => { chapter.moreImages = next; }, ed.slug);
     }
+  });
+}
+
+/* 「影片」章節的影片清單：輸入框即時同步回 chapter.videos，新增／移除／↑↓ 調整順序後重畫（保留其他
+   還沒存檔的文字，見 rerenderKeepingEdits）。 */
+function wireVideoList(chapter){
+  const list = document.getElementById("videoList");
+  const addBtn = document.getElementById("addVideoBtn");
+  if(!list || !addBtn) return;
+  chapter.videos = chapter.videos || [];
+  list.addEventListener("input", (e) => {
+    const row = e.target.closest("[data-vidx]");
+    const field = e.target.dataset.vfield;
+    if(!row || !field) return;
+    chapter.videos[Number(row.dataset.vidx)][field] = e.target.value;
+  });
+  list.addEventListener("click", (e) => {
+    const rm = e.target.closest("[data-vremove]");
+    if(rm){
+      chapter.videos.splice(Number(rm.dataset.vremove), 1);
+      rerenderKeepingEdits();
+      return;
+    }
+    const mv = e.target.closest("[data-vmove]");
+    if(mv && !mv.disabled){
+      const from = Number(mv.dataset.vmove);
+      const to = from + Number(mv.dataset.dir);
+      const [v] = chapter.videos.splice(from, 1);
+      chapter.videos.splice(to, 0, v);
+      rerenderKeepingEdits();
+    }
+  });
+  addBtn.addEventListener("click", () => {
+    chapter.videos.push({ id: `video-${uid()}`, url: "", title: "" });
+    rerenderKeepingEdits();
   });
 }
 
@@ -1360,18 +1498,25 @@ function collectEditorFields(ed){
 
   document.querySelectorAll(".chapter-section").forEach((section, i) => {
     const chapter = item.chapters[i];
+    section.querySelectorAll("[data-ufield]").forEach(el => {
+      teamUnit(chapter, el.dataset.ufield).text = el.value.replace(/\r\n/g, "\n");
+    });
+    section.querySelectorAll("[data-uname]").forEach(el => {
+      teamUnit(chapter, el.dataset.uname).name = el.value.trim();
+    });
     section.querySelectorAll("[data-cfield]").forEach(el => {
       const f = el.dataset.cfield;
       if(f === "pdfUrl"){
         chapter.pdf = Object.assign({}, chapter.pdf, { url: el.value.trim() });
       }else if(f === "pdfLabel"){
         chapter.pdf = Object.assign({}, chapter.pdf, { label: el.value.trim() });
-      }else if(f === "video"){
-        if(el.value.trim()) chapter.video = el.value.trim(); else delete chapter.video;
       }else{
         chapter[f] = el.value;
       }
     });
+    // 影片一律放「影片」章節：舊的單一影片欄位不再使用，拿掉（影片清單的空列在存檔時才清，見 saveCaseEditor——
+    // 這個函式在每次重畫前也會跑，這裡清的話剛按「新增影片」的空白列會馬上消失）
+    delete chapter.video;
     if(chapter.pdf && !chapter.pdf.url && !chapter.pdf.label) delete chapter.pdf;
     // 沒有照片就不留空陣列以外的雜訊，moreImages 全空就整個拿掉這個欄位
     if(!chapter.moreImages || chapter.moreImages.length === 0) delete chapter.moreImages;
@@ -1380,6 +1525,14 @@ function collectEditorFields(ed){
 
 async function saveCaseEditor(ed){
   collectEditorFields(ed);
+  // 影片章節：清掉沒填網址的空列、整理欄位
+  ed.item.chapters.forEach(chapter => {
+    if(!chapter.videos) return;
+    chapter.videos = chapter.videos
+      .map(v => ({ id: v.id || `video-${uid()}`, url: (v.url || "").trim(), title: (v.title || "").trim() }))
+      .filter(v => v.url);
+    if(chapter.videos.length === 0) delete chapter.videos;
+  });
   const statusEl = document.getElementById("saveStatus");
   try{
     setLoading(true, "儲存中…");
@@ -1390,7 +1543,7 @@ async function saveCaseEditor(ed){
     const result = await ghPutFile(path, content, `Update case ${ed.slug} via bamboo admin`, ed.sha);
     ed.sha = result.content ? result.content.sha : ed.sha;
     statusEl.textContent = "已儲存 " + new Date().toLocaleTimeString("zh-TW");
-    toast("已儲存並發布，網站會在下一次部署後更新");
+    toastSaved();
     await loadCaseList();
   }catch(err){
     statusEl.classList.add("err");

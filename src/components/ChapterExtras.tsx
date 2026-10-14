@@ -1,20 +1,38 @@
 "use client";
 
 import { useState } from "react";
-import type { Project } from "@/lib/projects";
+import { accentOnLight, type Project } from "@/lib/projects";
 import { TEXT_BODY, TEXT_PAD } from "@/components/theme";
 
 // 這幾個元件原本寫在 SplitExhibition.tsx 裡，現在首頁雙欄（只用 ChapterMap）跟案例內頁
 // （ChapterMap＋ChapterPdf＋ChapterVideo）都要用，抽成共用檔案，邏輯本身沒有變動。
 
 // 左右刻意留白（不滿版），跟滿版貼邊的圖片做出區隔；原生 controls 自帶跨瀏覽器全螢幕按鈕。
-export function ChapterVideo({ src }: { src: string }) {
+// （2026-10-14）支援 YouTube 連結：後台填的影片常是 YouTube 網址（youtu.be/… 或 youtube.com/watch?v=…），
+// 原生 <video> 播不了（只會顯示一塊黑框），改用 YouTube 的嵌入播放器；其他網址照舊用 <video>。
+// inset：左右留白（舊用法）；「影片」章節傳 false，讓播放器跟標題、內文同一條左緣對齊。
+export function ChapterVideo({ src, inset = true }: { src: string; inset?: boolean }) {
+  const youtubeId = youtubeIdOf(src);
   return (
-    <div className="mt-4 px-6 sm:mt-6 sm:px-12 lg:px-16">
-      {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
-      <video src={src} controls playsInline className="aspect-video w-full bg-black" />
+    <div className={inset ? "mt-4 px-6 sm:mt-6 sm:px-12 lg:px-16" : "mt-3"}>
+      {youtubeId ? (
+        <iframe
+          src={`https://www.youtube-nocookie.com/embed/${youtubeId}`}
+          title="影片"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowFullScreen
+          className="aspect-video w-full border-0 bg-black"
+        />
+      ) : (
+        <video src={src} controls playsInline className="aspect-video w-full bg-black" />
+      )}
     </div>
   );
+}
+
+function youtubeIdOf(url: string): string | null {
+  const m = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?(?:.*&)?v=|embed\/|shorts\/|live\/))([A-Za-z0-9_-]{11})/);
+  return m ? m[1] : null;
 }
 
 export function ChapterPdf({ pdf, accent }: { pdf: { url: string; label: string }; accent: string }) {
@@ -24,7 +42,7 @@ export function ChapterPdf({ pdf, accent }: { pdf: { url: string; label: string 
         href={pdf.url}
         download
         className="inline-flex items-center gap-2 font-mono text-[10px] tracking-wide uppercase underline underline-offset-2 sm:text-xs"
-        style={{ color: accent }}
+        style={{ color: accentOnLight(accent) }}
       >
         {pdf.label}
       </a>
@@ -87,11 +105,11 @@ export function ChapterMap({ project }: { project: Project }) {
       ) : (
         <div
           className="flex h-52 w-full items-center justify-center border border-dashed sm:h-72"
-          style={{ borderColor: project.accent }}
+          style={{ borderColor: accentOnLight(project.accent) }}
         >
           <span
             className="font-mono text-[10px] tracking-widest uppercase sm:text-xs"
-            style={{ color: project.accent }}
+            style={{ color: accentOnLight(project.accent) }}
           >
             地圖待補（尚未提供座標）
           </span>

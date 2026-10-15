@@ -7,13 +7,37 @@
   "type": "住宿空間",
   "intro": "〔佔位文字，約150字，抓版面用〕一籌是這次展覽的第二件作品，展現與常民竹小屋不同的語氣與空間態度。這段文字作為整體概述，說明作品的設計思考、構造精神與施工方式，之後會替換成正式的策展論述文字。",
   "accent": "#ffffff",
-  "titleAlign": "right",
+  "titleAlign": "left",
   "coverImages": [
     {
       "id": "project-two-e2x4mze",
       "tone": "bg-neutral-300",
       "caption": "",
       "src": "/images/project-two/Snipaste_2026-10-08_12-00-39.jpg"
+    },
+    {
+      "id": "project-two-cover-interior-30",
+      "tone": "bg-neutral-300",
+      "caption": "室內示意圖",
+      "src": "/images/project-two/deck-cover-interior-30.jpg"
+    },
+    {
+      "id": "project-two-cover-interior-31",
+      "tone": "bg-neutral-300",
+      "caption": "室內示意圖",
+      "src": "/images/project-two/deck-cover-interior-31.jpg"
+    },
+    {
+      "id": "project-two-cover-interior-32",
+      "tone": "bg-neutral-300",
+      "caption": "室內示意圖",
+      "src": "/images/project-two/deck-cover-interior-32.jpg"
+    },
+    {
+      "id": "project-two-cover-interior-33",
+      "tone": "bg-neutral-300",
+      "caption": "室內示意圖",
+      "src": "/images/project-two/deck-cover-interior-33.jpg"
     }
   ],
   "chapters": [
@@ -25,147 +49,251 @@
       "units": [
         {
           "key": "designer",
-          "name": "",
-          "text": "",
-          "images": []
+          "name": "諸野竹木構／黃韋維(左)、游智傑(右)",
+          "text": "諸野竹木構專門有限公司（JHUYEH LLC.） 2022 年成立於臺灣，是一間專注於竹構造與木構造的在地設計施作團隊。透過設計與施工的實踐，探索在地永續與工藝文化的交會，定義竹木構造在當代建築中的角色與未來可能。",
+          "images": [
+            {
+              "id": "project-two-u0krazx",
+              "tone": "bg-neutral-300",
+              "caption": "",
+              "src": "/images/project-two/1792058644221-16431826629970306088.jpg"
+            },
+            {
+              "id": "project-two-dpw4hph",
+              "tone": "bg-neutral-300",
+              "caption": "",
+              "src": "/images/project-two/team-you-zhijie-crop.jpg"
+            }
+          ]
         },
         {
           "key": "owner",
-          "name": "",
-          "text": "",
-          "images": []
+          "name": "竹育股份有限公司",
+          "text": "竹育是為數不多具有全竹加工利用能力的公司。目前已獲得WCA/ISO等多項國際認證。基於SDGs觀念已經將材料利用/生產制程/人性管理/社會回饋等理念融合與國際潮流接軌。公司的核心理念以國產竹材為橋透過實際行動，在台灣建立一個有價值/更包容/能永續的經濟循環。\n讓國材國用產業發展留在台灣這塊土地上。",
+          "images": [
+            {
+              "id": "project-two-j9od2a1",
+              "tone": "bg-neutral-300",
+              "caption": "",
+              "src": "/images/project-two/1792058763666-images.png"
+            }
+          ]
         }
       ]
     },
     {
       "key": "design",
       "title": "建築設計",
-      "text": "〔佔位文字，抓版面用〕一籌的設計命題與常民竹小屋不同，它更像是一次對「臨時性」構造的重新詮釋——不追求恆久留存，而是思考一個構造物如何在短暫的使用週期裡，依然給人足夠的空間品質與情感重量。量體刻意輕盈、通透，讓光線與周邊環境自由穿越，也讓觀者不會把它誤認成一棟「正式的建築」，而是更接近一個暫時搭起的場景。\n\n整體造型語彙走向更抽象、更幾何的方向，減少裝飾性的細節，讓竹材本身的紋理與結構邏輯成為唯一的表情。這種克制的態度，也是一籌與常民竹小屋在同一個展覽裡相互對話、彼此襯托的方式——一個貼地生根、一個輕盈暫留，兩種對「住」的想像並置出現，讓觀眾來回走動時能感受到語氣落差。\n\n這裡先用現場影像鋪陳整體氛圍，正式論述文字與圖說之後會補上，讓讀者先從畫面感受空間的輕盈感。",
+      "text": "「一籌 Think Bamboo」是一個介於「附近與遠方」、「流動與定著」之間的過渡性棲居。它可以被植入（亞）熱帶的鄉野、風景優勝區域、都會快閃暫放地，或是老宅原景觀的嵌合區——不必長久佔據一塊土地，卻能在一段時間裡，讓人真正住進自然之中。\n\n名字取自「略勝一籌」，也取自一副對聯：「籌茶籌酒籌清興，忘路忘機忘故人」，橫批「枕山聽泉」；以及「臥竹夜話一籌莫展歸於心，半生百味盡隨風」。竹小屋是放下計較、回到心裡的一處停頓。",
       "images": [
         {
-          "id": "project-two-jsnzfah",
+          "id": "project-two-render-1",
           "tone": "bg-neutral-300",
-          "caption": "",
-          "src": "/images/project-two/室外01_Large.jpeg"
+          "caption": "外觀示意圖",
+          "src": "/images/project-two/室外01_Large.jpeg",
+          "kind": "photo"
         },
         {
-          "id": "project-two-lsjzt4p",
+          "id": "project-two-render-2",
           "tone": "bg-neutral-300",
-          "caption": "",
-          "src": "/images/project-two/1791442430890-室外02_Large.jpeg"
+          "caption": "外觀示意圖",
+          "src": "/images/project-two/室外02_Large.jpeg",
+          "kind": "photo"
         }
       ],
       "moreImages": [
         {
-          "id": "project-two-811s0f4",
+          "id": "project-two-render-3",
           "tone": "bg-neutral-300",
-          "caption": "",
-          "src": "/images/project-two/室外04_Large.jpeg"
+          "caption": "外觀示意圖",
+          "src": "/images/project-two/室外04_Large.jpeg",
+          "kind": "photo"
         },
         {
-          "id": "project-two-u1wf4mx",
+          "id": "project-two-render-4",
           "tone": "bg-neutral-300",
-          "caption": "",
-          "src": "/images/project-two/1791347627292-室外06_Large.jpeg"
+          "caption": "外觀示意圖",
+          "src": "/images/project-two/室外06_Large.jpeg",
+          "kind": "photo"
         },
         {
-          "id": "project-two-40n5xz6",
+          "id": "project-two-render-5",
           "tone": "bg-neutral-300",
-          "caption": "",
-          "src": "/images/project-two/室外07_Large.jpeg"
+          "caption": "外觀示意圖",
+          "src": "/images/project-two/室外07_Large.jpeg",
+          "kind": "photo"
         },
         {
-          "id": "project-two-2kn279k",
+          "id": "project-two-render-6",
           "tone": "bg-neutral-300",
-          "caption": "",
-          "src": "/images/project-two/室內01_Large.jpeg"
+          "caption": "室內示意圖",
+          "src": "/images/project-two/室內01_Large.jpeg",
+          "kind": "photo"
         },
         {
-          "id": "project-two-ep447k9",
+          "id": "project-two-render-7",
           "tone": "bg-neutral-300",
-          "caption": "",
-          "src": "/images/project-two/室內02_Large.jpeg"
+          "caption": "室內示意圖",
+          "src": "/images/project-two/室內02_Large.jpeg",
+          "kind": "photo"
         },
         {
-          "id": "project-two-gy7kw0j",
+          "id": "project-two-render-8",
           "tone": "bg-neutral-300",
-          "caption": "",
-          "src": "/images/project-two/室內03_Large.jpeg"
+          "caption": "室內示意圖",
+          "src": "/images/project-two/室內03_Large.jpeg",
+          "kind": "photo"
         },
         {
-          "id": "project-two-4lep2xn",
+          "id": "project-two-render-9",
           "tone": "bg-neutral-300",
-          "caption": "",
-          "src": "/images/project-two/室內04_Large.jpeg"
+          "caption": "室內示意圖",
+          "src": "/images/project-two/室內04_Large.jpeg",
+          "kind": "photo"
+        },
+        {
+          "id": "project-two-render-10",
+          "tone": "bg-neutral-300",
+          "caption": "室內示意圖",
+          "src": "/images/project-two/室內05_Large.jpeg",
+          "kind": "photo"
         }
       ]
     },
     {
       "key": "module",
       "title": "模矩",
-      "text": "〔佔位文字，抓版面用〕一籌的模矩系統採用比常民竹小屋更小、更密的單元尺寸，讓構造在視覺上呈現細膩的紋理感，也更貼近臨時構造需要快速搭拆的操作邏輯。每個模矩單元的重量與尺寸都控制在單人可搬運的範圍內，讓搭建過程不需要依賴大型機具，也讓非專業人員能獨立完成部分組裝工作，降低參與的門檻。\n\n小尺度模矩帶來的代價是接點數量大幅增加，因此設計團隊另外發展了一套快拆式的連接構件，讓組裝與拆卸都能在短時間內完成，同時維持結構的穩定性，也讓一籌具備在不同場地間反覆巡迴展出的可能性，這套取捨是整個設計過程反覆測試最多次的環節，前後修改了好幾個版本才定案。\n\n這批照片先呈現模矩單元與快拆構件的實際樣貌，細部圖說與構件清單之後會整理進這個章節。",
+      "text": "一籌以 61cm 為模矩，組成 L2.44 × W3 × H3.57m 的基礎單元。整座小屋由 T、K、L、R 四個獨立機能單元組合而成，總長 976cm。\n\nT（衛浴單元）：乾濕分離淋浴、節水馬桶與一體盥洗台，配置衣物收納與洗衣儲物。K（廚房單元）：開放式 L 字型，不鏽鋼料理台含水槽與嵌入式 IH 爐，配置冰箱、電器櫃與收納。L（起居單元）：多功能核心區，連結廚吧作為會客、閱讀、工作與茶座。R（臥室單元）：以拉門區隔私密區域，拉開可連通起居單元，上方作寢具收納。\n\n單元可依基地與需求選配組合（1T・1K・1L・1R），讓同一套系統適地生長。",
       "images": [
         {
-          "id": "project-two-5b49tf6",
+          "id": "project-two-deck-plan",
           "tone": "bg-neutral-300",
-          "caption": "",
-          "src": "/images/project-two/Snipaste_2026-10-07_18-24-39.jpg"
+          "caption": "平面配置圖（T／K／L／R 單元）",
+          "src": "/images/project-two/deck-plan.jpg",
+          "kind": "drawing"
         },
         {
-          "id": "project-two-r8x8ihf",
+          "id": "project-two-deck-sections",
           "tone": "bg-neutral-300",
-          "caption": "",
-          "src": "/images/project-two/Snipaste_2026-10-07_18-25-17.jpg"
+          "caption": "西向立面圖、入口剖面圖、AA' 剖面圖、東向立面圖",
+          "src": "/images/project-two/deck-sections.jpg",
+          "kind": "drawing"
+        }
+      ],
+      "moreImages": [
+        {
+          "id": "project-two-deck-elevations",
+          "tone": "bg-neutral-300",
+          "caption": "北向、南向立面圖",
+          "src": "/images/project-two/deck-elevations.jpg",
+          "kind": "drawing"
         },
         {
-          "id": "project-two-u6vrq18",
+          "id": "project-two-deck-int-elev-1",
           "tone": "bg-neutral-300",
-          "caption": "",
-          "src": "/images/project-two/Snipaste_2026-10-07_18-25-24.jpg"
+          "caption": "室內立面圖",
+          "src": "/images/project-two/deck-int-elev-1.jpg",
+          "kind": "drawing"
         },
         {
-          "id": "project-two-h8xzwia",
+          "id": "project-two-deck-int-elev-2",
           "tone": "bg-neutral-300",
-          "caption": "",
-          "src": "/images/project-two/Snipaste_2026-10-07_18-25-33.jpg"
+          "caption": "室內立面圖",
+          "src": "/images/project-two/deck-int-elev-2.jpg",
+          "kind": "drawing"
+        },
+        {
+          "id": "project-two-deck-int-elev-3",
+          "tone": "bg-neutral-300",
+          "caption": "室內立面圖",
+          "src": "/images/project-two/deck-int-elev-3.jpg",
+          "kind": "drawing"
+        },
+        {
+          "id": "project-two-deck-int-elev-4",
+          "tone": "bg-neutral-300",
+          "caption": "室內立面圖",
+          "src": "/images/project-two/deck-int-elev-4.jpg",
+          "kind": "drawing"
+        },
+        {
+          "id": "project-two-deck-int-elev-5",
+          "tone": "bg-neutral-300",
+          "caption": "室內立面圖",
+          "src": "/images/project-two/deck-int-elev-5.jpg",
+          "kind": "drawing"
         }
       ]
     },
     {
       "key": "structure",
       "title": "構造",
-      "text": "〔佔位文字，抓版面用〕一籌的結構邏輯偏向輕構造（light structure）的思路，用大量小斷面的竹材互相支撐，取代少數幾根粗大構件的傳統做法，整體重量因此大幅降低，也讓構造本身帶有一種輕盈、幾乎懸浮的視覺效果，與常民竹小屋厚實穩重的量體形成對比，成為兩件作品結構性格的直接對照。\n\n為了因應快速搭拆的需求，結構系統刻意避免使用不可逆的接合方式，改以夾具與繩索張力共同維持整體穩定，這也讓一籌得以在不同基地之間重複搭建、成為一個可移動的展示構造，而不是綁定在單一地點的固定建物，每一次搭建與拆卸都會對構件進行檢查與微調，確保重複使用不影響安全。\n\n這裡先用現場照片呈現夾具與張力構件的樣貌，結構驗算資料與接點測試紀錄之後會補上。",
+      "text": "被動式設計涵蓋水、光、風、聲四大物理要素。\n\n**水與濕**：全屋離地 0.65m，阻絕地面濕氣與地表逕流，也能適應不平整地形；屋頂一字型鋼板維持 16% 洩水坡度；外牆採 36cm 寬版竹集成雨淋板導水；搭配省水標章設備節水。\n\n**光與熱**：屋面反射型鋼板，預留 5–10cm 空氣層，內夾 50mm PS 隔熱板與鋁箔防水氈；牆面 50mm PS 隔熱板外掛雨淋板；減少大面積開口，入口設外伸式遮陽帆布深簷。\n\n**風與涼**：依現地季風配置平面，門窗相對開設並設高窗排熱，配置對流風扇；雨淋板外牆兼顧隱私、透氣並緩衝強風。\n\n**聲與噪**：竹材乾燥後的微孔纖維吸收高頻雜音，竹材的彈性與韌性緩衝腳步聲、設備共振等低頻震動。\n\n室內以 12mm GLB 板作天花與牆面，地板為波龍編織地毯，浴室用竹節玻璃／夾膜玻璃，配不鏽鋼廚具檯面、竹捲簾與原竹管訂製家具。",
       "images": [
         {
-          "id": "project-two-8lvnwjc",
+          "id": "project-two-deck-sk-water",
           "tone": "bg-neutral-300",
-          "caption": "",
-          "src": "/images/project-two/1791442210955-messageImage_1785401046266.jpg"
+          "caption": "水與濕｜防潮與排水（甘建築師細部手稿）",
+          "src": "/images/project-two/deck-sk-water.jpg",
+          "kind": "drawing"
         },
         {
-          "id": "project-two-jugx470",
+          "id": "project-two-deck-sk-heat",
           "tone": "bg-neutral-300",
-          "caption": "",
-          "src": "/images/project-two/1791442226893-Snipaste_2026-10-07_18-25-43.jpg"
+          "caption": "光與熱｜隔熱與遮陽（甘建築師細部手稿）",
+          "src": "/images/project-two/deck-sk-heat.jpg",
+          "kind": "drawing"
+        }
+      ],
+      "moreImages": [
+        {
+          "id": "project-two-deck-sk-wind",
+          "tone": "bg-neutral-300",
+          "caption": "風與涼｜通風與抗風（甘建築師細部手稿）",
+          "src": "/images/project-two/deck-sk-wind.jpg",
+          "kind": "drawing"
         },
         {
-          "id": "project-two-nnybp7a",
+          "id": "project-two-deck-sk-sound",
           "tone": "bg-neutral-300",
-          "caption": "",
-          "src": "/images/project-two/1791442229303-Snipaste_2026-10-07_18-25-58.jpg"
+          "caption": "聲與噪｜竹纖維吸音結構（甘建築師細部手稿）",
+          "src": "/images/project-two/deck-sk-sound.jpg",
+          "kind": "drawing"
+        },
+        {
+          "id": "project-two-deck-furniture-1",
+          "tone": "bg-neutral-300",
+          "caption": "家具示意圖",
+          "src": "/images/project-two/deck-furniture-1.jpg",
+          "kind": "drawing"
         }
       ]
     },
     {
       "key": "engineering",
       "title": "結構設計",
-      "text": "",
-      "images": []
+      "text": "結構主材選用 3–5 年生孟宗竹加工的 GLB 集成竹材（Glued-laminated Bamboo），消除天然竹材的錐度與空心限制，具備抗變形、高密度、防水，以及經特殊塗層處理後的防火阻燃等建材特性。\n\n使用規格：角料 45×45、40×90、90×90mm，長 5800mm（切成 2700＋3100mm 使用）；板材 1220×2440mm，厚 12、20mm。小屋以 RC 基座架高 65cm，上置鋼構底座承載竹構單元。",
+      "images": [
+        {
+          "id": "project-two-deck-foundation",
+          "tone": "bg-neutral-300",
+          "caption": "基礎平面圖",
+          "src": "/images/project-two/deck-foundation.jpg",
+          "kind": "drawing"
+        },
+        {
+          "id": "project-two-deck-roof",
+          "tone": "bg-neutral-300",
+          "caption": "屋面配置圖",
+          "src": "/images/project-two/deck-roof.jpg",
+          "kind": "drawing"
+        }
+      ]
     },
     {
       "key": "construction",
       "title": "施工",
-      "text": "〔佔位文字，抓版面用〕一籌的施工強調「速度」與「可重複」——整個搭建過程被拆解成標準化的動作序列，讓不熟悉竹構造的人員也能在短時間的教學後加入搭建工作，這也是這件作品作為教育示範的重要部分，希望降低一般人對竹構造「很難、很專業」的距離感，讓更多人願意親手嘗試、參與這套系統的運作。\n\n現場施工分成基座定位、模組組裝、整體校正、收邊固定四個階段，每個階段都控制在明確的時間範圍內，作為未來巡迴展示時工班排程的參考依據，每次搭建也會邀請幾位第一次接觸的參與者，藉此驗證教學流程是否真的容易上手，並蒐集他們的操作回饋來修正教學步驟。\n\n這批照片先記錄幾次巡迴搭建的現場片段，詳細的施工時間紀錄之後會補齊放入這個章節。",
+      "text": "一籌的構件以「可移動」為前提：每個單元在工廠預製完成，尺寸限制在寬 3m、高 4m、長 16m 以內、重量 40 公噸以下，符合一般道路運輸規範。到現場只需完成 RC 基座與鋼構底座，再將單元吊放、接合，就能快速完成；需要遷移時，也能拆回單元再運走。",
       "images": [
         {
           "id": "project-two-bspr4h5",
@@ -202,7 +330,7 @@
     {
       "key": "assembly",
       "title": "組裝說明書",
-      "text": "〔佔位文字，抓版面用〕由於一籌的快拆設計，組裝說明書的角色比常民竹小屋更吃重——它不只是紀錄用的圖說，而是實際搭建時工班會隨身攜帶、逐步對照的操作手冊，內容以清楚的步驟編號與簡化圖示為主，減少現場判斷錯誤的機會，也讓不同批次的工班都能維持一致的搭建品質，即使換了一批完全沒經驗的人手也能照著操作。",
+      "text": "組裝說明書把一籌的單元組合拆解成可依序執行的步驟：基座定位、鋼構底座、單元吊放、單元接合與外牆收邊，照著圖就能完成組立。",
       "images": [],
       "pdf": {
         "url": "/files/project-two/assembly.pdf",
@@ -218,7 +346,7 @@
     {
       "key": "site",
       "title": "基地",
-      "text": "〔佔位文字，抓版面用〕一籌設計為可移動、可重複搭建的構造，因此「基地」對它而言不是單一固定的地點，而是一系列曾經或即將停留的場所。本次展覽選定的基地是林鐵沿線一處開闊的空地，視野開放、便於觀眾從各個角度接近作品，也方便未來拆卸移動到下一個展出地點，延續這件作品「四處暫留」的展示邏輯。\n\n基地的臨時性格也回應了一籌本身「暫留」的設計命題——構造與土地之間不是永久佔有的關係，而是短暫借用之後再歸還，這種關係本身也是這件作品想要傳達的核心價值之一。每一次移動到新的場地，團隊都會重新評估地形與人流動線，微調搭建的方向與配置，讓同一套構造也能長出不同的樣貌。實際地址與座標尚未提供，下方地圖會在資料到位後標示出精確位置。",
+      "text": "本案業主基地位於雲林縣斗六糖廠，一籌作為低碳綠色住宿的示範單元，嵌入糖廠既有的歷史場域。",
       "images": []
     }
   ],
@@ -226,5 +354,25 @@
   "coordinates": {
     "lat": 23.677845390683956,
     "lng": 120.53941093457391
-  }
+  },
+  "goals": {
+    "title": "低碳、可移動的過渡性棲居",
+    "positioningLabel": "目標使用",
+    "positioning": "低碳綠色住宿\n生態旅遊駐村\n再造歷史現場\n綠色主題推廣商屋",
+    "strategyLabel": "設計邏輯",
+    "strategyTitle": "低碳排、可移動、模組化、被動式設計",
+    "text": "提供 1–2 人短中期居住，強調與自然環境直接接觸；也能作為無法長期使用之地點的主題式 Pop-up Shop，並以多元機能選項嵌合原有聚落。",
+    "tableLabel": "",
+    "table": "設計邏輯 | 做法\n低碳排 | 3–5 年生孟宗竹 GLB 集成材\n可移動 | 61cm 模矩、單元 2.44×3×3.57m\n模組化 | T／K／L／R 四個機能單元適地組合\n被動式設計 | 水、光、風、聲四大物理要素",
+    "images": [
+      {
+        "id": "project-two-deck-carbon-chart",
+        "tone": "bg-neutral-300",
+        "caption": "全球碳排放來源：建成環境佔 42%（15.3 GT）",
+        "src": "/images/project-two/deck-carbon-chart.jpg",
+        "kind": "drawing"
+      }
+    ]
+  },
+  "homeCoverId": "project-two-e2x4mze"
 }

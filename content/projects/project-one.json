@@ -76,104 +76,151 @@
     {
       "key": "design",
       "title": "建築設計",
-      "text": "〔佔位文字，抓版面用〕常民竹小屋回應的是「常民」與「構造」之間的距離——不是為了展示工法而蓋，而是回到最基本的生活尺度，思考人如何在竹構造的空間裡靜下來、待下來、慢慢住進去。整體配置刻意保留低矮、貼近地面的姿態，讓建築物退居成背景，把使用者的日常動作留在畫面中央，也呼應基地周邊聚落原有的生活紋理與尺度感，避免用一棟過於張揚的量體打斷既有的地景關係。\n\n空間的開放程度、遮蔽與穿透的比例，都在設計初期反覆推敲，希望呈現一種介於室內與戶外之間、隨天氣與時間而變化的曖昧邊界。屋簷深淺、開口大小、動線轉折，每一個決定背後都對應著一段關於「怎麼住」的具體想像，而不只是造型上的考量，也希望觀者走進這個空間時能感受到細節的體貼。",
+      "text": "「常民竹小屋實驗計畫」以「竹構築市場化示範試點」為定位，設計方向是中小型、常民化、生活化——讓竹構不再只是節慶或藝術裝置，而是一般人買得起、搭得起、用得上的日常建築。竹輕亭是這套系統的第一座原型。\n\n同一座竹構棚架，可以是市集裡的活動攤商、營地裡的主題式帳幕，也可以是竹林間的療育基地；空間不預設單一用途，由使用者與場地決定它成為什麼。\n\n市場化分三個階段推進：第一階段「原型驗證」，由本計畫完成 6×6m 一種原型，取得實際建造數據；第二階段「小量市場試銷」，與公部門、利仁基金會及地方創生計畫合作，植入補助體系；第三階段「產品商品化」，以 Kit Set 定價銷售，並建立工班認證網絡。",
       "images": [
         {
-          "id": "project-one-o2fpbjm",
+          "id": "project-one-deck-perspective",
           "tone": "bg-neutral-300",
-          "caption": "",
-          "src": "/images/project-one/Snipaste_2026-10-08_14-05-39.jpg"
+          "caption": "透視圖",
+          "src": "/images/project-one/deck-perspective.jpg",
+          "kind": "photo"
         },
         {
-          "id": "project-one-7ld4gum",
+          "id": "project-one-deck-scene-market",
           "tone": "bg-neutral-300",
-          "caption": "",
-          "src": "/images/project-one/Snipaste_2026-10-08_14-07-02.jpg"
+          "caption": "市集攤位－活動攤商（情境示意，AI 生成）",
+          "src": "/images/project-one/deck-scene-market.jpg",
+          "kind": "photo"
         }
       ],
       "moreImages": [
         {
-          "id": "project-one-zsnx587",
+          "id": "project-one-deck-scene-camp",
           "tone": "bg-neutral-300",
-          "caption": "",
-          "src": "/images/project-one/1791946857473-Snipaste_2026-10-08_14-07-09.jpg"
+          "caption": "主題式帳幕－露營（情境示意，AI 生成）",
+          "src": "/images/project-one/deck-scene-camp.jpg",
+          "kind": "photo"
         },
         {
-          "id": "project-one-w57aih9",
+          "id": "project-one-deck-scene-yoga",
           "tone": "bg-neutral-300",
-          "caption": "",
-          "src": "/images/project-one/1791946857500-Snipaste_2026-10-08_14-07-17.jpg"
+          "caption": "療育基地－林間瑜珈（情境示意，AI 生成）",
+          "src": "/images/project-one/deck-scene-yoga.jpg",
+          "kind": "photo"
         }
       ]
     },
     {
       "key": "module",
       "title": "模矩",
-      "text": "〔佔位文字，抓版面用〕模矩系統是整個構造邏輯的起點：以單根竹材的常見長度與直徑為基準，反推出一套可重複、可搭接的單元尺寸，讓每一個構件都能在不同的位置上互換使用，降低現場裁切與浪費，也讓非專業的參與者更容易理解整個系統的組成方式，這套模矩同時也決定了立面的節奏與比例。\n\n從平面到剖面，模矩的網格貫穿整個設計，也成為施工階段溝通的共同語言——工班不需要逐一讀圖，只要理解模矩邏輯，就能判斷構件該落在哪裡，大幅降低溝通成本與現場出錯的機率，這種「先定規則、再長出形狀」的做法，是竹構造回應手工與效率之間拉扯的具體嘗試。",
+      "text": "竹輕亭以 3M 基準模矩（300cm）為構件邏輯核心：三組 A 字組合竹柱沿長向以 300cm 跨距排列，量體約 7.5 × 6.8m，屋頂高 353cm、簷下淨高 220cm。\n\n構造由下而上依序是 60×150cm 混凝土墩座、組合式懸浮戶外木地板、10cm 孟宗竹組合柱、10cm 孟宗竹橫梁與抗剪組合梁、12cm 孟宗竹縱梁、單元化實木檁條，最上層是預組雙層發泡金屬屋頂板。屋頂沿短向單斜排水，四角以防颱抗拉桿件（土牛）拉住。\n\n平面是交錯的折線形，兩側各配一組組合式竹集成板傢俱，另有組合式捲簾，可依需要遮陽或圍塑空間。",
       "images": [
         {
-          "id": "project-one-4qrzqpf",
+          "id": "project-one-deck-sheet-plans-full",
           "tone": "bg-neutral-300",
-          "caption": "",
-          "src": "/images/project-one/Snipaste_2026-10-08_14-22-45.jpg"
+          "caption": "地坪配置圖、一層平面圖、竹桁架配置圖、屋頂平面圖",
+          "src": "/images/project-one/deck-sheet-plans-full.jpg",
+          "kind": "drawing"
         },
         {
-          "id": "project-one-qh7jbn4",
+          "id": "project-one-deck-sheet-sections-full",
           "tone": "bg-neutral-300",
-          "caption": "",
-          "src": "/images/project-one/Snipaste_2026-10-08_14-22-56.jpg"
+          "caption": "正向立面圖、剖面圖",
+          "src": "/images/project-one/deck-sheet-sections-full.jpg",
+          "kind": "drawing"
+        }
+      ],
+      "moreImages": [
+        {
+          "id": "project-one-deck-elevation-long",
+          "tone": "bg-neutral-300",
+          "caption": "長向立面圖",
+          "src": "/images/project-one/deck-elevation-long.jpg",
+          "kind": "drawing"
+        },
+        {
+          "id": "project-one-deck-elevation-short",
+          "tone": "bg-neutral-300",
+          "caption": "短向立面圖",
+          "src": "/images/project-one/deck-elevation-short.jpg",
+          "kind": "drawing"
         }
       ]
     },
     {
       "key": "structure",
       "title": "構造",
-      "text": "〔佔位文字，抓版面用〕構造系統採用竹材本身的彈性與韌性作為設計出發點，主結構以桁架式的組合方式，將荷重層層分散到地面基礎，減少對單一構件強度的依賴，也讓整體結構在面對不規則外力時，能有一定程度的彈性緩衝而不至於瞬間破壞，這也是竹構造回應環境不確定性的方式之一。\n\n接點的處理是整個構造裡最關鍵的一環，既要傳遞力量，也要保留竹材熱脹冷縮與含水率變化的空間，多數接點採用綁紮與栓接混合的方式，而非單一膠合固定，讓未來的維護、替換單一構件成為可能，也呼應「常民構造」該有的可修復性格——壞掉的地方可以局部處理，不用整棟拆除重建。",
+      "text": "竹是自然材，每一根的粗細、彎曲都不相同。細部設計的原則是「不強求竹材變成鋼材，而是讓節點設計容納自然材誤差」，從四個關鍵點控制：選材——竹齡 3–5 年、直徑誤差 ±10%，控制初始變異；剖片——定厚剖片取竹青＋竹肉，提升接合面平整度；成對——兩根彎曲方向相反配對，消除整體偏斜；順應——接頭允許 ±5° 轉動餘量，由設計吸收材料誤差。\n\n竹材依用途分成 A（主構件）、B（次構件）、C（非結構填充）三級，廢料最少，C 級還能作為副產品銷售。\n\n節點五金以市售管束、管夾為起點，發展出本案專用的組裝五金：A 字柱頂以接合鋼板連接縱、橫梁，抗剪組合梁以 Φ42.7mm 圓管與 M20 雙頭螺紋圓桿鎖固，縱梁與檁條之間以可調式耐候束帶固定。",
       "images": [
         {
-          "id": "project-one-1o6pwta",
+          "id": "project-one-17ufy54",
           "tone": "bg-neutral-300",
-          "caption": "",
-          "src": "/images/project-one/Snipaste_2026-10-08_14-06-46.jpg"
+          "caption": "構造拆解圖",
+          "src": "/images/project-one/1792056454664-Snipaste_2026-10-08_14-06-46.jpg"
         },
         {
-          "id": "project-one-bfkxkil",
+          "id": "project-one-deck-details-full",
           "tone": "bg-neutral-300",
-          "caption": "",
-          "src": "/images/project-one/1791948117797-Snipaste_2026-10-14_11-20-07.jpg"
+          "caption": "節點詳圖",
+          "src": "/images/project-one/deck-details-full.jpg",
+          "kind": "drawing"
         }
       ],
       "moreImages": [
         {
-          "id": "project-one-fysxulq",
+          "id": "project-one-deck-components",
           "tone": "bg-neutral-300",
-          "caption": "",
-          "src": "/images/project-one/1791948121177-Snipaste_2026-10-14_11-20-28.jpg"
+          "caption": "模組構件尺寸數量",
+          "src": "/images/project-one/deck-components.jpg",
+          "kind": "drawing"
         },
         {
-          "id": "project-one-dgw8txc",
+          "id": "project-one-deck-hw-market-1",
           "tone": "bg-neutral-300",
-          "caption": "",
-          "src": "/images/project-one/1791948121195-Snipaste_2026-10-14_11-20-44.jpg"
+          "caption": "市售五金",
+          "src": "/images/project-one/deck-hw-market-1.jpg",
+          "kind": "photo"
         },
         {
-          "id": "project-one-prvg5hi",
+          "id": "project-one-deck-hw-market-2",
           "tone": "bg-neutral-300",
-          "caption": "",
-          "src": "/images/project-one/1791948121207-Snipaste_2026-10-14_11-21-00.jpg"
+          "caption": "市售五金",
+          "src": "/images/project-one/deck-hw-market-2.jpg",
+          "kind": "photo"
+        },
+        {
+          "id": "project-one-deck-hw-market-3",
+          "tone": "bg-neutral-300",
+          "caption": "市售五金",
+          "src": "/images/project-one/deck-hw-market-3.jpg",
+          "kind": "photo"
+        },
+        {
+          "id": "project-one-deck-hw-custom-1",
+          "tone": "bg-neutral-300",
+          "caption": "本案組裝五金：A 字柱頂接合",
+          "src": "/images/project-one/deck-hw-custom-1.jpg",
+          "kind": "photo"
+        },
+        {
+          "id": "project-one-deck-hw-custom-2",
+          "tone": "bg-neutral-300",
+          "caption": "本案組裝五金：檁條固定",
+          "src": "/images/project-one/deck-hw-custom-2.jpg",
+          "kind": "photo"
         }
       ]
     },
     {
       "key": "engineering",
       "title": "結構設計",
-      "text": "",
+      "text": "主結構由三組 A 字組合竹柱撐起：每組以 10cm 孟宗竹組成 A 字形，柱腳落在混凝土墩座上，柱頂以接合鋼板與橫梁、縱梁相接。\n\n兩跨之間以 10cm 孟宗竹抗剪組合梁交叉補強，中段以 M20 雙頭螺紋圓桿鎖固，形成向下張開的桁架，承擔屋頂荷重並抵抗側向變形；屋頂四角的防颱抗拉桿件，因應颱風季節的上揚風力。\n\n所有竹構件均經 VSD 防腐處理，縱梁需揀選「膨尾」竹。",
       "images": []
     },
     {
       "key": "construction",
       "title": "施工",
-      "text": "〔佔位文字，抓版面用〕施工過程刻意保留了手工參與的比例，從竹材的選料、防腐處理，到現場組裝，都邀請在地工班與志工共同完成，而不是全部交給機具與預製構件。這個決定讓整體工期拉長，卻也讓構造本身多了一層「這裡的人親手蓋起來」的重量，也讓參與者對這個空間產生更深的認同與情感連結，這種參與感也是「常民構造」想傳遞的核心精神之一。\n\n現場搭建分成基礎放樣、主結構立起、次結構填充、屋面收頭四個階段，每個階段都留下影像與圖說紀錄，作為未來其他基地複製這套工法的參考。施工過程中遇到的天氣延誤、材料調度、人力調配等實際狀況，之後也會整理成完整的施工紀錄放進這個章節，讓經驗可以被傳承。",
+      "text": "施工以「常民可操作」為原則，依難度分成三個層級：Lv.1 素人——3×3m 活動棚架，螺栓夾具組裝，2 人 4 小時完工，不需特殊工具；Lv.2 專業施工（組裝）——6×6m／6×3m，需要鉛直測量與地錨施作，1 日工班並結合吊卡；Lv.3 專業施工（工藝）——複合造型，結合吊卡與結構計算書，由建築師督察。竹輕亭屬於 Lv.2。\n\n構件規格由物流反推：吊卡貨斗長度 650cm，主構件長度上限就是 650cm，確保任何地點都能配送；一台 17T 吊卡剛好載運一組 6×6m 棚架的竹桿、接頭、繫材與說明書，成為可以電商銷售、倉儲配送的竹構 Kit Set。",
       "images": [
         {
           "id": "project-one-xmksxtb",
@@ -192,7 +239,7 @@
     {
       "key": "assembly",
       "title": "組裝說明書",
-      "text": "〔佔位文字，抓版面用〕組裝說明書把整個搭建過程拆解成可依序執行的步驟，從構件編號、接點對應，到工具與人力需求，都以圖解方式呈現，目標是讓沒有專業背景的人也能參與部分組裝作業，延續「常民構造」的精神，也讓這套工法有機會被複製到其他地方使用，而不是只存在於這一次的搭建現場。",
+      "text": "組裝說明書把竹輕亭的搭建拆解成可以依序執行的步驟，搭配構件組裝圖與模組構件尺寸表，照著圖就能完成組立。後續將整理成圖解施工手冊（A4 雙語），並附上教學影片 QR Code，讓施工知識也成為可以流通的產品。",
       "images": [],
       "pdf": {
         "url": "/files/project-one/assembly.pdf",
@@ -215,8 +262,37 @@
     {
       "key": "site",
       "title": "基地",
-      "text": "〔佔位文字，抓版面用〕基地位於林鐵沿線的一處緩坡地，周邊仍保留部分原始植被與早期聚落的動線紋理，鐵道的存在讓這塊土地帶有一種介於自然與人為建設之間的曖昧性格。建築量體刻意退讓在坡地的角落，把最好的視野留給穿越基地的既有步道，也盡量減少對原有地表植被的擾動，讓新的構造物像是從既有紋理裡長出來的，而不是外來的植入。\n\n基地環境的日照角度、風向與雨水排放路徑，都直接影響了竹構造的方位與屋簷出挑的深度，設計並非憑空而來，而是先讀懂基地、再回應基地，這也是整個團隊在動工前花最多時間反覆現勘與測繪的階段。周邊居民對這塊土地的記憶與使用習慣，也是設計過程中重要的參考依據。實際地址與座標尚未提供，下方地圖會在資料到位後標示出精確位置。",
-      "images": []
+      "text": "本案業主基地位於南投縣竹山鎮狙擊手射擊場，竹輕亭設置在漆彈場旁的空地，提供使用者參賽、觀賽、活動舉辦及休憩與聚會等用途。",
+      "images": [
+        {
+          "id": "project-one-deck-site-aerial",
+          "tone": "bg-neutral-300",
+          "caption": "基地位置（南投縣竹山鎮）",
+          "src": "/images/project-one/deck-site-aerial.jpg",
+          "kind": "photo"
+        },
+        {
+          "id": "project-one-deck-site-1",
+          "tone": "bg-neutral-300",
+          "caption": "基地現況",
+          "src": "/images/project-one/deck-site-1.jpg",
+          "kind": "photo"
+        },
+        {
+          "id": "project-one-deck-site-2",
+          "tone": "bg-neutral-300",
+          "caption": "基地現況",
+          "src": "/images/project-one/deck-site-2.jpg",
+          "kind": "photo"
+        },
+        {
+          "id": "project-one-deck-site-3",
+          "tone": "bg-neutral-300",
+          "caption": "基地現況",
+          "src": "/images/project-one/deck-site-3.jpg",
+          "kind": "photo"
+        }
+      ]
     }
   ],
   "published": true,

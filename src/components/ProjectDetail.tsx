@@ -63,8 +63,9 @@ export function ProjectDetail({
   // → 細部設計 → 結構設計 → 施工細節 → 組裝說明書 → 基地位置。除了組裝說明書（PDF 翻頁書）跟基地位置
   // （地圖）之外都是同一套圖文交錯排版（NarrativeSection）。還沒填內容的章節整個跳過，不會出現只有
   // 標題的空章節；基地位置一律顯示（沒座標時顯示「地圖待補」）。活動區塊只放在首頁，內頁不再顯示。
+  // （2026-10-15）「影片」章節一律保留位置（還沒有影片時顯示「影片待補」），兩案章節編號才會一致
   const chapters = orderedChapters(project).filter(
-    (c) => c.key !== "site" && hasContent(c),
+    (c) => c.key !== "site" && (c.key === "video" || hasContent(c)),
   );
   const insetX =
     variant === "modal" ? "px-8 sm:px-12 lg:px-16" : "px-4 sm:px-8 lg:px-12";
@@ -76,6 +77,9 @@ export function ProjectDetail({
   const ratioState = useMemo(() => createRatioState(), [project.slug]);
   const rootRef = useRef<HTMLDivElement>(null);
   useChapterSnap(rootRef, variant);
+
+  const siteChapter = project.chapters.find((c) => c.key === "site");
+  const siteImages = (siteChapter?.images ?? []).filter((img) => img.src);
 
   // 章節清單（封面底部那一排、左側直書導覽共用）：有填「核心目標」時排第一個、編號 00，其餘章節 01 起
   const goals = hasGoals(project.goals) ? project.goals : undefined;
@@ -131,13 +135,34 @@ export function ProjectDetail({
             );
           })}
 
+          {/* （2026-10-15）基地位置：原本只有地圖，改成跟其他章節一樣左欄放文字、右欄放地圖＋基地照片
+              （chapter.text／chapter.images，照片全部顯示、一張一行，不套文字字數上限）。沒填就維持只有地圖。 */}
           <ChapterFrame
             sticky={false}
             id="site"
             number={chapterNumber(chapters.length)}
             title={chapterTitle("site")}
             first={chapters.length === 0}
-            right={<ChapterMap project={project} />}
+            alignTo="text"
+            left={
+              siteChapter?.text
+                ? siteChapter.text.split("\n\n").map((t, i) => (
+                    <p key={i} className={`mt-6 max-w-2xl sm:max-w-none ${BODY_TEXT}`} style={{ order: i }}>
+                      {t}
+                    </p>
+                  ))
+                : undefined
+            }
+            right={
+              <>
+                <ChapterMap project={project} />
+                {siteImages.map((img) => (
+                  <div key={img.id} className={`mt-6 sm:mt-0 ${photoBleed}`}>
+                    <ImagePlaceholder image={img} natural aspect="aspect-[4/3]" />
+                  </div>
+                ))}
+              </>
+            }
           />
         </div>
       </div>
@@ -325,10 +350,11 @@ function ChapterEdgeNav({ items, variant }: { items: TocItem[]; variant: "page" 
         variant === "modal"
           ? "z-[105] hidden w-[60px] sm:flex"
           : "z-40 w-[18px] gap-5 sm:w-[30px]"
-      } sm:gap-[1.8em] sm:text-[clamp(9px,1.3vh,12px)] ${visible ? "opacity-100" : "pointer-events-none opacity-0"}`}
+      } sm:gap-[1.6em] sm:text-[clamp(8px,1.1vh,12px)] ${visible ? "opacity-100" : "pointer-events-none opacity-0"}`}
     >
       {/* （同日）加了「00 核心目標」後共 9 項，固定 12px 字＋28px 間距會比畫面高（900px 高的畫面上下各超出
-          約 13px）。電腦版字級跟著畫面高度縮放（最大 12px、最小 9px），間距用 em 跟著字級走，整排永遠放得下。 */}
+          約 13px）。電腦版字級跟著畫面高度縮放（最大 12px、最小 8px），間距用 em 跟著字級走，整排永遠放得下。
+          （同日）竹輕亭填滿 10 項（00～09）後再縮一點：1.1vh、間距 1.6em。 */}
       {/* 每個直書章節名稱上方加章節編號（01、02…，跟目錄、章節開頭的大編號同一套），編號橫排不轉向。
           字體、字級、字距、顏色跟右側邊框的「2026常民竹小屋」（EdgeTitle.tsx）一樣：襯線字 10／12px、
           字距 0.2em、主文字色 */}
@@ -683,7 +709,7 @@ function GoalsSection({ goals }: { goals: ProjectGoals }) {
     <section
       ref={fadeRef}
       id="goals"
-      className={`${FADE_CLASS} flex flex-col gap-8 pb-10 sm:grid sm:min-h-screen sm:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] sm:content-center sm:items-start sm:gap-x-12 sm:py-12 lg:gap-x-20`}
+      className={`${FADE_CLASS} flex flex-col gap-8 pb-10 sm:grid sm:min-h-screen sm:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] sm:content-center sm:items-start sm:gap-x-12 sm:py-8 lg:gap-x-20`}
     >
       <div>
         {/* 跟其他章節同一套開頭：大編號「00」＋章節名「核心目標」（ChapterFrame 的 header），左側直書導覽
@@ -768,7 +794,25 @@ function GoalsSection({ goals }: { goals: ProjectGoals }) {
           </div>
         )}
 
-        {images.length > 0 && (
+        {/* 只有一張圖（例如一籌的碳排放圖表）：完整顯示不裁切，高度＝畫面扣掉其他內容後剩下的空間（100vh − 600px），整個畫面才放得進一屏 */}
+        {images.length === 1 && (
+          <figure className="mt-8 sm:mt-6">
+            <Image
+              src={images[0].src!}
+              alt={images[0].caption || ""}
+              width={1600}
+              height={800}
+              sizes="(max-width: 640px) 100vw, 55vw"
+              className="h-auto w-full object-contain object-left sm:max-h-[calc(100vh-600px)] sm:w-auto"
+            />
+            {images[0].caption && (
+              <figcaption className="mt-2 font-serif-tc text-xs sm:text-sm" style={muted}>
+                {images[0].caption}
+              </figcaption>
+            )}
+          </figure>
+        )}
+        {images.length > 1 && (
           <div className="mt-8 grid grid-cols-2 gap-3 sm:mt-10 sm:grid-cols-4 sm:gap-4">
             {images.map((img) => (
               <figure key={img.id}>
@@ -868,7 +912,10 @@ function TeamSection({
           ),
           right: images.length ? (
             <div
-              className={`mt-6 flex flex-col gap-3 sm:mt-10 sm:ml-auto sm:w-[30%] sm:gap-4 ${hasHeading ? "sm:pt-[4.5px]" : "sm:pt-2"}`}
+              // （2026-10-15）多張圖時電腦版左右並排、向右貼齊，每張維持單張時的大小（右欄 30% 寬的正方形）
+              className={`mt-6 flex flex-col gap-3 sm:mt-10 sm:ml-auto sm:flex-row sm:justify-end sm:gap-4 ${hasHeading ? "sm:pt-[4.5px]" : "sm:pt-2"} ${
+                images.length > 1 ? "sm:w-[calc(60%+1rem)] sm:[&>*]:min-w-0 sm:[&>*]:flex-1" : "sm:w-[30%]"
+              }`}
             >
               {images.map((img) => (
                 // next/image 自動縮圖、轉 WebP（不直接載原圖，捲動比較順）；電腦版裁成正方形
@@ -879,7 +926,8 @@ function TeamSection({
                   width={0}
                   height={0}
                   sizes="(max-width: 640px) 100vw, 30vw"
-                  className="block h-auto w-full sm:aspect-square sm:object-cover"
+                  // object-top：直式人像裁成正方形時保留上緣，不切到頭（2026-10-15，黃韋維照片被切到頭）
+                  className="block h-auto w-full sm:aspect-square sm:object-cover sm:object-top"
                 />
               ))}
             </div>
@@ -917,19 +965,49 @@ function VideoSection({
           </p>
         )
       }
-      right={videos.map((v) => (
-        <div key={v.id} className="mt-8">
-          {v.title?.trim() && (
-            <h4
-              className={`font-serif-tc text-sm font-bold tracking-wide sm:text-base ${TEXT_PRIMARY}`}
-            >
-              {v.title.trim()}
-            </h4>
-          )}
-          <ChapterVideo src={v.url.trim()} inset={false} />
-        </div>
-      ))}
+      right={
+        videos.length > 0 ? (
+          videos.map((v) => (
+            <div key={v.id} className="mt-8">
+              {v.title?.trim() && (
+                <h4
+                  className={`font-serif-tc text-sm font-bold tracking-wide sm:text-base ${TEXT_PRIMARY}`}
+                >
+                  {v.title.trim()}
+                </h4>
+              )}
+              <ChapterVideo src={v.url.trim()} inset={false} />
+            </div>
+          ))
+        ) : (
+          // 還沒有影片：保留一個 16:9 的虛線框佔位，在後台「影片」章節貼上連結就會換成影片
+          <div
+            className="mt-8 flex aspect-video w-full items-center justify-center border border-dashed font-serif-tc text-sm tracking-[0.2em]"
+            style={{ borderColor: "var(--border-subtle)", color: "var(--foreground-muted)" }}
+          >
+            影片待補
+          </div>
+        )
+      }
     />
+  );
+}
+
+// 內文的粗體（2026-10-15）：後台文字裡用 **兩個星號** 包起來的字顯示成粗體（深色），例如「**水與濕**：…」。
+// 只支援這一種標記，其他文字原樣顯示。
+function RichText({ text }: { text: string }) {
+  return (
+    <>
+      {text.split(/(\*\*[^*]+\*\*)/).map((part, i) =>
+        /^\*\*[^*]+\*\*$/.test(part) ? (
+          <strong key={i} className={`font-bold ${TEXT_PRIMARY}`}>
+            {part.slice(2, -2)}
+          </strong>
+        ) : (
+          <Fragment key={i}>{part}</Fragment>
+        ),
+      )}
+    </>
   );
 }
 
@@ -1016,7 +1094,7 @@ function NarrativeSection({
         className={`mt-6 max-w-2xl sm:max-w-none ${BODY_TEXT}`}
         style={{ order: i }}
       >
-        {block.text}
+        <RichText text={block.text} />
       </p>
     ) : null,
   );

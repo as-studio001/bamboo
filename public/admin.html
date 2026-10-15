@@ -890,8 +890,8 @@ function renderManifestoEditor(){
         ${input("cover.title", "大標")}
         ${input("cover.subtitle", "英文副標")}
         ${input("cover.tagline", "一句話")}
-        ${input("cover.credit", "策展人")}
-        ${area("cover.notes", "補充說明（灰色小字，例如實驗場域、展示軸線）")}
+        ${area("cover.credit", "參與者", "一行一位，用「｜」分開標籤跟內容，例如：計畫發起人｜財團法人雲林縣利仁教育基金會")}
+        ${area("cover.notes", "補充說明（例如實驗場域、展示軸線）", "寫法同上，例如：兩組實驗場域｜竹輕亭 | 簇樂 · 一籌；跟參與者排成同一張兩欄表")}
         ${input("cover.label", "頁碼小字", labelHint)}
       `)}
 
@@ -1706,8 +1706,11 @@ function collectEditorFields(ed){
     delete item.coordinates;
   }
 
-  document.querySelectorAll(".chapter-section").forEach((section, i) => {
-    const chapter = item.chapters[i];
+  // 用 data-chapter（章節 key）對應資料，不用畫面上第幾個區塊——（2026-10-15）「核心目標」也用了
+  // chapter-section 的外框，照順序對會整排錯位一格（團隊介紹的欄位被寫到設計概念，丟錯誤、刪改圖片跟存檔都失效）
+  document.querySelectorAll(".chapter-section[data-chapter]").forEach((section) => {
+    const chapter = item.chapters.find(c => c.key === section.dataset.chapter);
+    if(!chapter) return;
     section.querySelectorAll("[data-ufield]").forEach(el => {
       teamUnit(chapter, el.dataset.ufield).text = el.value.replace(/\r\n/g, "\n");
     });

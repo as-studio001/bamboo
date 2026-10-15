@@ -149,6 +149,17 @@ export function CuratorialManifesto({ projects }: { projects?: [BridgeProject, B
   );
 }
 
+// 一行一項的文字拆成 { label, value }：「計畫發起人｜財團法人…」→ 標籤「計畫發起人」、內容「財團法人…」
+function lines(text?: string) {
+  return (text ?? "")
+    .split("\n")
+    .filter((l) => l.trim())
+    .map((l) => {
+      const at = l.indexOf("｜");
+      return at < 0 ? { label: "", value: l.trim() } : { label: l.slice(0, at).trim(), value: l.slice(at + 1).trim() };
+    });
+}
+
 function CoverScreen({ eyebrow, data }: { eyebrow?: string; data: NonNullable<typeof manifesto.cover> }) {
   return (
     <>
@@ -174,12 +185,33 @@ function CoverScreen({ eyebrow, data }: { eyebrow?: string; data: NonNullable<ty
       </Reveal>
       {(data.credit || data.notes) && (
         <Reveal delay={0.15} className={`mt-10 border-t ${RULE} pt-6 sm:mt-[7vh] sm:pt-8`}>
-          {data.credit && <p className="font-serif-tc text-base font-semibold sm:text-lg">{data.credit}</p>}
-          {data.notes && (
-            <p className="mt-3 text-sm leading-[1.9] whitespace-pre-line sm:text-base" style={MUTED}>
-              {data.notes}
-            </p>
-          )}
+          {/* （2026-10-15）參與者（credit）跟補充說明（notes）都是一行一項、用「｜」分成標籤跟內容，排成同一張
+              兩欄表：標籤一律灰色、內容一律粗體（同日改：補充說明的內容也用粗體）。沒有「｜」的行整行跨兩欄。 */}
+          <dl className="grid grid-cols-[auto_1fr] items-baseline gap-x-8 gap-y-2 sm:gap-x-12">
+            {[...lines(data.credit), ...lines(data.notes)].map((l) => ({ ...l, strong: true })).map((l, i) =>
+              l.label ? (
+                <Fragment key={i}>
+                  <dt className="font-serif-tc text-sm leading-[1.9] sm:text-base" style={MUTED}>
+                    {l.label}
+                  </dt>
+                  <dd
+                    className={`font-serif-tc text-sm leading-[1.9] sm:text-base ${l.strong ? "font-semibold sm:text-lg" : ""}`}
+                    style={l.strong ? undefined : MUTED}
+                  >
+                    {l.value}
+                  </dd>
+                </Fragment>
+              ) : (
+                <dd
+                  key={i}
+                  className={`col-span-2 font-serif-tc text-sm leading-[1.9] sm:text-base ${l.strong ? "font-semibold sm:text-lg" : ""}`}
+                  style={l.strong ? undefined : MUTED}
+                >
+                  {l.value}
+                </dd>
+              ),
+            )}
+          </dl>
         </Reveal>
       )}
     </>

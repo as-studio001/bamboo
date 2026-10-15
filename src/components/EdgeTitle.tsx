@@ -37,6 +37,8 @@ type Tone = "dark" | "light";
 // - 案例獨立頁：projects/[slug]/layout.tsx 傳 projectName
 // - 首頁上開著的案例彈出視窗：網址是 /projects/<slug>，從首頁傳進來的 projects 裡找出案名
 // 這時右側固定顯示這串字（不套首頁兩欄的「封面隱藏／換成案名」規則），點了照舊回到策展宣言。
+// （2026-10-15，電腦版）案例封面滿版後，右側這串字在封面上不顯示，封面往上捲過半個畫面才淡入
+// （見 useOnProjectCover）。
 export function EdgeTitle({
   side = "both",
   projects,
@@ -51,6 +53,7 @@ export function EdgeTitle({
   const rightRef = useRef<HTMLAnchorElement>(null);
   const { modes, tones, adaptive } = useHomeEdgeState(!!projects, [leftRef, rightRef]);
   const currentProjectName = projectName ?? projects?.find((p) => pathname === `/projects/${p.slug}`)?.name;
+  const onProjectCover = useOnProjectCover(!!currentProjectName, pathname);
 
   function handleClick(e: React.MouseEvent<HTMLAnchorElement>) {
     const manifesto = document.getElementById("manifesto");
@@ -63,7 +66,7 @@ export function EdgeTitle({
     const isLeft = index === 0;
     const project = projects?.[index];
     const withProject = !isLeft && !!currentProjectName;
-    const mode = withProject ? "brand" : modes[index];
+    const mode = withProject ? (onProjectCover ? "hidden" : "brand") : modes[index];
     const showName = mode === "name" && project;
     const label = withProject ? `${TITLE} × ${currentProjectName}` : showName ? project.name : TITLE;
     const frame = projects
@@ -101,6 +104,40 @@ export function EdgeTitle({
       {(side === "right" || side === "both") && renderSide(1)}
     </>
   );
+}
+
+// 案例內頁（獨立頁或首頁上的彈出視窗）電腦版：封面（ProjectDetail 的 DetailHero，帶
+// data-project-cover）還佔著畫面上半部時回傳 true。封面可能比這裡晚掛載（彈出視窗開啟中），
+// 所以每次都重新找元素；捲動用 capture 一併接到彈出視窗內部捲動區的事件。
+function useOnProjectCover(enabled: boolean, pathname: string) {
+  const [onCover, setOnCover] = useState(false);
+
+  useEffect(() => {
+    if (!enabled) return;
+    const mql = window.matchMedia("(min-width: 640px)");
+    let rafId: number | null = null;
+    const check = () => {
+      rafId = null;
+      const covers = document.querySelectorAll<HTMLElement>("[data-project-cover]");
+      const cover = covers[covers.length - 1];
+      setOnCover(!!cover && mql.matches && cover.getBoundingClientRect().bottom > window.innerHeight / 2);
+    };
+    const schedule = () => {
+      if (rafId === null) rafId = requestAnimationFrame(check);
+    };
+    schedule();
+    document.addEventListener("scroll", schedule, { capture: true, passive: true });
+    window.addEventListener("resize", schedule);
+    const interval = window.setInterval(schedule, 400);
+    return () => {
+      document.removeEventListener("scroll", schedule, { capture: true });
+      window.removeEventListener("resize", schedule);
+      window.clearInterval(interval);
+      if (rafId !== null) cancelAnimationFrame(rafId);
+    };
+  }, [enabled, pathname]);
+
+  return enabled && onCover;
 }
 
 // 首頁電腦版兩側標示的狀態：顯示什麼（modes）、用深灰還是淺灰（tones）。

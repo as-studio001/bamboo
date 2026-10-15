@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment, useEffect, useMemo, useState } from "react";
+import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import {
   accentOnLight,
@@ -70,15 +70,18 @@ export function ProjectDetail({
   // 整個案例頁共用一份橫幅配對輪替狀態，見 photoLayout.ts 的 RatioState 說明。
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const ratioState = useMemo(() => createRatioState(), [project.slug]);
+  const rootRef = useRef<HTMLDivElement>(null);
+  useChapterSnap(rootRef, variant);
 
   return (
     <div
+      ref={rootRef}
       className={`flex min-h-full w-full flex-col ${PANEL_BG} ${TEXT_PRIMARY}`}
     >
       {variant === "page" && (
         <ChapterEdgeNav keys={[...chapters.map((c) => c.key), "site"]} />
       )}
-      <DetailHero project={project} insetX={insetX} />
+      <DetailHero project={project} insetX={insetX} variant={variant} />
 
       {/* （2026-10-14）電腦版改成「書」的版面：封面 → 目錄 → 每一章一個跨頁（左欄章節號＋標題＋文字、
           右欄圖片，左欄捲動時固定在畫面上），章節之間用大留白分開、不畫分隔線。手機版維持原本的
@@ -131,7 +134,17 @@ export function ProjectDetail({
   );
 }
 
-function DetailHero({ project, insetX }: { project: Project; insetX: string }) {
+const HERO_INTERVAL_MS = 5000;
+
+function DetailHero({
+  project,
+  insetX,
+  variant,
+}: {
+  project: Project;
+  insetX: string;
+  variant: "page" | "modal";
+}) {
   const heroImages = project.coverImages.filter((img) => img.src);
   const finalImage =
     heroImages[heroImages.length - 1] ?? project.coverImages[0];
@@ -141,11 +154,66 @@ function DetailHero({ project, insetX }: { project: Project; insetX: string }) {
   // 額外下載——原圖數百 KB，會拖慢進入案例頁）。之後要依照片換字色，可以再接回 useImageTextColor。
   const heroTitleColor = finalHeroSrc ? "text-white" : TEXT_PRIMARY;
 
+  // （2026-10-15）封面輪播：用後台「封面照片」清單（coverImages，順序照清單），只有一張時維持靜態。
+  // 一開始先顯示最後一張——跟首頁兩欄的封面是同一張（同一個 layoutId），從首頁點進來的放大轉場才接得上；
+  // 之後每 5 秒換下一張（從第一張開始輪），淡入淡出 1 秒。右下角圓點可以手動切換，滑鼠停在
+  // 封面上時暫停；系統設定「減少動態效果」時不自動輪播（手動切換照常）。
+  const slides = heroImages.length ? heroImages : finalImage ? [finalImage] : [];
+  const [active, setActive] = useState(slides.length - 1);
+  const [paused, setPaused] = useState(false);
+  const hasCarousel = slides.length > 1;
+  useEffect(() => {
+    if (!hasCarousel || paused || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const id = window.setInterval(() => setActive((i) => (i + 1) % slides.length), HERO_INTERVAL_MS);
+    return () => window.clearInterval(id);
+  }, [hasCarousel, paused, slides.length, active]);
+
   return (
-    <div className="relative flex h-[70vh] min-h-[420px] w-full shrink-0 flex-col justify-end sm:h-[80vh]">
-      <div className="absolute inset-0">
-        <ImagePlaceholder image={finalImage} fill layoutId={finalImage?.id} />
-      </div>
+    <div
+      // （2026-10-15，電腦版）封面滿版：剛好一整個畫面高，往下捲才看得到目錄。
+      // - 獨立頁：用負邊距抵掉外框（projects/[slug]/layout.tsx 的 main）左右、上方各 30px 的白邊，貼滿視窗
+      // - 彈出視窗：面板本身就是左右貼齊玻璃脫縫的寬度，高度＝面板高度（視窗高 − 上方 106px 的標籤列）
+      // 手機版維持原本 70vh。
+      className={`relative flex h-[70vh] min-h-[420px] w-full shrink-0 flex-col justify-end ${
+        variant === "page"
+          ? "sm:-mx-[30px] sm:-mt-[30px] sm:h-[100dvh] sm:w-[calc(100%+60px)]"
+          : "sm:h-[calc(100dvh-106px)]"
+      }`}
+      // 右側「2026常民竹小屋 × 案名」在封面上不顯示，靠這個標記找封面（見 EdgeTitle.tsx 的 useOnProjectCover）
+      data-project-cover=""
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+    >
+      {slides.map((img, i) => (
+        <div
+          key={img.id}
+          aria-hidden={i !== active || undefined}
+          className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${i === active ? "opacity-100" : "opacity-0"}`}
+        >
+          <ImagePlaceholder image={img} fill layoutId={img.id === finalImage?.id ? finalImage.id : undefined} />
+        </div>
+      ))}
+      {hasCarousel && (
+        // 圓點指示（一張一點，目前那張是實心白點、其他是半透明），點圓點直接跳到那張。
+        // 放在跟案名相反的那一側（案名靠左就放右下、案名靠右——例如「一籌」——就放左下），不會疊到案名
+        <div className={`absolute bottom-0 z-20 flex items-center gap-1 px-3 pb-5 sm:px-7 sm:pb-9 lg:px-11 ${project.titleAlign === "right" ? "left-0" : "right-0"}`}>
+          {slides.map((img, i) => (
+            <button
+              key={img.id}
+              onClick={() => setActive(i)}
+              aria-label={`第 ${i + 1} 張，共 ${slides.length} 張`}
+              aria-current={i === active || undefined}
+              className="group p-1.5"
+            >
+              <span
+                className={`block size-2 rounded-full bg-white shadow-[0_0_4px_rgba(0,0,0,0.45)] transition-opacity duration-300 ${
+                  i === active ? "opacity-100" : "opacity-45 group-hover:opacity-80"
+                }`}
+              />
+            </button>
+          ))}
+        </div>
+      )}
       {/* project.titleAlign（見 projects.ts）——跟首頁 SplitExhibition.tsx 的封面標題同一個
           設定，「一籌」在內頁 hero 也維持靠右，兩邊視覺語言一致。 */}
       <div
@@ -174,9 +242,7 @@ function DetailHero({ project, insetX }: { project: Project; insetX: string }) {
 // 同樣寬度），內頁實際有內容的章節直書標籤垂直置中排列（用完整章節名稱），點擊捲到內頁對應區塊。
 function ChapterEdgeNav({ keys }: { keys: ChapterKey[] }) {
   function goTo(key: string) {
-    document
-      .getElementById(key)
-      ?.scrollIntoView({ behavior: "smooth", block: "start" });
+    scrollBlockToTop(document.getElementById(key));
   }
 
   // （2026-10-14）封面、目錄的時候還不顯示，第一章的「01」捲到畫面正中間才淡入；捲回去再淡出
@@ -218,6 +284,212 @@ function ChapterEdgeNav({ keys }: { keys: ChapterKey[] }) {
       ))}
     </nav>
   );
+}
+
+// 章節淡入淡出（2026-10-15，只有電腦版）：章節（目錄也是）跟畫面中間 60% 的區域有重疊時完全顯示，
+// 捲出這個區域就淡出，捲進來再淡入——跨章節時上一章淡出、下一章淡入，切換比較柔和。只動 opacity
+// （不用 transform，避免影響左欄的 sticky）；系統設定「減少動態效果」的人不套用。
+// data-faded="true" 時透明，由 useFadeInView 依 IntersectionObserver 切換。
+const FADE_CLASS =
+  "sm:transition-opacity sm:duration-700 sm:ease-out sm:data-[faded=true]:opacity-0 motion-reduce:sm:data-[faded=true]:opacity-100 motion-reduce:transition-none";
+
+function useFadeInView<T extends HTMLElement>() {
+  const ref = useRef<T>(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    el.dataset.faded = "true";
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        el.dataset.faded = entry.isIntersecting ? "false" : "true";
+      },
+      { rootMargin: "-20% 0px -20% 0px" },
+    );
+    observer.observe(el);
+    return () => {
+      observer.disconnect();
+      el.dataset.faded = "false";
+    };
+  }, []);
+  return ref;
+}
+
+// 停下來自動對齊章節（2026-10-15，只有電腦版）：捲動停下約 0.15 秒後，如果畫面上看得到兩個區塊（封面／
+// 目錄／章節）的交界，就平滑捲到佔畫面比較多的那一塊——交界在畫面上半部＝下一章佔比較多，把下一章的開頭
+// 對齊畫面頂端；交界在下半部＝上一章佔比較多，把上一章的結尾對齊畫面底部（章節至少一整個畫面高，短章節
+// 就等於對齊它的開頭）。長章節捲到中間、畫面上沒有交界時不動。
+// 捲動中完全不介入（原本試過 CSS scroll-snap，會跟滑鼠滾輪搶捲動、很卡），只在停下來之後才動作。
+// 獨立頁捲的是整個視窗；彈出視窗捲的是 DetailModal 的捲動容器。彈出視窗剛打開時會自動捲到被點的那張
+// 照片（DetailModal 的開場動畫，約 1 秒），這段時間不對齊，免得把畫面從那張照片拉走。
+// 系統設定「減少動態效果」時不套用。
+//
+// （同日修正，原本「不太順、點左側小標後還會再上下調整一次」）：
+// - 停下來的判斷從 0.15 秒拉長到 0.3 秒：滑鼠滾輪一格一格滾時，格與格之間常超過 0.15 秒，會在還在滾的
+//   時候就觸發對齊、跟滾輪搶
+// - 不用瀏覽器內建的 smooth 捲動，改用自己的緩動動畫（smoothScrollTo，先快後慢）；動畫進行中忽略自己
+//   造成的捲動事件，使用者一碰滾輪／觸控／鍵盤就立刻停下動畫，不跟使用者搶
+// - 點左側章節小標、目錄項目也用 smoothScrollTo 直接捲到「章節上緣對齊畫面頂端」這個位置——原本用
+//   scrollIntoView 會停在上緣往下 40px（scroll-mt-10），接著自動對齊又再補捲 40px，看起來像抖一下
+const SNAP_IDLE_MS = 300;
+const SCROLL_ANIM_MS = 600;
+
+type ScrollTarget = HTMLElement | Window;
+let activeScroll: { cancel: () => void } | null = null;
+
+const getTop = (t: ScrollTarget) => (t instanceof Window ? t.scrollY : t.scrollTop);
+const setTop = (t: ScrollTarget, top: number) => (t instanceof Window ? t.scrollTo(0, top) : (t.scrollTop = top));
+const easeOutCubic = (x: number) => 1 - Math.pow(1 - x, 3);
+
+function smoothScrollTo(target: ScrollTarget, top: number) {
+  activeScroll?.cancel();
+  const from = getTop(target);
+  const distance = top - from;
+  if (Math.abs(distance) < 1) return;
+  const start = performance.now();
+  let raf = 0;
+  const stop = () => {
+    cancelAnimationFrame(raf);
+    activeScroll = null;
+    ["wheel", "touchstart", "keydown", "mousedown"].forEach((ev) => window.removeEventListener(ev, stop));
+  };
+  const step = (now: number) => {
+    const p = Math.min(1, (now - start) / SCROLL_ANIM_MS);
+    setTop(target, from + distance * easeOutCubic(p));
+    if (p < 1) raf = requestAnimationFrame(step);
+    else stop();
+  };
+  ["wheel", "touchstart", "keydown", "mousedown"].forEach((ev) => window.addEventListener(ev, stop, { passive: true }));
+  activeScroll = { cancel: stop };
+  raf = requestAnimationFrame(step);
+}
+
+// 把某個區塊（章節／目錄）的上緣直接跳到畫面頂端——左側章節小標、目錄項目用。
+// （同日修正）不用捲動動畫：從 01 跳到 05 時，動畫會一路捲過中間每一章，加上章節的淡入淡出，畫面上會
+// 一閃一閃留下殘影。改成直接跳過去，目標章節本身再用淡入（FADE_CLASS）出現，切換一樣柔和、沒有殘影。
+function scrollBlockToTop(el: HTMLElement | null) {
+  if (!el) return;
+  activeScroll?.cancel();
+  const scroller = el.closest<HTMLElement>('[role="dialog"] .overflow-y-auto');
+  if (scroller) {
+    setTop(scroller, scroller.scrollTop + el.getBoundingClientRect().top - scroller.getBoundingClientRect().top);
+  } else {
+    setTop(window, window.scrollY + el.getBoundingClientRect().top);
+  }
+}
+
+function useChapterSnap(rootRef: React.RefObject<HTMLDivElement | null>, variant: "page" | "modal") {
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root) return;
+    const desktop = window.matchMedia("(min-width: 640px)");
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const scroller = variant === "modal" ? root.closest<HTMLElement>(".overflow-y-auto") : null;
+    const target: ScrollTarget = scroller ?? window;
+    const readyAt = performance.now() + (variant === "modal" ? 1500 : 300);
+    let timer: number | undefined;
+    // 這一串捲動的方向（1 往下、-1 往上）：對齊只會「順著」使用者剛剛捲的方向繼續走，不會往回拉——
+    // 原本「哪一章佔比多就對齊哪一章」的規則，在往下捲、下一章剛露出下半部時會把畫面拉回上一章，
+    // 跟使用者的動作反方向，感覺很不順（同日修正）
+    let lastTop = getTop(target);
+    let direction = 0;
+
+    function snap() {
+      if (!desktop.matches || reduced.matches || performance.now() < readyAt || activeScroll || !direction) return;
+      const viewTop = scroller ? scroller.getBoundingClientRect().top : 0;
+      const viewHeight = scroller ? scroller.clientHeight : window.innerHeight;
+      const currentTop = getTop(target);
+      const maxTop = scroller
+        ? scroller.scrollHeight - scroller.clientHeight
+        : document.documentElement.scrollHeight - window.innerHeight;
+
+      // 區塊的交界：目錄、每一章的上緣（封面跟目錄之間的交界＝目錄的上緣）
+      const blocks = root!.querySelectorAll<HTMLElement>("nav[aria-label='目錄'], section[id]");
+      for (const block of blocks) {
+        if (block.offsetHeight === 0) continue; // 手機版沒有目錄
+        const y = block.getBoundingClientRect().top - viewTop; // 交界在畫面中的位置
+        if (y <= 1 || y >= viewHeight - 1) continue; // 交界不在畫面裡
+        let delta = 0;
+        // 往下捲：交界已經進到畫面下方 1/4 以上，就繼續往下，把下一章開頭對齊畫面頂端；剛從底部露出來不動
+        if (direction > 0 && y < viewHeight * 0.75) delta = y;
+        // 往上捲：交界已經離開畫面上方 1/4，就繼續往上，把上一章結尾對齊畫面底部；剛從頂端露出來不動
+        if (direction < 0 && y > viewHeight * 0.25) delta = -(viewHeight - y);
+        const next = Math.max(0, Math.min(maxTop, currentTop + delta));
+        if (Math.abs(next - currentTop) >= 2) smoothScrollTo(target, next);
+        return;
+      }
+    }
+
+    // 滑鼠在左欄（章節編號／標題／內文；目錄頁的「目錄」那一側）上滾動＝直接換章（2026-10-15）：
+    // 一個滾動手勢（含觸控板放手後的慣性）只換一章，用跟點左側章節小標一樣的「直接跳過去＋淡入」；
+    // 往上滾時如果這一章已經捲到中間，先回到這一章開頭，再滾一次才到上一章；目錄頁往上回到封面。
+    // 滑鼠在右欄（圖片）照常捲動，捲完這一章的圖片再往下，交給上面的「停下來自動對齊」進到下一章。
+    // 左右欄的分界用 grid 第一欄的實際寬度＋一半欄間距算；封面不套用（不在任何區塊裡）。
+    const WHEEL_GESTURE_GAP_MS = 200;
+    let lastWheel = 0;
+
+    function blocksList() {
+      return [...root!.querySelectorAll<HTMLElement>("nav[aria-label='目錄'], section[id]")].filter((b) => b.offsetHeight > 0);
+    }
+
+    function inLeftColumn(block: HTMLElement, clientX: number) {
+      const s = getComputedStyle(block);
+      if (s.display !== "grid") return false;
+      const first = parseFloat(s.gridTemplateColumns);
+      const gap = parseFloat(s.columnGap) || 0;
+      return clientX < block.getBoundingClientRect().left + first + gap / 2;
+    }
+
+    function onWheel(e: WheelEvent) {
+      if (!desktop.matches || e.deltaY === 0) return;
+      const block = (e.target as HTMLElement).closest<HTMLElement>("nav[aria-label='目錄'], section[id]");
+      if (!block || !root!.contains(block) || !inLeftColumn(block, e.clientX)) return;
+      e.preventDefault();
+      const now = performance.now();
+      const newGesture = now - lastWheel > WHEEL_GESTURE_GAP_MS;
+      lastWheel = now;
+      if (!newGesture) return;
+
+      const viewTop = scroller ? scroller.getBoundingClientRect().top : 0;
+      const viewHeight = scroller ? scroller.clientHeight : window.innerHeight;
+      const blocks = blocksList();
+      // 目前這一章＝上緣已經在畫面上半部以上的最後一塊
+      let current = -1;
+      blocks.forEach((b, i) => {
+        if (b.getBoundingClientRect().top - viewTop <= viewHeight / 2) current = i;
+      });
+      if (e.deltaY > 0) {
+        const next = blocks[current + 1];
+        if (next) scrollBlockToTop(next);
+      } else {
+        const cur = blocks[current];
+        if (cur && cur.getBoundingClientRect().top - viewTop < -2) scrollBlockToTop(cur);
+        else if (current > 0) scrollBlockToTop(blocks[current - 1]);
+        else {
+          activeScroll?.cancel();
+          setTop(target, 0); // 目錄往上＝回到封面
+        }
+      }
+    }
+    root.addEventListener("wheel", onWheel, { passive: false });
+
+    const onScroll = () => {
+      window.clearTimeout(timer);
+      const top = getTop(target);
+      if (activeScroll) {
+        lastTop = top; // 自己的捲動動畫造成的捲動事件不算
+        return;
+      }
+      if (top !== lastTop) direction = Math.sign(top - lastTop);
+      lastTop = top;
+      timer = window.setTimeout(snap, SNAP_IDLE_MS);
+    };
+    target.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      target.removeEventListener("scroll", onScroll);
+      root.removeEventListener("wheel", onWheel);
+      window.clearTimeout(timer);
+    };
+  }, [rootRef, variant]);
 }
 
 const chapterNumber = (i: number) => String(i + 1).padStart(2, "0");
@@ -267,7 +539,8 @@ function ChapterFrame({
   // （團隊介紹的 rows 模式本來就不固定；組裝說明書、影片、基地位置也設成 false）
   sticky?: boolean;
 }) {
-  const sectionClass = `flex scroll-mt-10 flex-col ${first ? "" : "border-t pt-10"} sm:grid sm:min-h-screen sm:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] sm:items-start sm:gap-x-12 sm:border-0 sm:pt-28 sm:pb-28 lg:gap-x-20`;
+  const fadeRef = useFadeInView<HTMLElement>();
+  const sectionClass = `${FADE_CLASS} flex scroll-mt-10 flex-col ${first ? "" : "border-t pt-10"} sm:grid sm:min-h-screen sm:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] sm:items-start sm:gap-x-12 sm:border-0 sm:pt-28 sm:pb-28 lg:gap-x-20`;
   const sectionStyle = first
     ? undefined
     : { borderColor: "var(--border-subtle)" };
@@ -291,7 +564,7 @@ function ChapterFrame({
   // 的文字一起捲動，不會因為捲動而錯開。手機版就是依序「標題 → 第 1 列左、右 → 第 2 列左、右…」。
   if (rows) {
     return (
-      <section id={id} className={sectionClass} style={sectionStyle}>
+      <section ref={fadeRef} id={id} className={sectionClass} style={sectionStyle}>
         {header}
         {rows.map((row, i) => (
           <Fragment key={i}>
@@ -307,7 +580,7 @@ function ChapterFrame({
     // （同日修正）電腦版一個畫面只有一個章節：每章至少一整個畫面高（min-h-screen），捲完這一章才會看到下一章。
     // （原本還加了捲動吸附到章節開頭，會跟滑鼠滾輪搶捲動、造成卡頓，已拿掉。）
     // 右欄上緣跟左欄的哪個東西切齊見上面的 RIGHT_OFFSET。
-    <section id={id} className={sectionClass} style={sectionStyle}>
+    <section ref={fadeRef} id={id} className={sectionClass} style={sectionStyle}>
       <div className={`contents sm:block sm:self-start ${sticky ? "sm:sticky sm:top-28" : ""}`}>
         {header}
         {left}
@@ -328,16 +601,19 @@ function TableOfContents({
 }: {
   items: { key: ChapterKey; number: string }[];
 }) {
+  const fadeRef = useFadeInView<HTMLElement>();
   return (
     <nav
       aria-label="目錄"
-      className="hidden sm:grid sm:min-h-screen sm:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] sm:items-start sm:gap-x-12 sm:pt-28 sm:pb-28 lg:gap-x-20"
+      ref={fadeRef}
+      className={`${FADE_CLASS} hidden sm:grid sm:min-h-screen sm:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] sm:items-start sm:gap-x-12 sm:pt-28 sm:pb-28 lg:gap-x-20`}
     >
-      {/* （2026-10-14）「目錄」改成小字標籤（襯線 12px、字距 0.2em、灰色，跟左側章節小標同一套），像書的
-          頁眉標示，不跟章節開頭的大編號（01、02…）搶；跟清單第一項「01 團隊介紹」的文字底線（baseline）對齊——往下推 25.5px 是用 canvas 量出來的 */}
+      {/* （2026-10-15）「目錄」跟右邊清單的章節名稱（例如「團隊介紹」）同一套字體、字級（襯線 18px、行高 28px），
+          粗體、灰色；不跟章節開頭的大編號（01、02…）搶。往下推 17px＝清單上框線 1px＋每項上內距 16px，
+          跟清單第一項「團隊介紹」同一行 */}
       <div>
         <p
-          className="font-serif-tc text-xs tracking-[0.2em] sm:pt-[25.5px]"
+          className="font-serif-tc text-lg leading-7 font-bold sm:pt-[17px]"
           style={{ color: "var(--foreground-muted)" }}
         >
           目錄
@@ -352,9 +628,7 @@ function TableOfContents({
           >
             <button
               onClick={() =>
-                document
-                  .getElementById(key)
-                  ?.scrollIntoView({ behavior: "smooth", block: "start" })
+                scrollBlockToTop(document.getElementById(key))
               }
               className={`group flex w-full items-baseline gap-6 py-4 text-left font-serif-tc ${TEXT_PRIMARY}`}
             >

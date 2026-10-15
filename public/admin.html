@@ -1162,7 +1162,8 @@ function renderCaseEditor(){
       </div>
 
       <div class="field-block">
-        <label>封面照片（coverImages，首頁大圖輪播用）</label>
+        <label>封面照片（coverImages）</label>
+        <div class="field-hint" style="margin-top:0; margin-bottom:10px;">案例內頁的封面大圖會依這個順序輪播（每 5 秒換一張，可以拖曳調整順序；只有一張就不輪播）。首頁兩欄的封面固定用「最後一張」。</div>
         ${renderPhotoList("coverImages", item.coverImages)}
       </div>
 

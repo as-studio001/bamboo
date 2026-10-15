@@ -216,7 +216,9 @@ function TopChapterNav({ projects }: { projects: [Project, Project] }) {
     }
     const modalTarget = document.querySelector(`[role="dialog"] #${CSS.escape(key)}`);
     if (modalTarget) {
-      scrollChapterIntoView(key);
+      // 彈出視窗裡的章節上緣剛好對齊視窗頂端（gap 0）：案例內頁電腦版有「停下來自動對齊章節」，
+      // 差 16px 會被再補捲一次，看起來像抖一下
+      scrollChapterIntoView(key, 0);
       return;
     }
     scrollChapterIntoView(`${a.slug}-${key}`, 0);

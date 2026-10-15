@@ -1338,6 +1338,31 @@ function renderCaseEditor(){
         ${renderPhotoList("sketchImages", item.sketchImages)}
       </div>
 
+      <div class="chapter-section">
+        <div class="chapter-section-head"><strong>核心目標</strong><span class="key">案例內頁封面之後的第一個畫面（取代原本的目錄）</span></div>
+        <div class="field-hint" style="margin-top:0; margin-bottom:14px;">一個畫面的篇幅：左邊是標題＋設計定位，右邊是策略、說明、對照表、例圖。留空的欄位不顯示；全部留空就不顯示這個畫面。</div>
+        <div class="field-block"><label>標題（例如：設計目標與核心策略）</label><input type="text" data-goal="title" value="${esc((item.goals || {}).title || "")}"></div>
+        <div class="two-col">
+          <div class="field-block"><label>設計定位小標（例如：設計定位）</label><input type="text" data-goal="positioningLabel" value="${esc((item.goals || {}).positioningLabel || "")}"></div>
+          <div class="field-block"><label>設計定位（一行一項）</label><textarea data-goal="positioning">${esc((item.goals || {}).positioning || "")}</textarea></div>
+        </div>
+        <div class="two-col">
+          <div class="field-block"><label>策略小標（例如：策略一）</label><input type="text" data-goal="strategyLabel" value="${esc((item.goals || {}).strategyLabel || "")}"></div>
+          <div class="field-block"><label>策略標題（例如：模矩化空間與應用）</label><input type="text" data-goal="strategyTitle" value="${esc((item.goals || {}).strategyTitle || "")}"></div>
+        </div>
+        <div class="field-block"><label>說明</label><textarea data-goal="text">${esc((item.goals || {}).text || "")}</textarea></div>
+        <div class="field-block"><label>對照表標題（例如：市場對應原型）</label><input type="text" data-goal="tableLabel" value="${esc((item.goals || {}).tableLabel || "")}"></div>
+        <div class="field-block">
+          <label>對照表</label>
+          <textarea data-goal="table" placeholder="原型 | 目標市場 | 市場特性&#10;活動棚架 3×3m | 市集攤位、社區活動 | 高頻次租用">${esc((item.goals || {}).table || "")}</textarea>
+          <div class="field-hint">一行一列、用 | 分欄；第一行是表頭。</div>
+        </div>
+        <div class="field-block">
+          <label>例圖（建議 4 張，圖說會顯示在圖片下方）</label>
+          ${renderPhotoList("goalImages", (item.goals || {}).images)}
+        </div>
+      </div>
+
       ${CHAPTER_DEFS.map((def, i) => {
         const chapter = item.chapters[i];
         if(def.kind === "team") return `
@@ -1467,6 +1492,14 @@ function renderCaseEditor(){
     if(pick && pick.checked) ed.item.homeCoverId = pick.dataset.coverPick;
   });
   wirePhotoList("sketchImages", () => ed.item.sketchImages, (next) => { ed.item.sketchImages = next; }, ed.slug);
+  // 核心目標：文字欄位即時寫回 item.goals；例圖沿用照片清單元件
+  app.querySelectorAll("[data-goal]").forEach(el => {
+    el.addEventListener("input", () => {
+      ed.item.goals = ed.item.goals || {};
+      ed.item.goals[el.dataset.goal] = el.value;
+    });
+  });
+  wirePhotoList("goalImages", () => (ed.item.goals || {}).images, (next) => { ed.item.goals = Object.assign({}, ed.item.goals, { images: next }); }, ed.slug);
   CHAPTER_DEFS.forEach((def, i) => {
     const chapter = ed.item.chapters[i];
     if(def.kind === "team"){

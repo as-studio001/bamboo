@@ -2,12 +2,15 @@
 
 import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
+import { createPortal } from "react-dom";
 import {
   accentOnLight,
   orderedChapters,
   TEAM_UNITS,
+  hasGoals,
   homeCover,
   type Chapter,
+  type ProjectGoals,
   type ChapterKey,
   type Project,
 } from "@/lib/projects";
@@ -74,26 +77,33 @@ export function ProjectDetail({
   const rootRef = useRef<HTMLDivElement>(null);
   useChapterSnap(rootRef, variant);
 
+  // 章節清單（封面底部那一排、左側直書導覽共用）：有填「核心目標」時排第一個、編號 00，其餘章節 01 起
+  const goals = hasGoals(project.goals) ? project.goals : undefined;
+  const toc: TocItem[] = [
+    ...(goals ? [{ key: "goals", number: "00", title: GOALS_TITLE }] : []),
+    ...[...chapters.map((c) => c.key), "site" as ChapterKey].map((key, i) => ({
+      key,
+      number: chapterNumber(i),
+      title: chapterTitle(key),
+    })),
+  ];
+
   return (
     <div
       ref={rootRef}
       className={`flex min-h-full w-full flex-col ${PANEL_BG} ${TEXT_PRIMARY}`}
     >
-      {variant === "page" && (
-        <ChapterEdgeNav keys={[...chapters.map((c) => c.key), "site"]} />
-      )}
-      <DetailHero project={project} insetX={insetX} variant={variant} />
+      <ChapterEdgeNav items={toc} variant={variant} />
+      <DetailHero project={project} insetX={insetX} variant={variant} toc={toc} />
 
-      {/* （2026-10-14）電腦版改成「書」的版面：封面 → 目錄 → 每一章一個跨頁（左欄章節號＋標題＋文字、
+      {/* （2026-10-14）電腦版改成「書」的版面：封面 → 案例目標 → 每一章一個跨頁（左欄章節號＋標題＋文字、
           右欄圖片，左欄捲動時固定在畫面上），章節之間用大留白分開、不畫分隔線。手機版維持原本的
-          上下圖文交錯（見 ChapterFrame 的說明）。 */}
+          上下圖文交錯（見 ChapterFrame 的說明）。
+          （2026-10-15）原本封面之後的目錄頁拿掉：章節清單改成封面底部一整排小字（見 DetailHero），
+          目錄的位置改放這一案的目標（GoalsSection，沒填就跳過）。 */}
       <div className={`pt-10 pb-24 sm:pt-0 sm:pb-40 ${insetX}`}>
         <div className="min-w-0">
-          <TableOfContents
-            items={[...chapters.map((c) => c.key), "site" as ChapterKey].map(
-              (key, i) => ({ key, number: chapterNumber(i) }),
-            )}
-          />
+          {goals && <GoalsSection goals={goals} />}
 
           {chapters.map((chapter, i) => {
             const frame = { number: chapterNumber(i), first: i === 0 };
@@ -137,14 +147,20 @@ export function ProjectDetail({
 
 const HERO_INTERVAL_MS = 5000;
 
+// 「核心目標」（封面之後、第一章之前的那一個畫面）的名稱與編號 00，見 GoalsSection
+const GOALS_TITLE = "核心目標";
+type TocItem = { key: string; number: string; title: string };
+
 function DetailHero({
   project,
   insetX,
   variant,
+  toc,
 }: {
   project: Project;
   insetX: string;
   variant: "page" | "modal";
+  toc: TocItem[];
 }) {
   const heroImages = project.coverImages.filter((img) => img.src);
   // 跟首頁兩欄封面同一張（後台指定的「首頁封面」，沒指定就最後一張，見 projects.ts 的 homeCover）
@@ -189,7 +205,7 @@ function DetailHero({
         <div
           key={img.id}
           aria-hidden={i !== active || undefined}
-          className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${i === active ? "opacity-100" : "opacity-0"}`}
+          className={`absolute inset-0 transition-opacity duration-1000 ease-in-out sm:bottom-14 ${i === active ? "opacity-100" : "opacity-0"}`}
         >
           <ImagePlaceholder image={img} fill layoutId={img.id === finalImage?.id ? finalImage.id : undefined} />
         </div>
@@ -197,7 +213,7 @@ function DetailHero({
       {hasCarousel && (
         // 圓點指示（一張一點，目前那張是實心白點、其他是半透明），點圓點直接跳到那張。
         // 放在跟案名相反的那一側（案名靠左就放右下、案名靠右——例如「一籌」——就放左下），不會疊到案名
-        <div className={`absolute bottom-0 z-20 flex items-center gap-1 px-3 pb-5 sm:px-7 sm:pb-9 lg:px-11 ${project.titleAlign === "right" ? "left-0" : "right-0"}`}>
+        <div className={`absolute bottom-0 z-20 flex items-center gap-1 px-3 pb-5 sm:bottom-14 sm:px-7 sm:pb-5 lg:px-11 ${project.titleAlign === "right" ? "left-0" : "right-0"}`}>
           {slides.map((img, i) => (
             <button
               key={img.id}
@@ -218,7 +234,7 @@ function DetailHero({
       {/* project.titleAlign（見 projects.ts）——跟首頁 SplitExhibition.tsx 的封面標題同一個
           設定，「一籌」在內頁 hero 也維持靠右，兩邊視覺語言一致。 */}
       <div
-        className={`relative z-10 pb-8 sm:pb-12 ${insetX} ${project.titleAlign === "right" ? "text-right" : ""}`}
+        className={`relative z-10 pb-8 sm:pb-7 ${insetX} ${project.titleAlign === "right" ? "text-right" : ""}`}
       >
         {/* （2026-10-14）電腦版字體與大小跟首頁封面上的案名（SplitExhibition.tsx 的封面大標）一致：
             大標 48px（lg 57.6px）粗黑、資訊小字 18px 一般字重、跟內文同一套字體（不是等寬字）。手機版維持原樣。 */}
@@ -234,6 +250,23 @@ function DetailHero({
           {project.location} · {project.year} · {project.type}
         </p>
       </div>
+      {/* （2026-10-15，只有電腦版）取代原本封面之後的目錄頁：封面最底部一整排小字章節（編號＋名稱，
+          有核心目標時從 00 開始），平均分散在整個寬度，點了直接跳到那一章。這一排是白底（照片停在這一排的
+          上緣，見上面輪播圖的 sm:bottom-14），灰色粗體字，封面整體仍剛好一個畫面高。 */}
+      <div className={`relative z-10 hidden sm:block ${PANEL_BG} ${insetX}`}>
+      <nav aria-label="章節" className="flex h-14 items-center justify-between">
+        {toc.map((item) => (
+          <button
+            key={item.key}
+            onClick={() => scrollBlockToTop(document.getElementById(item.key))}
+            className="flex items-baseline gap-2 font-serif-tc text-xs font-bold tracking-[0.15em] text-[var(--foreground-muted)] transition-colors hover:text-[var(--foreground)] lg:text-sm"
+          >
+            <span className="tabular-nums">{item.number}</span>
+            {item.title}
+          </button>
+        ))}
+      </nav>
+      </div>
     </div>
   );
 }
@@ -241,50 +274,83 @@ function DetailHero({
 // 章節導覽直接取代左側邊框原本的「2026林鐵構築」品牌文字（見 EdgeTitle.tsx 的 side prop、
 // projects/[slug]/layout.tsx 只畫右側），定位跟 EdgeTitle 完全對齊（fixed inset-y-0 left-0，
 // 同樣寬度），內頁實際有內容的章節直書標籤垂直置中排列（用完整章節名稱），點擊捲到內頁對應區塊。
-function ChapterEdgeNav({ keys }: { keys: ChapterKey[] }) {
+// （2026-10-15）從首頁點進來的彈出視窗也顯示（只有電腦版）：放在視窗左側 60px 的玻璃脫縫裡置中。
+// 用 portal 掛到 body，不受彈出視窗面板本身的定位／轉場影響；z-index 高過玻璃條（z-30）跟對話框層
+// （z-100），按鈕才點得到。捲動來源是視窗裡的捲動區，所以用 capture 監聽所有捲動。
+// （同日）有核心目標時第一項是「00 核心目標」，從核心目標那一屏開始出現。
+function ChapterEdgeNav({ items, variant }: { items: TocItem[]; variant: "page" | "modal" }) {
   function goTo(key: string) {
     scrollBlockToTop(document.getElementById(key));
   }
 
   // （2026-10-14）封面、目錄的時候還不顯示，第一章的「01」捲到畫面正中間才淡入；捲回去再淡出
   const [visible, setVisible] = useState(false);
-  const firstKey = keys[0];
+  const [mounted, setMounted] = useState(false);
+  const [active, setActive] = useState<string | null>(null);
+  const itemsRef = useRef(items);
   useEffect(() => {
+    itemsRef.current = items;
+  });
+  const firstKey = items[0]?.key;
+  useEffect(() => {
+    const init = () => setMounted(true);
+    init();
     // 以第一章開頭的大編號「01」為準（章節框上面還有一段留白，用框的上緣會太早出現）：01 捲到畫面正中間才出現
     const first = document.getElementById(firstKey)?.querySelector("header");
     if (!first) return;
-    const update = () => setVisible(first.getBoundingClientRect().top <= window.innerHeight / 2);
+    const update = () => {
+      const mid = window.innerHeight / 2;
+      setVisible(first.getBoundingClientRect().top <= mid);
+      // （2026-10-15）目前所在的章節：上緣已經過了畫面中線的最後一個區塊
+      let current: string | null = null;
+      for (const { key } of itemsRef.current) {
+        const el = document.getElementById(key);
+        if (el && el.getBoundingClientRect().top <= mid) current = key;
+      }
+      setActive(current);
+    };
     update();
-    window.addEventListener("scroll", update, { passive: true });
+    document.addEventListener("scroll", update, { capture: true, passive: true });
     window.addEventListener("resize", update);
     return () => {
-      window.removeEventListener("scroll", update);
+      document.removeEventListener("scroll", update, { capture: true });
       window.removeEventListener("resize", update);
     };
   }, [firstKey]);
 
-  return (
+  const nav = (
     <nav
       aria-hidden={!visible || undefined}
-      className={`fixed inset-y-0 left-0 z-40 flex w-[18px] flex-col items-center justify-center gap-5 transition-opacity duration-500 sm:w-[30px] sm:gap-7 ${
-        visible ? "opacity-100" : "pointer-events-none opacity-0"
-      }`}
+      className={`fixed inset-y-0 left-0 flex flex-col items-center justify-center transition-opacity duration-500 ${
+        variant === "modal"
+          ? "z-[105] hidden w-[60px] sm:flex"
+          : "z-40 w-[18px] gap-5 sm:w-[30px]"
+      } sm:gap-[1.8em] sm:text-[clamp(9px,1.3vh,12px)] ${visible ? "opacity-100" : "pointer-events-none opacity-0"}`}
     >
+      {/* （同日）加了「00 核心目標」後共 9 項，固定 12px 字＋28px 間距會比畫面高（900px 高的畫面上下各超出
+          約 13px）。電腦版字級跟著畫面高度縮放（最大 12px、最小 9px），間距用 em 跟著字級走，整排永遠放得下。 */}
       {/* 每個直書章節名稱上方加章節編號（01、02…，跟目錄、章節開頭的大編號同一套），編號橫排不轉向。
           字體、字級、字距、顏色跟右側邊框的「2026常民竹小屋」（EdgeTitle.tsx）一樣：襯線字 10／12px、
           字距 0.2em、主文字色 */}
-      {keys.map((key, i) => (
+      {items.map((item) => (
         <button
-          key={key}
-          onClick={() => goTo(key)}
-          className="flex flex-col items-center gap-1.5 font-serif-tc text-[10px] text-[var(--foreground)] uppercase sm:text-xs"
+          key={item.key}
+          onClick={() => goTo(item.key)}
+          aria-current={active === item.key || undefined}
+          // 目前所在的章節維持深色，其他變淡（跟首頁頂部章節列同一套：opacity 0.35，滑鼠移上去 0.7）
+          className={`flex flex-col items-center gap-1.5 font-serif-tc text-[10px] text-[var(--foreground)] uppercase transition-opacity duration-300 sm:gap-[0.4em] sm:text-[1em] ${
+            active && active !== item.key ? "opacity-35 hover:opacity-70" : ""
+          }`}
         >
-          <span className="tabular-nums">{chapterNumber(i)}</span>
-          <span className="[writing-mode:vertical-rl] tracking-[0.2em]">{chapterTitle(key)}</span>
+          <span className="tabular-nums">{item.number}</span>
+          <span className="[writing-mode:vertical-rl] tracking-[0.2em]">{item.title}</span>
         </button>
       ))}
     </nav>
   );
+
+  if (variant === "page") return nav;
+  return mounted ? createPortal(nav, document.body) : null;
 }
 
 // 章節淡入淡出（2026-10-15，只有電腦版）：章節（目錄也是）跟畫面中間 60% 的區域有重疊時完全顯示，
@@ -403,10 +469,10 @@ function useChapterSnap(rootRef: React.RefObject<HTMLDivElement | null>, variant
         ? scroller.scrollHeight - scroller.clientHeight
         : document.documentElement.scrollHeight - window.innerHeight;
 
-      // 區塊的交界：目錄、每一章的上緣（封面跟目錄之間的交界＝目錄的上緣）
-      const blocks = root!.querySelectorAll<HTMLElement>("nav[aria-label='目錄'], section[id]");
+      // 區塊的交界：案例目標、每一章的上緣（封面跟下一塊之間的交界＝那一塊的上緣）
+      const blocks = root!.querySelectorAll<HTMLElement>("section[id]");
       for (const block of blocks) {
-        if (block.offsetHeight === 0) continue; // 手機版沒有目錄
+        if (block.offsetHeight === 0) continue;
         const y = block.getBoundingClientRect().top - viewTop; // 交界在畫面中的位置
         if (y <= 1 || y >= viewHeight - 1) continue; // 交界不在畫面裡
         let delta = 0;
@@ -429,7 +495,7 @@ function useChapterSnap(rootRef: React.RefObject<HTMLDivElement | null>, variant
     let lastWheel = 0;
 
     function blocksList() {
-      return [...root!.querySelectorAll<HTMLElement>("nav[aria-label='目錄'], section[id]")].filter((b) => b.offsetHeight > 0);
+      return [...root!.querySelectorAll<HTMLElement>("section[id]")].filter((b) => b.offsetHeight > 0);
     }
 
     function inLeftColumn(block: HTMLElement, clientX: number) {
@@ -442,7 +508,7 @@ function useChapterSnap(rootRef: React.RefObject<HTMLDivElement | null>, variant
 
     function onWheel(e: WheelEvent) {
       if (!desktop.matches || e.deltaY === 0) return;
-      const block = (e.target as HTMLElement).closest<HTMLElement>("nav[aria-label='目錄'], section[id]");
+      const block = (e.target as HTMLElement).closest<HTMLElement>("section[id]");
       if (!block || !root!.contains(block) || !inLeftColumn(block, e.clientX)) return;
       e.preventDefault();
       const now = performance.now();
@@ -467,7 +533,7 @@ function useChapterSnap(rootRef: React.RefObject<HTMLDivElement | null>, variant
         else if (current > 0) scrollBlockToTop(blocks[current - 1]);
         else {
           activeScroll?.cancel();
-          setTop(target, 0); // 目錄往上＝回到封面
+          setTop(target, 0); // 第一塊（案例目標或第一章）往上＝回到封面
         }
       }
     }
@@ -595,58 +661,131 @@ function ChapterFrame({
   );
 }
 
-// 目錄（只有電腦版）：封面之後、第一章之前，跟章節同一套左右兩欄——左欄「目錄」、右欄章節清單，
-// 點一項捲到那一章。
-function TableOfContents({
-  items,
-}: {
-  items: { key: ChapterKey; number: string }[];
-}) {
+// 核心目標（2026-10-15，取代原本的目錄頁；同日從「案例目標」改名、編號 00、加進封面底部章節列與左側直書導覽）：
+// 封面之後、第一章之前，一個畫面的篇幅，跟章節同一套左右兩欄。
+// 左欄：標題（例如「設計目標與核心策略」）＋設計定位（一行一項，細線分隔）；右欄：策略小標＋策略標題＋
+// 說明＋對照表（一行一列、| 分欄、第一行表頭）＋例圖（一排四張、圖說在下）。內容在各案後台「案例目標」填，
+// 留空的欄位不顯示。視覺沿用網站語彙（襯線、灰階、細線），不搬簡報的綠色色塊。
+// 手機版：上下排列，例圖一排兩張。
+function GoalsSection({ goals }: { goals: ProjectGoals }) {
   const fadeRef = useFadeInView<HTMLElement>();
+  const muted = { color: "var(--foreground-muted)" };
+  const rule = { borderColor: "var(--border-subtle)" };
+  const positioning = (goals.positioning ?? "").split("\n").filter((l) => l.trim());
+  const rows = (goals.table ?? "")
+    .split("\n")
+    .filter((l) => l.trim())
+    .map((l) => l.split("|").map((c) => c.trim()));
+  const [head, ...body] = rows;
+  const images = (goals.images ?? []).filter((img) => img.src);
+
   return (
-    <nav
-      aria-label="目錄"
+    <section
       ref={fadeRef}
-      className={`${FADE_CLASS} hidden sm:grid sm:min-h-screen sm:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] sm:items-start sm:gap-x-12 sm:pt-28 sm:pb-28 lg:gap-x-20`}
+      id="goals"
+      className={`${FADE_CLASS} flex flex-col gap-8 pb-10 sm:grid sm:min-h-screen sm:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] sm:content-center sm:items-start sm:gap-x-12 sm:py-12 lg:gap-x-20`}
     >
-      {/* （2026-10-15）「目錄」跟右邊清單的章節名稱（例如「團隊介紹」）同一套字體、字級（襯線 18px、行高 28px），
-          粗體、灰色；不跟章節開頭的大編號（01、02…）搶。往下推 17px＝清單上框線 1px＋每項上內距 16px，
-          跟清單第一項「團隊介紹」同一行 */}
       <div>
-        <p
-          className="font-serif-tc text-lg leading-7 font-bold sm:pt-[17px]"
-          style={{ color: "var(--foreground-muted)" }}
-        >
-          目錄
-        </p>
-      </div>
-      <ol className="border-t" style={{ borderColor: "var(--border-subtle)" }}>
-        {items.map(({ key, number }) => (
-          <li
-            key={key}
-            className="border-b"
-            style={{ borderColor: "var(--border-subtle)" }}
+        {/* 跟其他章節同一套開頭：大編號「00」＋章節名「核心目標」（ChapterFrame 的 header），左側直書導覽
+            也以這個 header 判斷何時出現 */}
+        <header>
+          <p
+            className="hidden font-serif-tc text-5xl leading-none font-light tabular-nums sm:block sm:h-12 lg:h-[60px] lg:text-6xl"
+            style={muted}
           >
-            <button
-              onClick={() =>
-                scrollBlockToTop(document.getElementById(key))
-              }
-              className={`group flex w-full items-baseline gap-6 py-4 text-left font-serif-tc ${TEXT_PRIMARY}`}
-            >
-              <span
-                className="w-8 shrink-0 text-sm tabular-nums"
-                style={{ color: "var(--foreground-muted)" }}
-              >
-                {number}
-              </span>
-              <span className="text-lg underline-offset-4 group-hover:underline">
-                {chapterTitle(key)}
-              </span>
-            </button>
-          </li>
-        ))}
-      </ol>
-    </nav>
+            00
+          </p>
+          <h3 className={`font-serif-tc text-lg font-bold tracking-wide sm:mt-5 sm:text-2xl sm:leading-8 ${TEXT_PRIMARY}`}>
+            {GOALS_TITLE}
+          </h3>
+        </header>
+        {goals.title && (
+          <p className={`mt-6 font-serif-tc text-2xl leading-[1.4] font-bold sm:mt-8 sm:text-3xl ${TEXT_PRIMARY}`}>
+            {goals.title}
+          </p>
+        )}
+        {positioning.length > 0 && (
+          <div className="mt-8 sm:mt-12">
+            {goals.positioningLabel && (
+              <p className="font-serif-tc text-sm font-bold" style={muted}>
+                {goals.positioningLabel}
+              </p>
+            )}
+            <ul className="mt-3 border-t" style={rule}>
+              {positioning.map((p, i) => (
+                <li key={i} className={`border-b py-3 font-serif-tc text-lg sm:text-xl ${TEXT_PRIMARY}`} style={rule}>
+                  {p}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </div>
+
+      {/* 右欄上緣跟左欄的章節名「核心目標」切齊（同 RIGHT_OFFSET.title），整個畫面才放得進一屏 */}
+      <div className={`min-w-0 ${RIGHT_OFFSET.title}`}>
+        {goals.strategyLabel && (
+          <p className="font-serif-tc text-sm" style={muted}>
+            {goals.strategyLabel}
+          </p>
+        )}
+        {goals.strategyTitle && (
+          <h4 className={`mt-1 font-serif-tc text-xl font-bold sm:text-2xl ${TEXT_PRIMARY}`}>{goals.strategyTitle}</h4>
+        )}
+        {goals.text && <p className={`mt-4 whitespace-pre-line ${BODY_TEXT}`}>{goals.text}</p>}
+
+        {rows.length > 0 && (
+          <div className="mt-6 sm:mt-8">
+            {goals.tableLabel && (
+              <p className="mb-2 font-serif-tc text-sm font-bold" style={muted}>
+                {goals.tableLabel}
+              </p>
+            )}
+            <table className="w-full border-collapse font-serif-tc text-sm sm:text-base">
+              {head && (
+                <thead>
+                  <tr className="border-y" style={rule}>
+                    {head.map((c, i) => (
+                      <th key={i} className="px-2 py-2 text-left font-bold first:pl-0" style={muted}>
+                        {c}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+              )}
+              <tbody>
+                {body.map((r, i) => (
+                  <tr key={i} className="border-b" style={rule}>
+                    {r.map((c, j) => (
+                      <td key={j} className={`px-2 py-2 first:pl-0 ${TEXT_PRIMARY}`}>
+                        {c}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {images.length > 0 && (
+          <div className="mt-8 grid grid-cols-2 gap-3 sm:mt-10 sm:grid-cols-4 sm:gap-4">
+            {images.map((img) => (
+              <figure key={img.id}>
+                <div className="relative aspect-[4/3] overflow-hidden bg-neutral-100">
+                  <Image src={img.src!} alt={img.caption || ""} fill sizes="(max-width: 640px) 50vw, 15vw" className="object-cover" />
+                </div>
+                {img.caption && (
+                  <figcaption className="mt-2 font-serif-tc text-xs sm:text-sm" style={muted}>
+                    {img.caption}
+                  </figcaption>
+                )}
+              </figure>
+            ))}
+          </div>
+        )}
+      </div>
+    </section>
   );
 }
 

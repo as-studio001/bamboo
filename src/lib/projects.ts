@@ -101,6 +101,27 @@ export type Chapter = {
 // 同樣是 { address, lat, lng, zoom }，方便之後兩邊的內容格式互通。
 export type Coordinates = { lat: number; lng: number; address?: string; zoom?: number };
 
+// （2026-10-15）案例目標：案例內頁封面之後的第一個畫面（取代原本的目錄頁），一個畫面的篇幅。
+// 左欄：標題（例如「設計目標與核心策略」）＋設計定位（一行一項）；右欄：策略小標＋策略標題＋說明＋
+// 對照表＋例圖。全部選填，都沒填就不顯示這個畫面。見 ProjectDetail.tsx 的 GoalsSection。
+export type ProjectGoals = {
+  title?: string;
+  positioningLabel?: string; // 例如「設計定位」
+  positioning?: string; // 一行一項，例如「中小型\n常民化\n生活化」
+  strategyLabel?: string; // 例如「策略一」
+  strategyTitle?: string; // 例如「模矩化空間與應用」
+  text?: string;
+  tableLabel?: string; // 例如「市場對應原型」
+  table?: string; // 一行一列、用 | 分欄，第一行是表頭
+  images?: ProjectImage[]; // 例圖（建議 4 張，圖說顯示在圖片下方）
+};
+
+export function hasGoals(goals?: ProjectGoals): goals is ProjectGoals {
+  if (!goals) return false;
+  const { title, positioning, strategyTitle, text, table, images } = goals;
+  return !!(title || positioning || strategyTitle || text || table || images?.some((img) => img.src));
+}
+
 export type Project = {
   slug: string;
   shortLabel: string;
@@ -119,6 +140,7 @@ export type Project = {
   // （2026-10-15）手稿：首頁策展宣言最後一屏「兩案預告」用，只取第一張有 src 的（見 CuratorialManifesto.tsx 的
   // BridgeScreen）。存成清單是為了沿用後台現成的上傳元件。
   sketchImages?: ProjectImage[];
+  goals?: ProjectGoals;
   chapters: Chapter[];
   coordinates?: Coordinates; // 基地章節的地圖標記位置，待使用者提供實際地址／經緯度
   published: boolean;

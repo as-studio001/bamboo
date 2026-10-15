@@ -2,7 +2,8 @@
 
 import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
-import { HOME_CHAPTER_KEYS, orderedChapters, type Project } from "@/lib/projects";
+import { usePathname } from "next/navigation";
+import { HOME_CHAPTER_KEYS, homeCover, orderedChapters, type Project } from "@/lib/projects";
 import { ImagePlaceholder } from "@/components/ImagePlaceholder";
 import { PhotoStream } from "@/components/PhotoStream";
 import { ChapterMap } from "@/components/ChapterExtras";
@@ -72,6 +73,17 @@ export function SplitExhibition({ projects }: { projects: [Project, Project] }) 
         <div className="shrink-0 bg-[var(--background)]" style={{ width: DIVIDER_WIDTH }} />
         <Panel project={b} side="right" role={roleFor("b")} onActivate={() => activate("b")} />
       </div>
+      {/* （2026-10-15，只有電腦版）底部 30px 白邊，跟最上面的細白邊上下對稱。正中間放橫寫的
+          「2026常民竹小屋」（這一屏兩側邊框不顯示字；同日從右下角移到中間），點了回到策展宣言；
+          左邊同一高度是齒輪（AdminAccessLink，fixed）。照片高度由 Panel 量 --slot-h 自動扣掉這條白邊。 */}
+      <div className="hidden h-[30px] shrink-0 items-center justify-center sm:flex">
+        <button
+          onClick={() => document.getElementById("manifesto")?.scrollIntoView({ behavior: "smooth" })}
+          className="font-serif-tc text-xs tracking-[0.2em] text-[var(--foreground)] opacity-80 transition-opacity hover:opacity-100"
+        >
+          2026常民竹小屋
+        </button>
+      </div>
     </div>
   );
 }
@@ -136,6 +148,36 @@ function pageStops(scroller: HTMLElement) {
   return Array.from(new Set(stops)).sort((a, b) => a - b);
 }
 
+// 欄位在 scrollTop＝top 時停在哪一章：上緣已經進到欄位上半部的最後一個章節群組（PhotoStream 的
+// data-chapter，加上基地地圖）。還在封面（第一章之前）回傳 null。
+// 章節群組的位置用 offsetTop 換算成相對捲動容器的距離，不受捲動動畫進行到一半影響。
+function chapterAt(scroller: HTMLElement, top = scroller.scrollTop): string | null {
+  const base = scroller.getBoundingClientRect().top - scroller.scrollTop;
+  let key: string | null = null;
+  scroller.querySelectorAll<HTMLElement>("[data-chapter]").forEach((el) => {
+    if (el.getBoundingClientRect().top - base <= top + scroller.clientHeight / 2) key = el.dataset.chapter ?? null;
+  });
+  return key;
+}
+
+// （2026-10-15，只有電腦版）兩欄章節同步：一欄翻頁後換到另一章（或回到封面），另一欄也一起捲到
+// 同一章的開頭（回封面就一起回封面），兩案永遠在看同一章。另一欄本來就在那一章、或沒有那一章時不動。
+function syncOtherPanel(scroller: HTMLElement, target: number) {
+  if (!window.matchMedia("(min-width: 640px)").matches) return;
+  const other = exhibitionScrollers().find((s) => s !== scroller);
+  if (!other) return;
+  const key = chapterAt(scroller, target);
+  if (key === chapterAt(scroller) || key === chapterAt(other)) return;
+  if (key === null) {
+    animateScrollTo(other, 0, PAGE_DURATION_MS);
+    return;
+  }
+  const anchor = other.querySelector<HTMLElement>(`[data-chapter="${key}"]`);
+  if (!anchor) return;
+  const offset = anchor.getBoundingClientRect().top - other.getBoundingClientRect().top;
+  animateScrollTo(other, other.scrollTop + offset, PAGE_DURATION_MS);
+}
+
 // 欄位已經在最頂還往上滾、或在最底還往下滾時，不攔截這次滾輪，讓它照瀏覽器原生行為往上傳給整頁
 // 捲動容器（(site)/layout.tsx 的 main，scroll-snap），切到「策展宣言」或「活動」那一屏——
 // 這樣滑鼠停在欄位上任何位置都能捲到首頁最上方跟最下方，不用先移到空白處。
@@ -171,6 +213,7 @@ function usePanelWheelScroll(ref: React.RefObject<HTMLDivElement | null>) {
       const target =
         dir > 0 ? (stops.find((s) => s > current + 2) ?? max) : ([...stops].reverse().find((s) => s < current - 2) ?? 0);
       animateScrollTo(el!, target, PAGE_DURATION_MS);
+      syncOtherPanel(el!, target);
     }
 
     el.addEventListener("wheel", onWheel, { passive: false });
@@ -199,6 +242,76 @@ function scrollChapterIntoView(id: string, gap = 16) {
 // - 沒有視窗開著，維持原本行為：A、B 兩案同步捲到各自「這個章節的照片群組」（PhotoStream
 //   用同一個 id={`${slug}-${key}`} 錨點，因為照片本身就直接借用章節的圖片，天生知道自己
 //   屬於哪個章節，這裡才能準確定位）
+// 頂部標籤列要標出的「目前章節」：
+// - 案例彈出視窗開著：視窗裡上緣已經進到畫面上半部的最後一個章節區塊（ProjectDetail 的 section id＝章節 key）
+// - 首頁兩欄：最近一次捲動的那一欄目前停在哪一章（chapterAt）；兩欄平常會同步在同一章
+// 還在封面時回傳 null。監聽所有捲動（capture），用 requestAnimationFrame 合併成一影格算一次；
+// 網址變了（開／關彈出視窗）也重算一次。
+function useActiveChapter(): string | null {
+  const [active, setActive] = useState<string | null>(null);
+  const pathname = usePathname();
+
+  useEffect(() => {
+    let source: HTMLElement | null = null;
+    let raf: number | null = null;
+    const measure = () => {
+      raf = null;
+      let key: string | null = null;
+      const modal = document.querySelector<HTMLElement>('[role="dialog"] .overflow-y-auto');
+      if (modal) {
+        const mid = modal.getBoundingClientRect().top + modal.clientHeight / 2;
+        modal.querySelectorAll<HTMLElement>("section[id]").forEach((s) => {
+          if (s.getBoundingClientRect().top <= mid) key = s.id;
+        });
+      } else {
+        const scrollers = exhibitionScrollers();
+        const s = source && scrollers.includes(source) ? source : scrollers[0];
+        if (s) key = chapterAt(s);
+      }
+      setActive(key);
+    };
+    const schedule = () => {
+      if (raf === null) raf = requestAnimationFrame(measure);
+    };
+    const onScroll = (e: Event) => {
+      if (e.target instanceof HTMLElement && e.target.closest("#exhibition")) source = e.target;
+      schedule();
+    };
+    schedule();
+    document.addEventListener("scroll", onScroll, { capture: true, passive: true });
+    return () => {
+      document.removeEventListener("scroll", onScroll, { capture: true });
+      if (raf !== null) cancelAnimationFrame(raf);
+    };
+  }, [pathname]);
+
+  return active;
+}
+
+// 兩欄各自是否已經往下捲離開封面（lib/coverReveal.ts 的同一個門檻），給頂部列兩端的案名用。
+function usePastCovers(): [boolean, boolean] {
+  const [past, setPast] = useState<[boolean, boolean]>([false, false]);
+  useEffect(() => {
+    let raf: number | null = null;
+    const measure = () => {
+      raf = null;
+      const [l, r] = exhibitionScrollers();
+      const next: [boolean, boolean] = [!!l && isPastCover(l), !!r && isPastCover(r)];
+      setPast((prev) => (prev[0] === next[0] && prev[1] === next[1] ? prev : next));
+    };
+    const schedule = () => {
+      if (raf === null) raf = requestAnimationFrame(measure);
+    };
+    schedule();
+    document.addEventListener("scroll", schedule, { capture: true, passive: true });
+    return () => {
+      document.removeEventListener("scroll", schedule, { capture: true });
+      if (raf !== null) cancelAnimationFrame(raf);
+    };
+  }, []);
+  return past;
+}
+
 function TopChapterNav({ projects }: { projects: [Project, Project] }) {
   const [a, b] = projects;
 
@@ -239,18 +352,50 @@ function TopChapterNav({ projects }: { projects: [Project, Project] }) {
   // （2026-10-12 修正）寬度 400px 以下的手機（例如 Pixel）原本間距 gap-6 時整排放不下，最右邊的
   // 「活動」會被擠到右側邊框的直書標示（EdgeTitle，也是連結、疊在上層）底下，點「活動」右半邊
   // 其實點到的是 EdgeTitle、被帶回策展宣言。400px 以下間距縮成 gap-4，可點範圍也跟著縮成左右各 8px。
+  // （2026-10-15）字體改成跟兩側直書「2026常民竹小屋」（EdgeTitle）同一套襯線字（粗體），大小與顏色不變。
   const labelClass =
-    "relative font-black text-[10px] tracking-wide uppercase text-foreground before:absolute before:-inset-x-2 before:-inset-y-4 before:content-[''] min-[400px]:before:-inset-x-3 sm:text-sm";
+    "relative font-serif-tc font-bold text-[10px] tracking-wide uppercase text-foreground before:absolute before:-inset-x-2 before:-inset-y-4 before:content-[''] min-[400px]:before:-inset-x-3 sm:text-sm";
+
+  // （2026-10-15，只有電腦版）目前所在的章節標籤維持原色，其他標籤變淡；還在封面時全部原色。
+  const active = useActiveChapter();
+  const dimClass = (key: string) =>
+    `transition-opacity duration-300 ${active && active !== key ? "sm:opacity-35 sm:hover:opacity-70" : ""}`;
+  const pastCovers = usePastCovers();
 
   return (
-    <div className="flex h-[52px] shrink-0 items-center justify-center gap-4 min-[400px]:gap-6 sm:h-[76px] sm:gap-10">
+    <div className="relative flex h-[52px] shrink-0 items-center justify-center gap-4 min-[400px]:gap-6 sm:h-[76px] sm:gap-10">
+      {/* （2026-10-15，只有電腦版）兩案案名放在這一列的左右兩端（左案在左欄正上方、右案在右欄正上方），
+          取代原本兩側邊框的直書案名（EdgeTitle 在這一屏改成不顯示）。跟章節標籤同一套字（襯線粗體、
+          同大小同顏色）；那一欄還停在封面時不顯示（封面上已經有案名大標），往下捲離開封面才淡入。
+          點案名打開該案的案例頁（從首頁點會被攔截成彈出視窗）。 */}
+      {projects.map((p, i) => (
+        <Link
+          key={p.slug}
+          href={`/projects/${p.slug}`}
+          prefetch={false}
+          aria-hidden={!pastCovers[i] || undefined}
+          tabIndex={pastCovers[i] ? undefined : -1}
+          className={`absolute top-1/2 hidden -translate-y-1/2 font-serif-tc text-sm font-bold tracking-wide text-foreground uppercase transition-opacity duration-500 sm:block ${
+            i === 0 ? "left-8" : "right-8"
+          } ${pastCovers[i] ? "opacity-100" : "pointer-events-none opacity-0"}`}
+          style={navStyle}
+        >
+          {p.name}
+        </Link>
+      ))}
       {/* 只列首頁會出現的章節（團隊介紹、結構設計只在案例內頁），照固定順序 */}
       {orderedChapters(a, HOME_CHAPTER_KEYS).map((chapter) => (
-        <button key={chapter.key} onClick={() => goTo(chapter.key)} className={labelClass} style={navStyle}>
+        <button
+          key={chapter.key}
+          onClick={() => goTo(chapter.key)}
+          aria-current={active === chapter.key || undefined}
+          className={`${labelClass} ${dimClass(chapter.key)}`}
+          style={navStyle}
+        >
           {chapterLabel(chapter.key)}
         </button>
       ))}
-      <button onClick={goToEvents} className={labelClass} style={navStyle}>
+      <button onClick={goToEvents} className={`${labelClass} ${dimClass("events")}`} style={navStyle}>
         {chapterLabel("events")}
       </button>
     </div>
@@ -280,8 +425,8 @@ function Panel({
 
   // 開場首圖：拿掉輪播動畫，直接顯示最後一張（原本刷過去的那些張只是動畫過場，不是內容），
   // 只有那張才是持續存在的封面。
-  const heroImages = project.coverImages.filter((img) => img.src);
-  const finalImage = heroImages[heroImages.length - 1] ?? project.coverImages[0];
+  // （2026-10-15）用後台指定的「首頁封面」，沒指定就用最後一張（見 projects.ts 的 homeCover）
+  const finalImage = homeCover(project);
 
   // 電腦版封面上的案名：欄位還停在封面時顯示，往下捲超過門檻就淡出（見 lib/coverReveal.ts）。
   // 同時把欄位可見高度寫進 CSS 變數 --slot-h：電腦版每張照片（PhotoStream.tsx）與最後的基地地圖
@@ -390,6 +535,7 @@ function Panel({
               <PhotoStream project={project} />
               <div
                 id={`${project.slug}-site`}
+                data-chapter="site"
                 data-snap
                 className="scroll-mt-4 pt-8 sm:flex sm:h-[var(--slot-h)] sm:flex-col sm:justify-center sm:px-10 sm:pt-0"
               >

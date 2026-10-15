@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { exhibitionScrollers, isPastCover } from "@/lib/coverReveal";
+import { exhibitionScrollers } from "@/lib/coverReveal";
 import { backdropLuminance } from "@/lib/backdropLuminance";
 
 const TITLE = "2026常民竹小屋";
@@ -145,7 +145,6 @@ function useOnProjectCover(enabled: boolean, pathname: string) {
 function useHomeEdgeState(enabled: boolean, refs: React.RefObject<HTMLAnchorElement | null>[]) {
   const [onExhibition, setOnExhibition] = useState(false);
   const [isDesktop, setIsDesktop] = useState(false);
-  const [past, setPast] = useState<[boolean, boolean]>([false, false]);
   const [tones, setTones] = useState<[Tone, Tone]>(["dark", "dark"]);
   const tonesRef = useRef<[Tone, Tone]>(["dark", "dark"]);
 
@@ -190,12 +189,8 @@ function useHomeEdgeState(enabled: boolean, refs: React.RefObject<HTMLAnchorElem
       if (rafId === null) rafId = requestAnimationFrame(measureTones);
     };
 
-    const updatePast = () => {
-      setPast([!!scrollers[0] && isPastCover(scrollers[0]), !!scrollers[1] && isPastCover(scrollers[1])]);
-      scheduleMeasure();
-    };
-    updatePast();
-    scrollers.forEach((s) => s.addEventListener("scroll", updatePast, { passive: true }));
+    scheduleMeasure();
+    scrollers.forEach((s) => s.addEventListener("scroll", scheduleMeasure, { passive: true }));
     main?.addEventListener("scroll", scheduleMeasure, { passive: true });
     window.addEventListener("resize", scheduleMeasure);
     const interval = window.setInterval(scheduleMeasure, 800);
@@ -203,7 +198,7 @@ function useHomeEdgeState(enabled: boolean, refs: React.RefObject<HTMLAnchorElem
     return () => {
       mql.removeEventListener("change", updateDesktop);
       observer?.disconnect();
-      scrollers.forEach((s) => s.removeEventListener("scroll", updatePast));
+      scrollers.forEach((s) => s.removeEventListener("scroll", scheduleMeasure));
       main?.removeEventListener("scroll", scheduleMeasure);
       window.removeEventListener("resize", scheduleMeasure);
       window.clearInterval(interval);
@@ -214,9 +209,9 @@ function useHomeEdgeState(enabled: boolean, refs: React.RefObject<HTMLAnchorElem
   }, [enabled]);
 
   const adaptive = enabled && isDesktop;
-  const modeFor = (i: 0 | 1): Mode => {
-    if (!adaptive || !onExhibition) return "brand";
-    return past[i] ? "name" : "hidden";
-  };
-  return { modes: [modeFor(0), modeFor(1)] as [Mode, Mode], tones, adaptive };
+  // （2026-10-15）「兩欄展覽」那一屏兩側一律不顯示：案名改放到頂部章節列的左右兩端、回宣言改用
+  // 章節列最前面的「宣言」（見 SplitExhibition.tsx 的 TopChapterNav）。原本「離開封面後換成案名」
+  // 的 name 模式保留在程式裡但不再使用。
+  const modeFor = (): Mode => (!adaptive || !onExhibition ? "brand" : "hidden");
+  return { modes: [modeFor(), modeFor()] as [Mode, Mode], tones, adaptive };
 }

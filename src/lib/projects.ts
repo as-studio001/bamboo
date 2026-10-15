@@ -113,6 +113,12 @@ export type Project = {
   titleAlign?: "left" | "right"; // 封面標題／副標的水平對齊，預設 left；兩案各自獨立的視覺
   // 語言（展覽規格書「每個建築案可有自己獨立的視覺語言」），不用兩案套同一套排版。
   coverImages: ProjectImage[];
+  // （2026-10-15）首頁兩欄封面要用 coverImages 裡的哪一張（存那張的 id，後台「首頁封面」單選）；
+  // 沒指定、或指定的那張已經被刪掉時，沿用原本的規則用最後一張。見 homeCover()。
+  homeCoverId?: string;
+  // （2026-10-15）手稿：首頁策展宣言最後一屏「兩案預告」用，只取第一張有 src 的（見 CuratorialManifesto.tsx 的
+  // BridgeScreen）。存成清單是為了沿用後台現成的上傳元件。
+  sketchImages?: ProjectImage[];
   chapters: Chapter[];
   coordinates?: Coordinates; // 基地章節的地圖標記位置，待使用者提供實際地址／經緯度
   published: boolean;
@@ -150,6 +156,15 @@ export const projects: Project[] = [projectOneData, projectTwoData] as Project[]
 
 export function getPublishedProjects(): Project[] {
   return projects.filter((p) => p.published);
+}
+
+// 首頁兩欄的封面照片（也是案例內頁封面輪播一開始顯示的那張——兩邊同一個 layoutId，從首頁點進來的
+// 放大轉場才接得上）：後台指定的 homeCoverId，沒有就用最後一張有圖的。
+export function homeCover(project: Project): ProjectImage | undefined {
+  const withSrc = project.coverImages.filter((img) => img.src);
+  return (
+    withSrc.find((img) => img.id === project.homeCoverId) ?? withSrc[withSrc.length - 1] ?? project.coverImages[0]
+  );
 }
 
 export function getProjectBySlug(slug: string): Project | undefined {

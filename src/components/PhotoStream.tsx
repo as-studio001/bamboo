@@ -72,7 +72,7 @@ export function PhotoStream({ project }: { project: Project }) {
       {groups.map((chapter, groupIndex) => {
         const photos = visibleImages(chapter.text, chapter.images);
         return (
-          <div key={chapter.key} id={`${project.slug}-${chapter.key}`} className="scroll-mt-4">
+          <div key={chapter.key} id={`${project.slug}-${chapter.key}`} data-chapter={chapter.key} className="scroll-mt-4">
             {photos.length > 0
               ? photos.map((photo, i) => (
                   <PhotoItem

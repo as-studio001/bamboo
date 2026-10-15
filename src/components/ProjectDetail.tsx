@@ -6,6 +6,7 @@ import {
   accentOnLight,
   orderedChapters,
   TEAM_UNITS,
+  homeCover,
   type Chapter,
   type ChapterKey,
   type Project,
@@ -146,8 +147,8 @@ function DetailHero({
   variant: "page" | "modal";
 }) {
   const heroImages = project.coverImages.filter((img) => img.src);
-  const finalImage =
-    heroImages[heroImages.length - 1] ?? project.coverImages[0];
+  // 跟首頁兩欄封面同一張（後台指定的「首頁封面」，沒指定就最後一張，見 projects.ts 的 homeCover）
+  const finalImage = homeCover(project);
   const finalHeroSrc = finalImage?.src;
 
   // 兩案標題一律白字（原本會另外下載封面原圖、分析亮度決定黑字或白字，但結果已經不使用，拿掉這個
@@ -155,11 +156,11 @@ function DetailHero({
   const heroTitleColor = finalHeroSrc ? "text-white" : TEXT_PRIMARY;
 
   // （2026-10-15）封面輪播：用後台「封面照片」清單（coverImages，順序照清單），只有一張時維持靜態。
-  // 一開始先顯示最後一張——跟首頁兩欄的封面是同一張（同一個 layoutId），從首頁點進來的放大轉場才接得上；
-  // 之後每 5 秒換下一張（從第一張開始輪），淡入淡出 1 秒。右下角圓點可以手動切換，滑鼠停在
-  // 封面上時暫停；系統設定「減少動態效果」時不自動輪播（手動切換照常）。
+  // 一開始先顯示首頁封面那張（後台指定，沒指定就最後一張）——跟首頁兩欄的封面是同一張（同一個 layoutId），
+  // 從首頁點進來的放大轉場才接得上；之後每 5 秒照清單順序換下一張，淡入淡出 1 秒。右下角圓點可以手動切換，
+  // 滑鼠停在封面上時暫停；系統設定「減少動態效果」時不自動輪播（手動切換照常）。
   const slides = heroImages.length ? heroImages : finalImage ? [finalImage] : [];
-  const [active, setActive] = useState(slides.length - 1);
+  const [active, setActive] = useState(() => Math.max(0, slides.findIndex((s) => s.id === finalImage?.id)));
   const [paused, setPaused] = useState(false);
   const hasCarousel = slides.length > 1;
   useEffect(() => {

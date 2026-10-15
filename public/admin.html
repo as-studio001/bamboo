@@ -444,7 +444,7 @@ async function loadCaseList(){
   const items = await Promise.all(files.map(async f => {
     try{
       const { json } = await ghGetFile(f.path);
-      const thumb = (json.coverImages || []).find(c => c.src);
+      const thumb = (json.coverImages || []).find(c => c.src && c.id === effectiveHomeCoverId(json));
       return { slug: json.slug || f.name.replace(/\.json$/, ""), name: json.name || "", published: json.published !== false, thumb: thumb ? thumb.src : "" };
     }catch(e){
       return { slug: f.name.replace(/\.json$/, ""), name: "（讀取失敗）", published: true, thumb: "" };
@@ -811,14 +811,42 @@ async function saveChaptersEditor(ed){
    策展宣言（整個展覽共用一份，首頁第一個畫面）
    ============================================================
    對應 content/manifesto.json（前台 src/lib/manifesto.ts 讀這個檔案）。
-   欄位：eyebrow（最上面的小字）、title（大標）、lead（重點段落）、
-   body（灰色內文）；lead／body 裡的換行前台會原樣保留。
+   （2026-10-15）宣言改成首頁最上面的五個連續畫面，每一屏一個物件：
+   cover（封面）、statement（一句話主張＋NOT／NOT／BUT）、formula（A＋B＝？）、
+   counts（數字＋竹構生成鏈）、closing（系統提供可能，業主決定結果）。
+   欄位用 data-mf="路徑"（例如 statement.contrasts.0.text）直接綁到 item；
+   生成鏈用 data-mf-lines（一行一個步驟）。文字裡的換行前台會原樣保留，留空的欄位前台不顯示。
 */
+function mfNormalize(json){
+  const m = Object.assign({ eyebrow: "" }, json);
+  m.cover = Object.assign({ label: "", title: "", subtitle: "", tagline: "", credit: "", notes: "" }, m.cover);
+  m.statement = Object.assign({ label: "", title: "", body: "", contrasts: [] }, m.statement);
+  while(m.statement.contrasts.length < 3) m.statement.contrasts.push({ label: m.statement.contrasts.length < 2 ? "Not" : "But", text: "" });
+  m.formula = Object.assign({ label: "", note: "", terms: [] }, m.formula);
+  while(m.formula.terms.length < 3) m.formula.terms.push({ symbol: ["A", "B", "?"][m.formula.terms.length], title: "", subtitle: "", en: "" });
+  m.counts = Object.assign({ label: "", title: "", body: "", items: [], chainLabel: "", chain: [] }, m.counts);
+  m.closing = Object.assign({ label: "", title: "", emphasis: "", from: "", to: "", shiftBody: "", variables: "", variablesBody: "" }, m.closing);
+  m.bridge = Object.assign({ label: "", title: "", points: "", quote: "", divider: "" }, m.bridge);
+  m.bridge.intros = Object.assign({}, m.bridge.intros);
+  (state.cases || []).forEach(c => { if(!(c.slug in m.bridge.intros)) m.bridge.intros[c.slug] = ""; });
+  return m;
+}
+
+function mfGet(obj, path){
+  return path.split(".").reduce((o, k) => (o == null ? undefined : o[k]), obj);
+}
+function mfSet(obj, path, value){
+  const keys = path.split(".");
+  const last = keys.pop();
+  const target = keys.reduce((o, k) => o[k], obj);
+  target[last] = value;
+}
+
 async function openManifestoEditor(){
   try{
     setLoading(true, "載入策展宣言中…");
     const { json, sha } = await ghGetFile("content/manifesto.json");
-    state.editingManifesto = { item: Object.assign({ eyebrow: "", title: "", lead: "", body: "" }, json), sha };
+    state.editingManifesto = { item: mfNormalize(json), sha };
     render();
   }catch(err){
     toast(err.message || "載入失敗", true);
@@ -830,33 +858,131 @@ async function openManifestoEditor(){
 function renderManifestoEditor(){
   const ed = state.editingManifesto;
   const item = ed.item;
+  const input = (path, label, hint) => `
+    <div class="field-block">
+      <label>${label}</label>
+      <input type="text" data-mf="${path}" value="${esc(mfGet(item, path) || "")}">
+      ${hint ? `<div class="field-hint">${hint}</div>` : ""}
+    </div>`;
+  const area = (path, label, hint) => `
+    <div class="field-block">
+      <label>${label}</label>
+      <textarea data-mf="${path}">${esc(mfGet(item, path) || "")}</textarea>
+      ${hint ? `<div class="field-hint">${hint}</div>` : ""}
+    </div>`;
+  const section = (num, title, body) => `
+    <div class="chapter-section">
+      <div class="chapter-section-head"><span class="num">${num}</span><strong>${title}</strong></div>
+      ${body}
+    </div>`;
+  const labelHint = "這一屏底部頁碼旁的英文小字";
+
   app.innerHTML = `
     ${renderTopBar()}
     <div class="wrap editor">
       <div class="editor-head">
         <button type="button" class="back-link" id="backBtn">← 回案例列表</button>
       </div>
+      <div class="field-hint" style="margin-bottom:20px">策展宣言是首頁最上面的六個畫面，依序往下捲。換行會照樣顯示；任一欄留空，前台就不顯示那一塊。</div>
 
-      <div class="field-block">
-        <label>小標（最上面的灰色小字）</label>
-        <input type="text" id="mf_eyebrow" value="${esc(item.eyebrow || "")}">
-      </div>
+      ${section(1, "封面", `
+        ${input("eyebrow", "最上面的灰色小字")}
+        ${input("cover.title", "大標")}
+        ${input("cover.subtitle", "英文副標")}
+        ${input("cover.tagline", "一句話")}
+        ${input("cover.credit", "策展人")}
+        ${area("cover.notes", "補充說明（灰色小字，例如實驗場域、展示軸線）")}
+        ${input("cover.label", "頁碼小字", labelHint)}
+      `)}
 
-      <div class="field-block">
-        <label>標題</label>
-        <input type="text" id="mf_title" value="${esc(item.title || "")}">
-      </div>
+      ${section(2, "一句話主張", `
+        ${area("statement.title", "主張大字（換行處就是畫面上的斷行）")}
+        ${area("statement.body", "說明")}
+        <div class="field-block"><label>三格對照（最後一格是答案，會加深強調）</label></div>
+        <div class="three-col">
+          ${item.statement.contrasts.map((c, i) => `
+            <div>
+              ${input(`statement.contrasts.${i}.label`, `第 ${i + 1} 格小字`)}
+              ${input(`statement.contrasts.${i}.text`, `第 ${i + 1} 格內容`)}
+            </div>`).join("")}
+        </div>
+        ${input("statement.label", "頁碼小字", labelHint)}
+      `)}
 
-      <div class="field-block">
-        <label>重點段落（標題下方的大字，換行會照樣顯示）</label>
-        <textarea class="tall" id="mf_lead">${esc(item.lead || "")}</textarea>
-      </div>
+      ${section(3, "核心公式 A ＋ B ＝ ？", `
+        <div class="three-col">
+          ${item.formula.terms.map((t, i) => `
+            <div>
+              ${input(`formula.terms.${i}.symbol`, `第 ${i + 1} 項符號`)}
+              ${input(`formula.terms.${i}.title`, "標題")}
+              ${input(`formula.terms.${i}.subtitle`, "副標")}
+              ${input(`formula.terms.${i}.en`, "英文")}
+            </div>`).join("")}
+        </div>
+        <div class="field-hint" style="margin:-14px 0 20px">「？」會自動變成竹棕色（公式、符號、下面的結語都一樣）。</div>
+        ${area("formula.note", "結語")}
+        ${input("formula.label", "頁碼小字", labelHint)}
+      `)}
 
-      <div class="field-block">
-        <label>內文（最下面的灰色小字，換行會照樣顯示）</label>
-        <textarea class="tall" id="mf_body">${esc(item.body || "")}</textarea>
-        <div class="field-hint">任一欄留空，前台就不顯示那一塊。</div>
-      </div>
+      ${section(4, "數字與竹構生成鏈", `
+        ${input("counts.title", "標題")}
+        ${area("counts.body", "說明")}
+        <div class="field-block"><label>數字</label></div>
+        <div class="video-list" style="margin-bottom:12px">
+          ${item.counts.items.map((it, i) => `
+            <div class="photo-row">
+              <div class="fields" style="flex-direction:row">
+                <input type="text" data-mf="counts.items.${i}.value" value="${esc(it.value || "")}" placeholder="數字" style="width:80px;flex:none">
+                <input type="text" data-mf="counts.items.${i}.label" value="${esc(it.label || "")}" placeholder="說明，例如：組實驗場域">
+                <input type="text" data-mf="counts.items.${i}.en" value="${esc(it.en || "")}" placeholder="英文小字">
+              </div>
+              <button type="button" class="row-remove-btn" data-mf-remove="${i}" aria-label="刪除">×</button>
+            </div>`).join("")}
+        </div>
+        <button type="button" class="btn small" id="mfAddCount" style="margin-bottom:26px">＋ 新增一項數字</button>
+        ${input("counts.chainLabel", "生成鏈標題")}
+        <div class="field-block">
+          <label>生成鏈步驟（一行一個，第一個和最後一個會加大）</label>
+          <textarea class="tall" data-mf-lines="counts.chain">${esc((item.counts.chain || []).join("\n"))}</textarea>
+        </div>
+        ${input("counts.label", "頁碼小字", labelHint)}
+      `)}
+
+      ${section(5, "結語", `
+        <div class="two-col">
+          ${input("closing.title", "第一行（較小）")}
+          ${input("closing.emphasis", "第二行（大字）")}
+        </div>
+        <div class="two-col">
+          <div>
+            ${input("closing.from", "從（灰色）")}
+            ${input("closing.to", "到（粗體）")}
+            ${area("closing.shiftBody", "左欄說明")}
+          </div>
+          <div>
+            ${area("closing.variables", "右欄大字（一行一句）")}
+            ${area("closing.variablesBody", "右欄說明")}
+          </div>
+        </div>
+        ${input("closing.label", "頁碼小字", labelHint)}
+      `)}
+
+      ${section(6, "兩案預告（銜接兩欄展覽）", `
+        ${input("bridge.title", "標題")}
+        ${area("bridge.points", "三個面向（一行一個，前面自動加 ☉）")}
+        ${area("bridge.quote", "引言")}
+        ${input("bridge.divider", "分隔線小字", "例如：兩組實驗場域")}
+        <div class="field-block"><label>各案一句簡介（顯示在手稿與案名下方）</label>
+          <div class="field-hint" style="margin-top:0">手稿在各案的編輯頁「手稿」欄位上傳。</div>
+        </div>
+        <div class="two-col">
+          ${Object.keys(item.bridge.intros).map(slug => {
+            const c = (state.cases || []).find(x => x.slug === slug);
+            return area(`bridge.intros.${slug}`, esc(c ? c.name : slug));
+          }).join("")}
+        </div>
+        ${input("bridge.label", "頁碼小字", labelHint)}
+      `)}
 
       <div class="save-bar">
         <span class="save-status" id="saveStatus"></span>
@@ -869,17 +995,43 @@ function renderManifestoEditor(){
     state.editingManifesto = null;
     render();
   });
-  ["eyebrow", "title", "lead", "body"].forEach(k => {
-    document.getElementById("mf_" + k).addEventListener("input", (e) => { item[k] = e.target.value; });
+  app.querySelectorAll("[data-mf]").forEach(el => {
+    el.addEventListener("input", () => mfSet(item, el.dataset.mf, el.value));
+  });
+  app.querySelectorAll("[data-mf-lines]").forEach(el => {
+    el.addEventListener("input", () => mfSet(item, el.dataset.mfLines, el.value.split("\n")));
+  });
+  app.querySelectorAll("[data-mf-remove]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      item.counts.items.splice(Number(btn.dataset.mfRemove), 1);
+      render();
+    });
+  });
+  document.getElementById("mfAddCount").addEventListener("click", () => {
+    item.counts.items.push({ value: "", label: "", en: "" });
+    render();
   });
   document.getElementById("saveBtn").addEventListener("click", () => saveManifestoEditor(ed));
 }
 
+// 存檔前整理：字串去頭尾空白、統一換行；生成鏈去掉空行；數字列整列空白的拿掉
+function mfClean(v){
+  if(typeof v === "string") return v.replace(/\r\n/g, "\n").trim();
+  if(Array.isArray(v)) return v.map(mfClean);
+  if(v && typeof v === "object"){
+    const out = {};
+    Object.keys(v).forEach(k => { out[k] = mfClean(v[k]); });
+    return out;
+  }
+  return v;
+}
+
 async function saveManifestoEditor(ed){
   const statusEl = document.getElementById("saveStatus");
-  const item = ed.item;
-  ["eyebrow", "title"].forEach(k => { item[k] = (item[k] || "").trim(); });
-  ["lead", "body"].forEach(k => { item[k] = (item[k] || "").replace(/\r\n/g, "\n").trim(); });
+  const item = mfClean(ed.item);
+  item.counts.chain = item.counts.chain.filter(s => s);
+  item.counts.items = item.counts.items.filter(it => it.value || it.label || it.en);
+  ed.item = item;
   try{
     setLoading(true, "儲存中…");
     statusEl.classList.remove("err");
@@ -1061,6 +1213,15 @@ function maxPhotosForText(text){
   return 2 + Math.floor((len - 300) / 100);
 }
 
+/* 首頁封面實際會用哪一張（跟前台 lib/projects.ts 的 homeCover 同一套規則）：指定的 homeCoverId
+   還在清單裡、有圖就用它，否則用最後一張有圖的。 */
+function effectiveHomeCoverId(item){
+  const withSrc = (item.coverImages || []).filter(c => c.src);
+  const picked = withSrc.find(c => c.id === item.homeCoverId);
+  const img = picked || withSrc[withSrc.length - 1] || (item.coverImages || [])[0];
+  return img ? img.id : "";
+}
+
 function renderPhotoList(containerId, images, opts){
   opts = opts || {};
   return `
@@ -1078,6 +1239,10 @@ function renderPhotoList(containerId, images, opts){
               <option value="photo" ${img.kind === "photo" ? "selected" : ""}>類型：照片（裁切填滿）</option>
               <option value="drawing" ${img.kind === "drawing" ? "selected" : ""}>類型：圖說（完整不裁切）</option>
             </select>` : ""}
+            ${opts.coverId !== undefined ? `
+            <label class="checkbox-row" style="font-size:12.5px">
+              <input type="radio" name="homeCoverPick" data-cover-pick="${esc(img.id)}" ${img.id === opts.coverId ? "checked" : ""}> 首頁封面
+            </label>` : ""}
           </div>
           <div class="row-move">
             <button type="button" class="row-move-btn" data-move="${i}" data-dir="-1" title="往前移" ${i === 0 ? "disabled" : ""}>↑</button>
@@ -1163,8 +1328,14 @@ function renderCaseEditor(){
 
       <div class="field-block">
         <label>封面照片（coverImages）</label>
-        <div class="field-hint" style="margin-top:0; margin-bottom:10px;">案例內頁的封面大圖會依這個順序輪播（每 5 秒換一張，可以拖曳調整順序；只有一張就不輪播）。首頁兩欄的封面固定用「最後一張」。</div>
-        ${renderPhotoList("coverImages", item.coverImages)}
+        <div class="field-hint" style="margin-top:0; margin-bottom:10px;">案例內頁的封面大圖會依這個順序輪播（每 5 秒換一張，可以拖曳調整順序；只有一張就不輪播）。勾選「首頁封面」的那張是首頁兩欄的封面，也是案例內頁一開始顯示的那張；沒勾就用最後一張。</div>
+        ${renderPhotoList("coverImages", item.coverImages, { coverId: effectiveHomeCoverId(item) })}
+      </div>
+
+      <div class="field-block">
+        <label>手稿（sketchImages，首頁策展宣言最後一屏「兩案預告」用）</label>
+        <div class="field-hint" style="margin-top:0; margin-bottom:10px;">只用第一張。建議橫式 3:2、白紙或去背、黑／深灰線條、長邊 2000px 以上，兩案的比例與線條粗細盡量一致；紙張的淺色底會自動融進網頁白底。旁邊那句簡介在「策展宣言」後台填。還沒上傳時前台顯示灰色佔位框。</div>
+        ${renderPhotoList("sketchImages", item.sketchImages)}
       </div>
 
       ${CHAPTER_DEFS.map((def, i) => {
@@ -1291,6 +1462,11 @@ function renderCaseEditor(){
   document.getElementById("saveBtn").addEventListener("click", () => saveCaseEditor(ed));
 
   wirePhotoList("coverImages", () => ed.item.coverImages, (next) => { ed.item.coverImages = next; }, ed.slug);
+  document.getElementById("coverImages").addEventListener("change", (e) => {
+    const pick = e.target.closest("[data-cover-pick]");
+    if(pick && pick.checked) ed.item.homeCoverId = pick.dataset.coverPick;
+  });
+  wirePhotoList("sketchImages", () => ed.item.sketchImages, (next) => { ed.item.sketchImages = next; }, ed.slug);
   CHAPTER_DEFS.forEach((def, i) => {
     const chapter = ed.item.chapters[i];
     if(def.kind === "team"){

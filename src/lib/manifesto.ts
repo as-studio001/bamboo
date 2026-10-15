@@ -1,13 +1,74 @@
 // 「策展宣言」是整個展覽共用的一份文字（不屬於任何一個建築案），跟「活動」一樣走 git-based CMS：
 // 存在 content/manifesto.json，前台建置時直接 import；後台 /admin 的「策展宣言」編輯畫面負責
-// 寫回這個檔案。四個欄位對應宣言頁由上到下的四塊文字，lead／body 裡的換行會原樣保留。
+// 寫回這個檔案。
+//
+// （2026-10-15）從單一畫面改成五個連續畫面（見 CuratorialManifesto.tsx），內容整理自策展簡報：
+// 封面 → 一句話主張（NOT／NOT／BUT）→ A＋B＝？ → 數字與竹構生成鏈 → 系統提供可能，業主決定結果。
+// 每一屏一個物件；文字欄位裡的換行前台會原樣保留，留空的欄位前台就不顯示那一塊。
 import manifestoData from "../../content/manifesto.json";
 
+export type ManifestoCover = {
+  label?: string; // 底部頁碼旁的英文小字
+  title?: string; // 大標，例如「常民竹小屋實驗計畫」
+  subtitle?: string; // 英文副標
+  tagline?: string; // 一句話
+  credit?: string; // 策展人
+  notes?: string; // 灰色補充（實驗場域、展示軸線…），可換行
+};
+
+export type ManifestoStatement = {
+  label?: string;
+  title?: string; // 主張大字，可換行
+  body?: string;
+  contrasts?: { label: string; text: string }[]; // NOT／NOT／BUT，最後一格是答案（深色強調）
+};
+
+export type ManifestoFormula = {
+  label?: string;
+  terms?: { symbol: string; title: string; subtitle?: string; en?: string }[]; // A、B、?，最後一個是結果
+  note?: string;
+};
+
+export type ManifestoCounts = {
+  label?: string;
+  title?: string;
+  body?: string;
+  items?: { value: string; label: string; en?: string }[];
+  chainLabel?: string;
+  chain?: string[]; // 竹構生成鏈的步驟
+};
+
+export type ManifestoClosing = {
+  label?: string;
+  title?: string; // 第一行（小）
+  emphasis?: string; // 第二行（大）
+  from?: string;
+  to?: string;
+  shiftBody?: string;
+  variables?: string; // 一行一個
+  variablesBody?: string;
+};
+
+// （2026-10-15）第六屏「兩案預告」：接在結語之後、兩欄展覽之前，當作理念到作品的過渡。
+// 上半部是原本單頁宣言的三個面向＋引言，下半部左右對分（對齊下面的兩欄展覽）放兩案的手稿
+// （各案後台的 sketchImages）、案名、資訊與一句簡介（intros，依案例 slug 存）。
+export type ManifestoBridge = {
+  label?: string;
+  title?: string;
+  points?: string; // 一行一個面向
+  quote?: string;
+  divider?: string; // 分隔線中間的小字，例如「兩組實驗場域」
+  intros?: Record<string, string>; // 各案一句簡介，key 是案例 slug
+};
+
 export type Manifesto = {
-  eyebrow?: string; // 最上面的小字（等寬字、灰色）
-  title?: string; // 大標
-  lead?: string; // 標題下方的重點段落（襯線字）
-  body?: string; // 最下面的灰色內文
+  eyebrow?: string; // 第一屏最上面的小字（等寬字、灰色）
+  cover?: ManifestoCover;
+  statement?: ManifestoStatement;
+  formula?: ManifestoFormula;
+  counts?: ManifestoCounts;
+  closing?: ManifestoClosing;
+  bridge?: ManifestoBridge;
 };
 
 export const manifesto: Manifesto = manifestoData as Manifesto;

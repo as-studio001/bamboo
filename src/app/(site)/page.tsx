@@ -1,6 +1,16 @@
-import { getPublishedProjects } from "@/lib/projects";
+import { getPublishedProjects, type Project } from "@/lib/projects";
 import { SplitExhibition } from "@/components/SplitExhibition";
-import { CuratorialManifesto } from "@/components/CuratorialManifesto";
+import { CuratorialManifesto, type BridgeProject } from "@/components/CuratorialManifesto";
+
+// 策展宣言最後一屏「兩案預告」只需要案名、資訊跟手稿，不把整份案例資料傳進 client component
+function toBridge(p: Project): BridgeProject {
+  return {
+    slug: p.slug,
+    name: p.name,
+    meta: [p.location, p.year, p.type].filter(Boolean).join(" · "),
+    sketch: p.sketchImages?.find((img) => img.src)?.src,
+  };
+}
 import { EventsSection } from "@/components/EventsSection";
 
 // 首頁現在是兩個滿版畫面疊在一起、用整頁捲動切換（見 (site)/layout.tsx 的 main）：
@@ -15,7 +25,7 @@ export default function Home() {
 
   return (
     <>
-      <CuratorialManifesto />
+      <CuratorialManifesto projects={[toBridge(a), toBridge(b)]} />
       <div id="exhibition" className="h-[100dvh] w-full shrink-0 snap-start">
         <SplitExhibition projects={[a, b]} />
       </div>

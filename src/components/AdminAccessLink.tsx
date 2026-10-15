@@ -12,13 +12,16 @@
 //
 // 固定在左下角的圓形按鈕，預設半透明、hover 才轉全不透明——這是給知道要找的人用的入口，
 // 不需要隨時明顯。（右下角原本是深色模式切換鈕，2026-10-13 取消深色模式後已拿掉。）
+// （2026-10-15，電腦版）兩欄展覽那一屏底部多了一條 30px 白邊（右邊放「2026常民竹小屋」，見
+// SplitExhibition.tsx），齒輪縮成 22px、放在那條白邊的垂直正中間（離底 4px），跟右邊的字同一個高度，
+// 不再壓在照片上。
 export function AdminAccessLink() {
   return (
     <a
       href="/admin"
       aria-label="後台管理"
       title="後台管理"
-      className="fixed bottom-5 left-5 z-[110] flex h-9 w-9 items-center justify-center rounded-full opacity-40 shadow-md transition-opacity hover:opacity-100 sm:bottom-8 sm:left-8"
+      className="fixed bottom-5 left-5 z-[110] flex h-9 w-9 items-center justify-center rounded-full opacity-40 shadow-md transition-opacity hover:opacity-100 sm:bottom-1 sm:left-8 sm:h-[22px] sm:w-[22px] sm:shadow-none sm:[&>svg]:h-3 sm:[&>svg]:w-3"
       style={{ backgroundColor: "var(--panel-text)", color: "var(--panel-bg)" }}
     >
       <GearIcon />

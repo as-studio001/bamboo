@@ -80,6 +80,7 @@ export function ProjectDetail({
 
   const siteChapter = project.chapters.find((c) => c.key === "site");
   const siteImages = (siteChapter?.images ?? []).filter((img) => img.src);
+  const siteMore = (siteChapter?.moreImages ?? []).filter((img) => img.src);
 
   // 章節清單（封面底部那一排、左側直書導覽共用）：有填「核心目標」時排第一個、編號 00，其餘章節 01 起
   const goals = hasGoals(project.goals) ? project.goals : undefined;
@@ -144,23 +145,32 @@ export function ProjectDetail({
             title={chapterTitle("site")}
             first={chapters.length === 0}
             alignTo="text"
+            // （2026-10-16）地圖改放左欄、文字下方；右欄放基地照片（chapter.images），其餘照片放 More in Detail
+            // （chapter.moreImages）。沒有文字時左欄只有地圖。
             left={
-              siteChapter?.text
-                ? siteChapter.text.split("\n\n").map((t, i) => (
-                    <p key={i} className={`mt-6 max-w-2xl sm:max-w-none ${BODY_TEXT}`} style={{ order: i }}>
-                      {t}
-                    </p>
-                  ))
-                : undefined
+              <>
+                {siteChapter?.text?.split("\n\n").map((t, i) => (
+                  <p key={i} className={`mt-6 max-w-2xl sm:max-w-none ${BODY_TEXT}`} style={{ order: i }}>
+                    <RichText text={t} />
+                  </p>
+                ))}
+                <div className="mt-6 sm:mt-8" style={{ order: 50 }}>
+                  <ChapterMap project={project} />
+                </div>
+              </>
             }
             right={
               <>
-                <ChapterMap project={project} />
-                {siteImages.map((img) => (
-                  <div key={img.id} className={`mt-6 sm:mt-0 ${photoBleed}`}>
+                {siteImages.map((img, i) => (
+                  <div key={img.id} className={`mt-6 sm:mt-0 ${photoBleed}`} style={{ order: 60 + i }}>
                     <ImagePlaceholder image={img} natural aspect="aspect-[4/3]" />
                   </div>
                 ))}
+                {siteMore.length > 0 && (
+                  <div style={{ order: 90 }}>
+                    <ReadMoreGallery images={siteMore} accent={accentOnLight(project.accent)} />
+                  </div>
+                )}
               </>
             }
           />
@@ -619,6 +629,7 @@ function ChapterFrame({
   alignTo = "text",
   rows,
   sticky = true,
+  wide = false,
 }: {
   id: string;
   number: string;
@@ -631,6 +642,8 @@ function ChapterFrame({
   // sticky：左欄（編號＋標題＋文字）捲動時固定在畫面上（預設）。false＝左右兩欄一起捲動，圖片跟文字不會錯開
   // （團隊介紹的 rows 模式本來就不固定；組裝說明書、影片、基地位置也設成 false）
   sticky?: boolean;
+  // wide：（2026-10-16，影片章節用）不分左右兩欄，章節開頭下面的內容（left）橫跨整個寬度
+  wide?: boolean;
 }) {
   const fadeRef = useFadeInView<HTMLElement>();
   const sectionClass = `${FADE_CLASS} flex scroll-mt-10 flex-col ${first ? "" : "border-t pt-10"} sm:grid sm:min-h-screen sm:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] sm:items-start sm:gap-x-12 sm:border-0 sm:pt-28 sm:pb-28 lg:gap-x-20`;
@@ -665,6 +678,17 @@ function ChapterFrame({
             <div className="sm:col-start-2">{row.right}</div>
           </Fragment>
         ))}
+      </section>
+    );
+  }
+
+  if (wide) {
+    return (
+      <section ref={fadeRef} id={id} className={sectionClass} style={sectionStyle}>
+        <div className="contents sm:col-span-2 sm:block">
+          {header}
+          {left}
+        </div>
       </section>
     );
   }
@@ -958,15 +982,16 @@ function VideoSection({
       number={number}
       title={chapterTitle(chapter.key)}
       first={first}
+      // （2026-10-16）影片橫跨整個內容寬度（不分左右欄），文字放在影片上方
+      wide
       left={
-        chapter.text?.trim() && (
-          <p className={`mt-4 whitespace-pre-line sm:mt-6 ${BODY_TEXT}`}>
-            {chapter.text.trim()}
-          </p>
-        )
-      }
-      right={
-        videos.length > 0 ? (
+        <>
+          {chapter.text?.trim() && (
+            <p className={`mt-4 max-w-3xl whitespace-pre-line sm:mt-6 ${BODY_TEXT}`}>
+              {chapter.text.trim()}
+            </p>
+          )}
+          {videos.length > 0 ? (
           videos.map((v) => (
             <div key={v.id} className="mt-8">
               {v.title?.trim() && (
@@ -987,7 +1012,8 @@ function VideoSection({
           >
             影片待補
           </div>
-        )
+          )}
+        </>
       }
     />
   );

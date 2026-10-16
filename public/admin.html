@@ -383,7 +383,12 @@ function compressImageFile(file, maxDimension, quality){
     img.src = url;
   });
 }
-function sanitizeFilename(name){ return name.replace(/[^\w.\-一-鿿]+/g, "_"); }
+// （2026-10-16）.jfif／.jpe 這類 JPEG 的冷門副檔名統一改成 .jpg——Vercel 不認得 .jfif，會用
+// application/octet-stream 送出，網站的圖片最佳化（next/image）因此回 400、正式網站上圖片顯示不出來
+// （竹輕亭設計單位「初樸」的照片就是這樣）；本機開發伺服器剛好能顯示，所以只有上線後才看得到問題。
+function sanitizeFilename(name){
+  return name.replace(/[^\w.\-一-鿿]+/g, "_").replace(/\.(jfif|jpe|pjpeg|pjp)$/i, ".jpg");
+}
 
 // 單一檔案上傳大小上限——Netlify Function 本身收 request body 有實際上限
 // （約 6MB），留一點餘裕訂在 4MB，跟 Internal-Pages 現在的後台（admin/index.html
@@ -1440,7 +1445,7 @@ function renderCaseEditor(){
           ` : `
           <div class="field-block">
             <div class="label">基地座標（coordinates）</div>
-            <div class="field-hint" style="margin-top:0; margin-bottom:10px;">「基地」章節不使用照片——只要填地址、經緯度，畫面上就會顯示地圖；三個都留空的話會顯示「地圖待補」。</div>
+            <div class="field-hint" style="margin-top:0; margin-bottom:10px;">填地址、經緯度，案例內頁「基地位置」左欄文字下方就會顯示地圖；三個都留空的話會顯示「地圖待補」。</div>
             <div class="two-col">
               <input type="text" id="f_coord_address" placeholder="地址" value="${item.coordinates ? esc(item.coordinates.address || "") : ""}">
               <input type="text" id="f_coord_zoom" placeholder="地圖縮放（選填，例如 16，預設 15）" value="${item.coordinates && item.coordinates.zoom != null ? esc(item.coordinates.zoom) : ""}">
@@ -1450,9 +1455,14 @@ function renderCaseEditor(){
               <input type="text" id="f_coord_lng" placeholder="經度 lng（例如 121.5654）" value="${item.coordinates ? esc(item.coordinates.lng) : ""}">
             </div>
           </div>
+          <div class="field-block">
+            <div class="label">基地照片（顯示在右欄，建議 2 張）</div>
+            <div class="field-hint" style="margin-top:0; margin-bottom:10px;">這裡的照片全部顯示在案例內頁右欄；其他照片放到下面的「More in Detail」。（2026-10-16 起基地位置也能放照片）</div>
+            ${renderPhotoList(`chapterImages_${def.key}`, chapter.images, { kind: true })}
+          </div>
           `}
 
-          ${def.kind === "narrative" ? `
+          ${def.kind === "narrative" || def.kind === "site" ? `
           <div class="field-block">
             <div class="label">More in Detail 收合圖庫（moreImages）</div>
             ${renderPhotoList(`chapterMore_${def.key}`, chapter.moreImages)}
@@ -1513,7 +1523,7 @@ function renderCaseEditor(){
       return;
     }
     wirePhotoList(`chapterImages_${def.key}`, () => chapter.images, (next) => { chapter.images = next; }, ed.slug);
-    if(def.kind === "narrative"){
+    if(def.kind === "narrative" || def.kind === "site"){
       wirePhotoList(`chapterMore_${def.key}`, () => chapter.moreImages, (next) => { chapter.moreImages = next; }, ed.slug);
     }
   });

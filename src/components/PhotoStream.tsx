@@ -8,7 +8,7 @@ import { HOME_CHAPTER_KEYS, orderedChapters, type Chapter, type Project, type Pr
 import { visibleImages } from "@/lib/photoLayout";
 import { usePdfCover } from "@/lib/usePdfCover";
 import { pdfCoverId } from "@/lib/pdfPages";
-import { TEXT_BODY, SHARED_ELEMENT_TRANSITION } from "@/components/theme";
+import { SHARED_ELEMENT_TRANSITION } from "@/components/theme";
 
 // 首頁雙欄的「圖片＋簡短說明」索引：一張一列、原始比例顯示（直式就直式、橫式就橫式），
 // 不套用統一形狀的裁切遮罩，風格參考 herzogdemeuron.com 的 process 頁面。
@@ -116,7 +116,8 @@ function PhotoItem({
   }, [photo.src]);
   const kind: ImageKind = photo.kind ?? measured?.kind ?? "photo";
   const ratio = templateRatio(kind, measured?.ratio ?? photo.ratio ?? 4 / 3);
-  const frameVars = { "--tpl-r": ratio, "--cap-h": photo.caption ? "44px" : "0px" } as React.CSSProperties;
+  // （2026-10-16）首頁兩欄不顯示圖說（圖說只在案例內頁出現），版型框不用再扣圖說的高度
+  const frameVars = { "--tpl-r": ratio, "--cap-h": "0px" } as React.CSSProperties;
 
   return (
     <Link
@@ -149,9 +150,6 @@ function PhotoItem({
               }`}
             />
           </motion.div>
-          {photo.caption && (
-            <p className={`mt-2 text-center text-[11px] sm:mt-0 sm:shrink-0 sm:py-3 sm:text-xs ${TEXT_BODY}`}>{photo.caption}</p>
-          )}
         </>
       ) : (
         <motion.div
@@ -186,7 +184,7 @@ function AssemblyCoverItem({ project, chapter, isFirst }: { project: Project; ch
       // 電腦版一張一頁，跟 PhotoItem 相同（佔滿 --slot-h、版型框置中）。組裝說明書的 PDF 封面固定套
       // 「圖說直式」版型（5:7，不裁切）。
       className={`group block sm:flex sm:h-[var(--slot-h)] sm:flex-col sm:items-center sm:justify-center sm:pt-0 ${isFirst ? "pt-0" : "pt-8"}`}
-      style={{ "--tpl-r": TEMPLATES.drawing.portrait, "--cap-h": chapter.pdf?.label ? "44px" : "0px" } as React.CSSProperties}
+      style={{ "--tpl-r": TEMPLATES.drawing.portrait, "--cap-h": "0px" } as React.CSSProperties}
     >
       <motion.div
         layoutId={id}
@@ -204,9 +202,6 @@ function AssemblyCoverItem({ project, chapter, isFirst }: { project: Project; ch
           />
         )}
       </motion.div>
-      {chapter.pdf?.label && (
-        <p className={`mt-2 text-center text-[11px] sm:mt-0 sm:shrink-0 sm:py-3 sm:text-xs ${TEXT_BODY}`}>{chapter.pdf.label}</p>
-      )}
     </Link>
   );
 }

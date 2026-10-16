@@ -54,7 +54,7 @@
               "id": "project-one-vqff3va",
               "tone": "bg-neutral-300",
               "caption": "",
-              "src": "/images/project-one/images.jfif"
+              "src": "/images/project-one/team-chupu.jpg"
             }
           ]
         },
@@ -159,14 +159,42 @@
           "src": "/images/project-one/1792056454664-Snipaste_2026-10-08_14-06-46.jpg"
         },
         {
-          "id": "project-one-deck-details-full",
+          "id": "project-one-deck-detail-1",
           "tone": "bg-neutral-300",
-          "caption": "節點詳圖",
-          "src": "/images/project-one/deck-details-full.jpg",
+          "caption": "縱梁固定鋼板平面詳圖",
+          "src": "/images/project-one/deck-detail-1.jpg",
           "kind": "drawing"
         }
       ],
       "moreImages": [
+        {
+          "id": "project-one-deck-detail-2",
+          "tone": "bg-neutral-300",
+          "caption": "組合柱頂部接合鋼板剖面詳圖",
+          "src": "/images/project-one/deck-detail-2.jpg",
+          "kind": "drawing"
+        },
+        {
+          "id": "project-one-deck-detail-3",
+          "tone": "bg-neutral-300",
+          "caption": "組合柱頂部接合鋼板平面詳圖",
+          "src": "/images/project-one/deck-detail-3.jpg",
+          "kind": "drawing"
+        },
+        {
+          "id": "project-one-deck-detail-4",
+          "tone": "bg-neutral-300",
+          "caption": "組合柱頂部接合鋼板剖面詳圖（組合梁鎖固）",
+          "src": "/images/project-one/deck-detail-4.jpg",
+          "kind": "drawing"
+        },
+        {
+          "id": "project-one-deck-detail-5",
+          "tone": "bg-neutral-300",
+          "caption": "組合梁鎖固接合平面詳圖",
+          "src": "/images/project-one/deck-detail-5.jpg",
+          "kind": "drawing"
+        },
         {
           "id": "project-one-deck-components",
           "tone": "bg-neutral-300",
@@ -272,12 +300,13 @@
           "kind": "photo"
         },
         {
-          "id": "project-one-deck-site-1",
+          "id": "project-one-0l3mrfj",
           "tone": "bg-neutral-300",
-          "caption": "基地現況",
-          "src": "/images/project-one/deck-site-1.jpg",
-          "kind": "photo"
-        },
+          "caption": "",
+          "src": "/images/project-one/1792118546924-Snipaste_2026-10-16_10-42-14.jpg"
+        }
+      ],
+      "moreImages": [
         {
           "id": "project-one-deck-site-2",
           "tone": "bg-neutral-300",

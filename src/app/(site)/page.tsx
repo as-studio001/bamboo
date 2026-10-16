@@ -1,4 +1,4 @@
-import { getPublishedProjects, type Project } from "@/lib/projects";
+import { getPublishedProjects, homeCover, type Project } from "@/lib/projects";
 import { SplitExhibition } from "@/components/SplitExhibition";
 import { CuratorialManifesto, type BridgeProject } from "@/components/CuratorialManifesto";
 
@@ -9,6 +9,7 @@ function toBridge(p: Project): BridgeProject {
     name: p.name,
     meta: [p.location, p.year, p.type].filter(Boolean).join(" · "),
     sketch: p.sketchImages?.find((img) => img.src)?.src,
+    cover: homeCover(p)?.src,
   };
 }
 import { EventsSection } from "@/components/EventsSection";

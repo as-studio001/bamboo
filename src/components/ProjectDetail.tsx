@@ -274,12 +274,12 @@ function DetailHero({
         {/* （2026-10-14）電腦版字體與大小跟首頁封面上的案名（SplitExhibition.tsx 的封面大標）一致：
             大標 48px（lg 57.6px）粗黑、資訊小字 18px 一般字重、跟內文同一套字體（不是等寬字）。手機版維持原樣。 */}
         <h1
-          className={`font-black leading-[0.95] tracking-tight uppercase text-4xl sm:text-5xl lg:text-[57.6px] ${heroTitleColor}`}
+          className={`font-serif-tc font-black leading-[1.05] tracking-tight uppercase text-4xl sm:text-5xl lg:text-[57.6px] ${heroTitleColor}`}
         >
           {project.name}
         </h1>
         <p
-          className="mt-3 font-mono text-[10px] tracking-wide uppercase sm:[font-family:inherit] sm:text-[18px] sm:font-normal"
+          className="mt-3 font-serif-tc text-[11px] tracking-wide uppercase sm:text-[18px] sm:font-normal"
           style={{ color: project.accent }}
         >
           {project.location} · {project.year} · {project.type}

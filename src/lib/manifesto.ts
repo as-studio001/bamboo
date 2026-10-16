@@ -14,6 +14,8 @@ export type ManifestoCover = {
   tagline?: string; // 一句話
   credit?: string; // 策展人
   notes?: string; // 灰色補充（實驗場域、展示軸線…），可換行
+  image?: string; // （2026-10-16）第一屏滿版背景照片，留空＝紙張底
+  figure?: string; // （2026-10-16）第一屏右下角的主視覺（去背 PNG，例如海報裡的竹剖面），貼齊畫面右緣；有滿版照片時不顯示
 };
 
 export type ManifestoStatement = {

@@ -63,6 +63,26 @@ body {
   }
 }
 
+/* （2026-10-16）策展宣言的紙張底：取自活動海報的米灰紙色（#E7E3DA 一帶）＋極淡的紙纖維顆粒＋往四周
+   微微變暗的暈影，取代原本的純白，接到兩欄展覽的照片時不會那麼「跳」。文字色、細線色在這個範圍內改成
+   偏暖的深炭色系（覆寫 --foreground 等變數，裡面的元件不用改）。
+   .paper-dark：第一屏有滿版背景照片時用，字改成米白。 */
+.paper {
+  --foreground: #26221e;
+  --foreground-muted: rgb(38 34 30 / 0.62);
+  --border-subtle: rgb(38 34 30 / 0.3); /* （同日）細線加深：0.16 → 0.3 */
+  /* （同日）再淺一點：#E7E3DA → #F1EEE7，邊緣暈影也減淡 */
+  background-color: #f1eee7;
+  background-image:
+    radial-gradient(ellipse at 50% 40%, rgb(255 255 255 / 0.3) 0%, rgb(255 255 255 / 0) 55%, rgb(60 50 35 / 0.06) 100%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.25 0 0 0 0 0.2 0 0 0 0 0.14 0 0 0 0.09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.paper-dark {
+  --foreground: #f4f1ea;
+  --foreground-muted: rgb(244 241 234 / 0.78);
+  --border-subtle: rgb(244 241 234 / 0.32);
+}
+
 .no-scrollbar {
   scrollbar-width: none;
   -ms-overflow-style: none;

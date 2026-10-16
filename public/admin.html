@@ -824,7 +824,7 @@ async function saveChaptersEditor(ed){
 */
 function mfNormalize(json){
   const m = Object.assign({ eyebrow: "" }, json);
-  m.cover = Object.assign({ label: "", title: "", subtitle: "", tagline: "", credit: "", notes: "" }, m.cover);
+  m.cover = Object.assign({ label: "", title: "", subtitle: "", tagline: "", credit: "", notes: "", image: "", figure: "" }, m.cover);
   m.statement = Object.assign({ label: "", title: "", body: "", contrasts: [] }, m.statement);
   while(m.statement.contrasts.length < 3) m.statement.contrasts.push({ label: m.statement.contrasts.length < 2 ? "Not" : "But", text: "" });
   m.formula = Object.assign({ label: "", note: "", terms: [] }, m.formula);
@@ -898,6 +898,22 @@ function renderManifestoEditor(){
         ${area("cover.credit", "參與者", "一行一位，用「｜」分開標籤跟內容，例如：計畫發起人｜財團法人雲林縣利仁教育基金會")}
         ${area("cover.notes", "補充說明（例如實驗場域、展示軸線）", "寫法同上，例如：兩組實驗場域｜竹輕亭 | 簇樂 · 一籌；跟參與者排成同一張兩欄表")}
         ${input("cover.label", "頁碼小字", labelHint)}
+        <div class="field-block">
+          <label>封面背景照片（第一屏滿版）</label>
+          ${item.cover.image ? `<img src="${esc(item.cover.image)}" alt="" style="max-width:240px;display:block;margin-bottom:8px;border:1px solid var(--line)">` : ""}
+          <input type="text" data-mf="cover.image" value="${esc(item.cover.image || "")}" placeholder="留空＝紙張底（不放照片）">
+          <button type="button" class="btn small" id="mfCoverUpload" style="margin-top:8px">上傳照片</button>
+          <input type="file" accept="image/*" id="mfCoverFile" style="display:none">
+          <div class="field-hint">建議橫式、長邊 2400px 以上（會鋪滿整個畫面，解析度不足會糊）。照片上會自動加一層深色漸層，文字改成米白。</div>
+        </div>
+        <div class="field-block">
+          <label>封面主視覺（第一屏右下角，紙張底時顯示）</label>
+          ${item.cover.figure ? `<img src="${esc(item.cover.figure)}" alt="" style="max-width:160px;display:block;margin-bottom:8px;border:1px solid var(--line);background:#e7e3da">` : ""}
+          <input type="text" data-mf="cover.figure" value="${esc(item.cover.figure || "")}" placeholder="留空＝不放">
+          <button type="button" class="btn small" id="mfFigureUpload" style="margin-top:8px">上傳圖片</button>
+          <input type="file" accept="image/png,image/*" id="mfFigureFile" style="display:none">
+          <div class="field-hint">建議去背的 PNG（例如海報裡的竹剖面），貼齊畫面右緣、一部分超出畫面。上面有「封面背景照片」時不顯示。</div>
+        </div>
       `)}
 
       ${section(2, "一句話主張", `
@@ -1011,6 +1027,39 @@ function renderManifestoEditor(){
       item.counts.items.splice(Number(btn.dataset.mfRemove), 1);
       render();
     });
+  });
+  document.getElementById("mfCoverUpload").addEventListener("click", () => document.getElementById("mfCoverFile").click());
+  document.getElementById("mfCoverFile").addEventListener("change", async (e) => {
+    const file = e.target.files && e.target.files[0];
+    if(!file) return;
+    try{
+      setLoading(true, "上傳中…");
+      item.cover.image = await uploadAsset(file, "manifesto");
+      render();
+    }catch(err){
+      toast(err.message || "上傳失敗", true);
+    }finally{
+      setLoading(false);
+    }
+  });
+  document.getElementById("mfFigureUpload").addEventListener("click", () => document.getElementById("mfFigureFile").click());
+  document.getElementById("mfFigureFile").addEventListener("change", async (e) => {
+    const file = e.target.files && e.target.files[0];
+    if(!file) return;
+    try{
+      setLoading(true, "上傳中…");
+      // 去背 PNG 不經過壓縮（compressImageFile 會轉成 JPEG、透明變黑）
+      const filename = sanitizeFilename(file.name);
+      const b64 = await readFileAsBase64(file);
+      assertUploadSize(file);
+      const data = await callFunction("github-proxy", { action: "uploadAsset", folder: "public/images/manifesto", filename, content: b64, repo: REPO_NAME, useBlob: file.size > CONTENTS_API_LIMIT_BYTES });
+      item.cover.figure = "/" + data.path.replace(/^public\//, "");
+      render();
+    }catch(err){
+      toast(err.message || "上傳失敗", true);
+    }finally{
+      setLoading(false);
+    }
   });
   document.getElementById("mfAddCount").addEventListener("click", () => {
     item.counts.items.push({ value: "", label: "", en: "" });

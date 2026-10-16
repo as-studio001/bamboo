@@ -465,8 +465,8 @@ function Panel({
         <div
           className={`pointer-events-none absolute inset-x-0 top-0 z-20 px-3 pt-3 ${project.titleAlign === "right" ? "text-right" : ""}`}
         >
-          <h2 className="truncate text-3xl leading-[0.95] font-black tracking-tight text-[#141414] uppercase">{project.name}</h2>
-          <p className="mt-2 truncate font-mono text-[10px] tracking-wide text-[#141414] uppercase">
+          <h2 className="truncate font-serif-tc text-3xl leading-[1.05] font-black tracking-tight text-[#141414] uppercase">{project.name}</h2>
+          <p className="mt-2 truncate font-serif-tc text-[11px] tracking-wide text-[#141414] uppercase">
             {project.location} · {project.year} · {project.type}
           </p>
         </div>
@@ -480,7 +480,7 @@ function Panel({
               <ImagePlaceholder image={finalImage ?? project.coverImages[0]} />
             </div>
             <span
-              className={`mt-3 [writing-mode:vertical-rl] font-black tracking-[0.15em] uppercase leading-none text-sm ${TEXT_PRIMARY}`}
+              className={`mt-3 [writing-mode:vertical-rl] font-serif-tc font-black tracking-[0.15em] uppercase leading-none text-sm ${TEXT_PRIMARY}`}
             >
               {project.name}
             </span>
@@ -520,8 +520,8 @@ function Panel({
                   pastCover ? "opacity-0" : "opacity-100"
                 } ${side === "left" ? "items-end text-right" : "items-start text-left"}`}
               >
-                <h2 className="text-5xl leading-[0.95] font-black tracking-tight text-white uppercase lg:text-[57.6px]">{project.name}</h2>
-                <p className="mt-3 text-[18px] font-normal tracking-wide uppercase" style={{ color: project.accent }}>
+                <h2 className="font-serif-tc text-5xl leading-[1.05] font-black tracking-tight text-white uppercase lg:text-[57.6px]">{project.name}</h2>
+                <p className="mt-3 font-serif-tc text-[18px] font-normal tracking-wide uppercase" style={{ color: project.accent }}>
                   {project.location} · {project.year} · {project.type}
                 </p>
               </div>

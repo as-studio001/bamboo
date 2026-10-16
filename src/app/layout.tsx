@@ -4,7 +4,7 @@ import "./globals.css";
 
 const notoSerifTC = Noto_Serif_TC({
   variable: "--font-serif-tc",
-  weight: ["400", "500", "700"],
+  weight: ["400", "500", "700", "900"], // 900：案名大標（2026-10-16 改成思源宋體）
   subsets: ["latin"],
 });
 

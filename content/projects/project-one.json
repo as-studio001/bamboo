@@ -89,7 +89,7 @@
           "id": "project-one-deck-scene-market",
           "tone": "bg-neutral-300",
           "caption": "市集攤位－活動攤商（情境示意，AI 生成）",
-          "src": "/images/project-one/deck-scene-market.jpg",
+          "src": "/images/project-one/deck-scene-market-clean.jpg",
           "kind": "photo"
         }
       ],
@@ -98,14 +98,14 @@
           "id": "project-one-deck-scene-camp",
           "tone": "bg-neutral-300",
           "caption": "主題式帳幕－露營（情境示意，AI 生成）",
-          "src": "/images/project-one/deck-scene-camp.jpg",
+          "src": "/images/project-one/deck-scene-camp-clean.jpg",
           "kind": "photo"
         },
         {
           "id": "project-one-deck-scene-yoga",
           "tone": "bg-neutral-300",
           "caption": "療育基地－林間瑜珈（情境示意，AI 生成）",
-          "src": "/images/project-one/deck-scene-yoga.jpg",
+          "src": "/images/project-one/deck-scene-yoga-clean.jpg",
           "kind": "photo"
         }
       ]
@@ -156,13 +156,13 @@
           "id": "project-one-17ufy54",
           "tone": "bg-neutral-300",
           "caption": "構造拆解圖",
-          "src": "/images/project-one/1792056454664-Snipaste_2026-10-08_14-06-46.jpg"
+          "src": "/images/project-one/deck-exploded-gray.jpg"
         },
         {
           "id": "project-one-deck-detail-1",
           "tone": "bg-neutral-300",
           "caption": "縱梁固定鋼板平面詳圖",
-          "src": "/images/project-one/deck-detail-1.jpg",
+          "src": "/images/project-one/deck-detail-1-clean.jpg",
           "kind": "drawing"
         }
       ],
@@ -171,28 +171,28 @@
           "id": "project-one-deck-detail-2",
           "tone": "bg-neutral-300",
           "caption": "組合柱頂部接合鋼板剖面詳圖",
-          "src": "/images/project-one/deck-detail-2.jpg",
+          "src": "/images/project-one/deck-detail-2-clean.jpg",
           "kind": "drawing"
         },
         {
           "id": "project-one-deck-detail-3",
           "tone": "bg-neutral-300",
           "caption": "組合柱頂部接合鋼板平面詳圖",
-          "src": "/images/project-one/deck-detail-3.jpg",
+          "src": "/images/project-one/deck-detail-3-clean.jpg",
           "kind": "drawing"
         },
         {
           "id": "project-one-deck-detail-4",
           "tone": "bg-neutral-300",
           "caption": "組合柱頂部接合鋼板剖面詳圖（組合梁鎖固）",
-          "src": "/images/project-one/deck-detail-4.jpg",
+          "src": "/images/project-one/deck-detail-4-clean.jpg",
           "kind": "drawing"
         },
         {
           "id": "project-one-deck-detail-5",
           "tone": "bg-neutral-300",
           "caption": "組合梁鎖固接合平面詳圖",
-          "src": "/images/project-one/deck-detail-5.jpg",
+          "src": "/images/project-one/deck-detail-5-clean.jpg",
           "kind": "drawing"
         },
         {
@@ -253,13 +253,13 @@
         {
           "id": "project-one-xmksxtb",
           "tone": "bg-neutral-300",
-          "caption": "",
+          "caption": "墩座預埋鋼板與錨栓加工",
           "src": "/images/project-one/936298_0.jpg"
         },
         {
           "id": "project-one-kbbwxkt",
           "tone": "bg-neutral-300",
-          "caption": "",
+          "caption": "孟宗竹材進料與晾置",
           "src": "/images/project-one/936302_0.jpg"
         }
       ]

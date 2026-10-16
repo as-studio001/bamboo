@@ -1019,6 +1019,13 @@ function VideoSection({
   );
 }
 
+// 章節圖片下方的圖片介紹（2026-10-16）：顯示後台每張圖的「圖說」（caption），沒填就不顯示。
+// 字型、大小、粗細、顏色跟 More in Detail 的圖說完全一樣（ReadMoreGallery：10／12px、一般字重、TEXT_BODY）。
+function PhotoCaption({ text }: { text?: string }) {
+  if (!text?.trim()) return null;
+  return <p className={`mt-2 text-[10px] leading-relaxed sm:text-xs ${TEXT_BODY}`}>{text.trim()}</p>;
+}
+
 // 內文的粗體（2026-10-15）：後台文字裡用 **兩個星號** 包起來的字顯示成粗體（深色），例如「**水與濕**：…」。
 // 只支援這一種標記，其他文字原樣顯示。
 function RichText({ text }: { text: string }) {
@@ -1144,6 +1151,7 @@ function NarrativeSection({
             natural
             aspect="aspect-[16/9]"
           />
+          <PhotoCaption text={photo.caption} />
         </div>
       );
     }
@@ -1182,6 +1190,7 @@ function NarrativeSection({
               natural
               aspect={row.portrait ? "aspect-[3/4]" : "aspect-[4/3]"}
             />
+            <PhotoCaption text={photo.caption} />
           </div>
         ))}
       </div>

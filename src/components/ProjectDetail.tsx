@@ -1222,6 +1222,31 @@ function NarrativeSection({
   );
 }
 
+// 原圖寬度不到這個像素數就算「小圖」（解析度不足以撐滿右欄），More in Detail 裡縮成半欄寬
+const SMALL_IMAGE_PX = 900;
+
+// 量出哪幾張是小圖（瀏覽器載入原圖讀 naturalWidth；只在圖庫展開後才量）
+function useSmallImages(images: Chapter["moreImages"]) {
+  const [small, setSmall] = useState<Set<string>>(() => new Set());
+  useEffect(() => {
+    if (!images?.length) return;
+    let cancelled = false;
+    images.forEach((image) => {
+      if (!image.src) return;
+      const probe = new window.Image();
+      probe.onload = () => {
+        if (cancelled || probe.naturalWidth >= SMALL_IMAGE_PX) return;
+        setSmall((prev) => (prev.has(image.id) ? prev : new Set(prev).add(image.id)));
+      };
+      probe.src = image.src;
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [images]);
+  return small;
+}
+
 // 「+ MORE IN DETAIL」收合圖庫，比照 Internal-Pages 同名區塊——預設收合成一顆帶「+」的
 // 文字按鈕，點開才展開成一排小圖＋圖說，一顆按鈕收合／展開，不用另外做進場動畫。
 function ReadMoreGallery({
@@ -1232,6 +1257,7 @@ function ReadMoreGallery({
   accent: string;
 }) {
   const [open, setOpen] = useState(false);
+  const small = useSmallImages(open ? images : undefined);
   if (!images || images.length === 0) return null;
 
   return (
@@ -1255,14 +1281,29 @@ function ReadMoreGallery({
         // 更多張，份量上更明顯跟上面的主要論述圖片區隔開來。
         // 手機：兩欄縮圖（4:3 裁切）；電腦版（書頁版面，2026-10-14）：跟右欄其他圖片一樣一次一張、上下
         // 排列、原比例不裁切
-        <div className="mt-5 flex flex-wrap gap-3 sm:mt-6 sm:flex-col sm:flex-nowrap sm:gap-6">
+        // （2026-10-16）電腦版：原圖寬度不到 SMALL_IMAGE_PX 的小圖（例如竹輕亭的五金照片）縮成半欄寬、兩張一排，
+        // 不硬放大到整欄（看起來太大，也會因為放大而糊）；一般圖照舊一次一張整欄寬。
+        <div className="mt-5 flex flex-wrap gap-3 sm:mt-6 sm:gap-6">
           {images.map((image) => (
-            <div key={image.id} className="w-[calc(50%-6px)] sm:w-full">
+            <div key={image.id} className={`w-[calc(50%-6px)] ${small.has(image.id) ? "sm:w-[calc(50%-12px)]" : "sm:w-full"}`}>
               <div className="sm:hidden">
                 <ImagePlaceholder image={image} aspect="aspect-[4/3]" />
               </div>
               <div className="hidden sm:block">
-                <ImagePlaceholder image={image} natural aspect="aspect-[4/3]" />
+                {small.has(image.id) && image.src ? (
+                  // 小圖：放進同樣大小的 4:3 白底框，完整顯示不裁切、置中，空白處是白底，一排的圖上下對齊
+                  <div className="relative aspect-[4/3] w-full bg-white">
+                    <Image
+                      src={image.src}
+                      alt={image.caption ?? ""}
+                      fill
+                      sizes="30vw"
+                      className="object-contain"
+                    />
+                  </div>
+                ) : (
+                  <ImagePlaceholder image={image} natural aspect="aspect-[4/3]" />
+                )}
               </div>
               {image.caption && (
                 <p

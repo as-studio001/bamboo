@@ -251,16 +251,30 @@
       "text": "施工以「常民可操作」為原則，依難度分成三個層級：Lv.1 素人——3×3m 活動棚架，螺栓夾具組裝，2 人 4 小時完工，不需特殊工具；Lv.2 專業施工（組裝）——6×6m／6×3m，需要鉛直測量與地錨施作，1 日工班並結合吊卡；Lv.3 專業施工（工藝）——複合造型，結合吊卡與結構計算書，由建築師督察。竹輕亭屬於 Lv.2。\n\n構件規格由物流反推：吊卡貨斗長度 650cm，主構件長度上限就是 650cm，確保任何地點都能配送；一台 17T 吊卡剛好載運一組 6×6m 棚架的竹桿、接頭、繫材與說明書，成為可以電商銷售、倉儲配送的竹構 Kit Set。",
       "images": [
         {
-          "id": "project-one-xmksxtb",
+          "id": "project-one-jhr2rtb",
           "tone": "bg-neutral-300",
-          "caption": "墩座預埋鋼板與錨栓加工",
-          "src": "/images/project-one/936298_0.jpg"
+          "caption": "",
+          "src": "/images/project-one/construction-bw-1.jpg"
         },
         {
-          "id": "project-one-kbbwxkt",
+          "id": "project-one-vgsa65h",
           "tone": "bg-neutral-300",
-          "caption": "孟宗竹材進料與晾置",
-          "src": "/images/project-one/936302_0.jpg"
+          "caption": "",
+          "src": "/images/project-one/construction-bw-2.jpg"
+        }
+      ],
+      "moreImages": [
+        {
+          "id": "project-one-b4fzceh",
+          "tone": "bg-neutral-300",
+          "caption": "",
+          "src": "/images/project-one/1792122051994-7C9FBCB3-2EFC-4711-B150-1BDE1FBCEAFD_3282B9B5-90AB-4832-8B3D-EF39FE138FF3_encrypted_0.jpg"
+        },
+        {
+          "id": "project-one-72b9ite",
+          "tone": "bg-neutral-300",
+          "caption": "",
+          "src": "/images/project-one/1792122061354-68D7FDEE-84CF-4BC2-AAC5-CC7BE8A93E1D_032452A0-4D0A-4DB9-84D0-43C1BBC52261_encrypted_0.jpg"
         }
       ]
     },

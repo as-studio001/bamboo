@@ -89,9 +89,9 @@ function Screen({
       {figure && !image && (
         <motion.div
           aria-hidden
-          // （2026-10-16）稍微半透明（0.8），像印在紙上，不跟大標搶（同日由 0.6 調高）
+          // （2026-10-16）完全不透明（同日試過 0.6 → 0.8 → 0.92，最後改回不透明）
           initial={{ opacity: 0, x: 40 }}
-          animate={{ opacity: 0.8, x: 0 }}
+          animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 1.1, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
           // z-10：疊在參與者表格上方那條細線上面（細線不穿過竹剖面）；文字本身不會跟竹剖面重疊
           className="pointer-events-none absolute right-0 bottom-[8vh] z-10 hidden aspect-[460/600] sm:block"

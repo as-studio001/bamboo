@@ -7,7 +7,8 @@
     "tagline": "竹構的下一步——一套可以持續生成的系統，而不是一件完成品。",
     "credit": "計畫發起人｜財團法人雲林縣利仁教育基金會\n策展人｜原型建築有限公司",
     "notes": "兩組實驗場域｜竹輕亭 | 簇樂 、 一籌\n四條展示軸線｜竹構大樣 · 竹構施工組裝動畫 · 竹構工法 · 竹構線上資源庫",
-    "figure": "/images/manifesto/bamboo-section.png"
+    "figure": "/images/manifesto/bamboo-section.png",
+    "backdrop": "/images/manifesto/cover-mist-bamboo.jpg"
   },
   "statement": {
     "label": "What this exhibition does",
@@ -99,7 +100,27 @@
     "intros": {
       "project-one": "一套 3 米模矩的竹構棚架——A 字竹柱加預組屋頂板，一天就能組立；同一組構件可以是市集攤位、露營帳幕或林間涼亭。",
       "project-two": "用集成竹材預製、可整組吊運的竹小屋——衛浴、廚房、起居、臥室四個單元自由組合，讓 1–2 人短住在自然裡。"
-    }
+    },
+    "reasonsLabel": "為什麼要做竹小屋",
+    "reasons": [
+      {
+        "title": "從展演到日常",
+        "text": "竹構多半是節慶、藝術裝置，展完即拆；竹小屋讓竹構成為人們真正天天使用的棚架、涼亭與小屋。"
+      },
+      {
+        "title": "從工藝到系統",
+        "text": "傳統竹構仰賴師傅經驗，難以複製；標準化構件與組裝邏輯，讓一般工班照圖就能組立。"
+      },
+      {
+        "title": "從單件到可選",
+        "text": "中小型、常民化的尺度，業主依生活與場地選配，同一套系統長出不同的空間。"
+      },
+      {
+        "title": "從材料到產業",
+        "text": "讓在地竹材有穩定的去處，帶動加工、預製與施工，讓竹林重新成為地方經濟的一部分。"
+      }
+    ],
+    "cta": "看兩個案子"
   },
   "closing": {
     "label": "The manifesto",

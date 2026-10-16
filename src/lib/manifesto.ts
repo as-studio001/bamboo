@@ -15,6 +15,9 @@ export type ManifestoCover = {
   credit?: string; // 策展人
   notes?: string; // 灰色補充（實驗場域、展示軸線…），可換行
   image?: string; // （2026-10-16）第一屏滿版背景照片，留空＝紙張底
+  // （2026-10-16）第一屏滿版「淺色」背景圖（例如霧中竹影插畫）：不加深色遮罩、文字維持深色，左側再疊一層
+  // 由紙色漸透明的薄霧確保字清楚；有這張時不顯示右下角主視覺（figure）。跟 image 二擇一，image 優先。
+  backdrop?: string;
   figure?: string; // （2026-10-16）第一屏右下角的主視覺（去背 PNG，例如海報裡的竹剖面），貼齊畫面右緣；有滿版照片時不顯示
 };
 
@@ -61,6 +64,10 @@ export type ManifestoBridge = {
   quote?: string;
   divider?: string; // 分隔線中間的小字，例如「兩組實驗場域」
   intros?: Record<string, string>; // 各案一句簡介，key 是案例 slug
+  // （2026-10-16）第二屏「為什麼要做竹小屋」四格（關鍵字＋一句說明），放在三個面向與公式之間
+  reasonsLabel?: string;
+  reasons?: { title: string; text: string }[];
+  cta?: string; // 兩案下方的按鈕文字，點了捲到兩欄展覽（例如「看兩個案子」）
 };
 
 export type Manifesto = {

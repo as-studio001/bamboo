@@ -8,13 +8,9 @@ import { manifesto } from "@/lib/manifesto";
 // 首頁最上面的「策展宣言」，點進網站先看到這裡，往下捲完才進到兩欄並列的展覽（SplitExhibition）。
 // 這一段不屬於任何一個建築案，是整個展覽層級的論述，跟 project.intro（各案自己的簡介）分開。
 //
-// （2026-10-15）從單一畫面改成五個連續的滿版畫面，像一本書的序章，內容整理自策展簡報：
-//   01 封面：計畫名稱、一句話、策展人與展覽構成
-//   02 一句話主張：「我們希望把竹構，變成一套零件系統。」＋ NOT／NOT／BUT
-//   03 核心公式：A ＋ B ＝ ？
-//   04 數字與竹構生成鏈
-//   05 結語：系統提供可能，業主決定結果
-//   06 兩案預告：原本單頁宣言的三個面向＋兩案手稿，銜接下面的兩欄展覽（見 BridgeScreen）
+// （2026-10-15）從單一畫面改成六個連續的滿版畫面（內容整理自策展簡報）；（2026-10-16）再濃縮成兩屏：
+//   01 宣言（IntroScreen）：計畫名稱、主張一句、NOT／NOT／BUT、參與者
+//   02 系統 → 兩案（SystemScreen）：A ＋ B ＝ ？、系統提供可能，業主決定結果、兩案預告（銜接兩欄展覽）
 // 每一屏都是 100dvh、snap-start，沿用 (site)/layout.tsx main 的整頁吸附，捲一次換一屏。
 // 視覺沿用網站本身的語彙（襯線字、灰階、細線），不搬簡報的色塊；只有「？」用竹棕色點一下，
 // 讓「答案未定」成為整段唯一的重點色。
@@ -57,6 +53,7 @@ function Screen({
   label,
   children,
   image,
+  backdrop,
   figure,
 }: {
   id?: string;
@@ -67,6 +64,7 @@ function Screen({
   // （2026-10-16）滿版背景照片（目前只有第一屏用，後台「封面背景照片」）：照片鋪滿整屏、上面一層由下往上
   // 變深的遮罩，字改成米白（.paper-dark）
   image?: string;
+  backdrop?: string; // 淺色滿版背景圖（不加深色遮罩，見 lib/manifesto.ts）
   // （2026-10-16）右下角主視覺（去背圖），參考海報構圖：竹剖面貼齊畫面右緣、一部分超出畫面，放在文字後面
   figure?: string;
 }) {
@@ -74,7 +72,7 @@ function Screen({
   return (
     <section
       id={id}
-      className={`paper ${image ? "paper-dark" : ""} relative flex min-h-[100dvh] w-full shrink-0 snap-start flex-col overflow-hidden px-6 pt-16 text-[var(--foreground)] sm:h-[100dvh] sm:min-h-0 sm:px-16 sm:pt-[8vh] lg:px-24`}
+      className={`paper ${image ? "paper-dark" : ""} relative flex min-h-[100dvh] w-full shrink-0 snap-start flex-col overflow-hidden px-6 pt-16 text-[var(--foreground)] sm:h-[100dvh] sm:min-h-0 sm:px-16 sm:pt-[6vh] lg:px-24`}
     >
       {image && (
         <>
@@ -86,7 +84,20 @@ function Screen({
           />
         </>
       )}
-      {figure && !image && (
+      {backdrop && !image && (
+        <>
+          <Image src={backdrop} alt="" fill priority sizes="100vw" className="object-cover object-right" />
+          {/* 左側薄霧：紙色由左往右漸透明，文字壓在上面清楚；右側竹影維持原樣 */}
+          <div
+            aria-hidden
+            className="absolute inset-0 hidden sm:block"
+            style={{ background: "linear-gradient(to right, rgb(241 238 231 / 0.88) 0%, rgb(241 238 231 / 0.6) 38%, rgb(241 238 231 / 0) 62%)" }}
+          />
+          {/* 手機：直式畫面竹影會落在文字正後方，整片蓋一層較濃的紙色，只讓竹影淡淡透出來 */}
+          <div aria-hidden className="absolute inset-0 sm:hidden" style={{ background: "rgb(241 238 231 / 0.82)" }} />
+        </>
+      )}
+      {figure && !image && !backdrop && (
         <motion.div
           aria-hidden
           // （2026-10-16）完全不透明（同日試過 0.6 → 0.8 → 0.92，最後改回不透明）
@@ -107,13 +118,16 @@ function Screen({
           {String(index + 1).padStart(2, "0")} / {String(total).padStart(2, "0")}
           {label ? ` · ${label}` : ""}
         </p>
-        <button
-          onClick={scrollToExhibition}
-          className={`${EYEBROW} link-underline transition-opacity hover:opacity-100`}
-          style={MUTED}
-        >
-          {last ? "進入展覽 ↓" : "略過宣言 →"}
-        </button>
+        {/* 最後一屏中間已經有「看兩個案子 ↓」，右下角不重複放 */}
+        {!last && (
+          <button
+            onClick={scrollToExhibition}
+            className={`${EYEBROW} link-underline transition-opacity hover:opacity-100`}
+            style={MUTED}
+          >
+            略過宣言 →
+          </button>
+        )}
       </div>
       {index === 0 && (
         // 第一屏底部中間的捲動提示：緩慢上下浮動，提示「往下還有」
@@ -180,15 +194,25 @@ export type BridgeProject = {
 };
 
 export function CuratorialManifesto({ projects }: { projects?: [BridgeProject, BridgeProject] }) {
-  const { eyebrow, cover, statement, formula, counts, closing, bridge } = manifesto;
+  // （2026-10-16）六屏濃縮成兩屏：
+  //   01 宣言：計畫名稱＋主張一句（statement.title）＋ NOT／NOT／BUT ＋參與者（cover.credit）
+  //   02 系統 → 兩案：A ＋ B ＝ ？一行公式＋「系統提供可能，業主決定結果。」＋兩案預告
+  // 數字（counts）、竹構生成鏈、轉變前後（closing.from/to…）、三個面向（bridge.points／quote）、
+  // 展覽構成（cover.notes）、一句話（cover.tagline）暫不顯示——資料仍留在 content/manifesto.json，
+  // 後台也還能編輯，之後要加回來不用重打。
+  const { eyebrow, cover, statement, formula, closing, bridge } = manifesto;
   const screens = [
-    cover && { key: "cover", label: cover.label, body: <CoverScreen eyebrow={eyebrow} data={cover} /> },
-    statement && { key: "statement", label: statement.label, body: <StatementScreen data={statement} /> },
-    formula && { key: "formula", label: formula.label, body: <FormulaScreen data={formula} /> },
-    counts && { key: "counts", label: counts.label, body: <CountsScreen data={counts} /> },
-    closing && { key: "closing", label: closing.label, body: <ClosingScreen data={closing} /> },
+    cover && {
+      key: "cover",
+      label: cover.label,
+      body: <IntroScreen eyebrow={eyebrow} data={cover} statement={statement} />,
+    },
     bridge &&
-      projects && { key: "bridge", label: bridge.label, body: <BridgeScreen data={bridge} projects={projects} /> },
+      projects && {
+        key: "bridge",
+        label: bridge.label,
+        body: <SystemScreen data={bridge} formula={formula} closing={closing} projects={projects} />,
+      },
   ].filter((s): s is { key: string; label: string | undefined; body: React.ReactElement } => !!s);
 
   return (
@@ -202,6 +226,7 @@ export function CuratorialManifesto({ projects }: { projects?: [BridgeProject, B
           label={s.label}
           image={s.key === "cover" ? cover?.image : undefined}
           figure={s.key === "cover" ? cover?.figure : undefined}
+          backdrop={s.key === "cover" ? cover?.backdrop : undefined}
         >
           {s.body}
         </Screen>
@@ -221,9 +246,25 @@ function lines(text?: string) {
     });
 }
 
-function CoverScreen({ eyebrow, data }: { eyebrow?: string; data: NonNullable<typeof manifesto.cover> }) {
+// 有右下角主視覺（竹剖面）時，第一屏左側內容（含細線）的最大寬度：停在竹剖面左邊 48px，不跟竹子重疊
+const BESIDE_FIGURE = "sm:max-w-[calc(100vw-min(32vw,54vh)-4rem-48px)] lg:max-w-[calc(100vw-min(32vw,54vh)-6rem-48px)]";
+
+// 第一屏「宣言」：計畫名稱＋英文副標＋主張一句＋ NOT／NOT／BUT 一排小格＋參與者表格
+function IntroScreen({
+  eyebrow,
+  data,
+  statement,
+}: {
+  eyebrow?: string;
+  data: NonNullable<typeof manifesto.cover>;
+  statement?: typeof manifesto.statement;
+}) {
+  // 淺色背景圖（竹影在右半部）：文字區限制在左側約一半，不壓到竹影；只有主視覺時停在竹剖面左邊
+  const beside = data.image ? "" : data.backdrop ? "sm:max-w-[60vw] lg:max-w-[56vw]" : data.figure ? BESIDE_FIGURE : "";
+  const contrasts = statement?.contrasts ?? [];
+  const credits = lines(data.credit);
   return (
-    <>
+    <div className={beside}>
       <Reveal>
         {eyebrow && (
           <p className={EYEBROW} style={MUTED}>
@@ -231,49 +272,59 @@ function CoverScreen({ eyebrow, data }: { eyebrow?: string; data: NonNullable<ty
           </p>
         )}
         {data.title && (
-          <h1 className="mt-6 font-serif-tc text-4xl leading-[1.25] font-semibold sm:mt-8 sm:text-6xl lg:text-7xl">
+          <h1 className="mt-5 font-serif-tc text-4xl leading-[1.2] font-semibold sm:mt-6 sm:text-6xl sm:whitespace-nowrap lg:text-7xl">
             <BambooAccent text={data.title} />
           </h1>
         )}
         {data.subtitle && (
-          <p className="mt-3 font-serif-tc text-xl italic sm:mt-4 sm:text-3xl" style={MUTED}>
+          <p className="mt-2 font-serif-tc text-xl italic sm:mt-3 sm:text-3xl" style={MUTED}>
             {data.subtitle}
           </p>
         )}
-        {data.tagline && (
-          <p className="mt-8 max-w-4xl font-serif-tc text-lg leading-[1.7] sm:mt-12 sm:text-2xl">{data.tagline}</p>
+        {statement?.title && (
+          // 主張一句：原本第二屏的大標，換行合成一行
+          <p className="mt-7 font-serif-tc text-xl leading-[1.5] font-semibold sm:mt-[5vh] sm:text-3xl">
+            <BambooAccent text={statement.title.replace(/\s*\n\s*/g, "")} />
+          </p>
         )}
       </Reveal>
-      {(data.credit || data.notes) && (
-        <Reveal
-          delay={0.15}
-          // 有右下角主視覺（竹剖面）時，細線停在竹剖面左邊 48px，不穿過竹子（主視覺寬度見 Screen 的 FIGURE_WIDTH）
-          className={`mt-10 border-t ${RULE} pt-6 sm:mt-[7vh] sm:pt-8 ${
-            data.figure && !data.image ? "sm:max-w-[calc(100vw-min(32vw,54vh)-4rem-48px)] lg:max-w-[calc(100vw-min(32vw,54vh)-6rem-48px)]" : ""
-          }`}
-        >
-          {/* （2026-10-15）參與者（credit）跟補充說明（notes）都是一行一項、用「｜」分成標籤跟內容，排成同一張
-              兩欄表：標籤一律灰色、內容一律粗體（同日改：補充說明的內容也用粗體）。沒有「｜」的行整行跨兩欄。 */}
+
+      {contrasts.length > 0 && (
+        // NOT／NOT／BUT：一排三格小格，最後一格（BUT）竹棕色實底
+        <Reveal delay={0.12} className="mt-6 grid gap-2 sm:mt-[3.5vh] sm:grid-cols-3 sm:gap-4">
+          {contrasts.map((c, i) => {
+            const answer = i === contrasts.length - 1;
+            return (
+              <div
+                key={i}
+                className={`flex flex-col gap-1 border px-4 py-3 sm:px-5 sm:py-4 ${answer ? "border-transparent shadow-[0_8px_24px_rgb(120_60_20/0.16)]" : RULE}`}
+                style={answer ? { backgroundColor: ACCENT, color: "#f7f3ec" } : undefined}
+              >
+                <span className={EYEBROW} style={answer ? { color: "rgb(247 243 236 / 0.8)" } : MUTED}>
+                  {c.label}
+                </span>
+                <span className={`font-serif-tc text-base sm:text-lg ${answer ? "font-semibold" : ""}`} style={answer ? undefined : MUTED}>
+                  {c.text}
+                </span>
+              </div>
+            );
+          })}
+        </Reveal>
+      )}
+
+      {credits.length > 0 && (
+        <Reveal delay={0.24} className={`mt-8 border-t ${RULE} pt-5 sm:mt-[5vh] sm:pt-6`}>
           <dl className="grid grid-cols-[auto_1fr] items-baseline gap-x-8 gap-y-2 sm:gap-x-12">
-            {[...lines(data.credit), ...lines(data.notes)].map((l) => ({ ...l, strong: true })).map((l, i) =>
+            {credits.map((l, i) =>
               l.label ? (
                 <Fragment key={i}>
                   <dt className="font-serif-tc text-sm leading-[1.9] sm:text-base" style={MUTED}>
                     {l.label}
                   </dt>
-                  <dd
-                    className={`font-serif-tc text-sm leading-[1.9] sm:text-base ${l.strong ? "font-semibold sm:text-lg" : ""}`}
-                    style={l.strong ? undefined : MUTED}
-                  >
-                    {l.value}
-                  </dd>
+                  <dd className="font-serif-tc text-sm leading-[1.9] font-semibold sm:text-lg">{l.value}</dd>
                 </Fragment>
               ) : (
-                <dd
-                  key={i}
-                  className={`col-span-2 font-serif-tc text-sm leading-[1.9] sm:text-base ${l.strong ? "font-semibold sm:text-lg" : ""}`}
-                  style={l.strong ? undefined : MUTED}
-                >
+                <dd key={i} className="col-span-2 font-serif-tc text-sm leading-[1.9] font-semibold sm:text-lg">
                   {l.value}
                 </dd>
               ),
@@ -281,212 +332,104 @@ function CoverScreen({ eyebrow, data }: { eyebrow?: string; data: NonNullable<ty
           </dl>
         </Reveal>
       )}
-    </>
+    </div>
   );
 }
 
-function StatementScreen({ data }: { data: NonNullable<typeof manifesto.statement> }) {
-  const contrasts = data.contrasts ?? [];
-  return (
-    <>
-      <Reveal>
-        {data.title && (
-          <h2 className="font-serif-tc text-3xl leading-[1.35] font-semibold whitespace-pre-line sm:text-5xl lg:text-6xl">
-            <BambooAccent text={data.title} />
-          </h2>
-        )}
-        {data.body && (
-          <p className="mt-8 max-w-4xl text-sm leading-[1.95] whitespace-pre-line sm:mt-10 sm:font-serif-tc sm:text-lg" style={MUTED}>
-            {data.body}
-          </p>
-        )}
-      </Reveal>
-      {contrasts.length > 0 && (
-        <Reveal delay={0.15} className="mt-10 grid gap-3 sm:mt-[7vh] sm:grid-cols-3 sm:gap-5">
-          {contrasts.map((c, i) => {
-            const answer = i === contrasts.length - 1;
-            return (
-              <div
-                key={i}
-                // （2026-10-16）最後一格（BUT）用竹棕色實底＋米白字凸顯，跟「竹」「？」同一個重點色
-                className={`border px-5 py-5 sm:px-6 sm:py-6 ${answer ? "border-transparent shadow-[0_10px_30px_rgb(120_60_20/0.18)]" : RULE}`}
-                style={answer ? { backgroundColor: ACCENT, color: "#f7f3ec" } : undefined}
-              >
-                <p className={EYEBROW} style={answer ? { color: "rgb(247 243 236 / 0.8)" } : MUTED}>
-                  {c.label}
-                </p>
-                <p
-                  className={`mt-3 font-serif-tc text-lg sm:text-xl ${answer ? "font-semibold sm:text-2xl" : ""}`}
-                  style={answer ? undefined : MUTED}
-                >
-                  {c.text}
-                </p>
-              </div>
-            );
-          })}
-        </Reveal>
-      )}
-    </>
-  );
-}
-
-function FormulaScreen({ data }: { data: NonNullable<typeof manifesto.formula> }) {
-  const terms = data.terms ?? [];
-  return (
-    <>
-      {terms.length > 0 && (
-        <Reveal>
-          {/* A ＋ B ＝ ？：前面幾項用「＋」接，最後一項用「＝」接 */}
-          <p className="text-center font-serif-tc text-6xl leading-none font-semibold sm:text-8xl lg:text-9xl">
-            {terms.map((t, i) => (
-              <Fragment key={i}>
-                {i > 0 && (
-                  <span className="mx-[0.3em] font-normal" style={MUTED}>
-                    {i === terms.length - 1 ? "=" : "+"}
-                  </span>
-                )}
-                <Accented text={t.symbol} />
-              </Fragment>
-            ))}
-          </p>
-        </Reveal>
-      )}
-      {terms.length > 0 && (
-        <Reveal delay={0.15} className={`mt-12 grid gap-8 sm:mt-[9vh] sm:grid-cols-3 sm:gap-0`}>
-          {terms.map((t, i) => (
-            <div key={i} className={i > 0 ? `sm:border-l sm:px-8 lg:px-10 ${RULE}` : "sm:pr-8 lg:pr-10"}>
-              <p className="font-serif-tc text-3xl font-semibold sm:text-4xl">
-                <Accented text={t.symbol} />
-              </p>
-              <p className="mt-4 font-serif-tc text-lg font-semibold sm:text-xl">{t.title}</p>
-              {t.subtitle && <p className="mt-1 font-serif-tc text-base sm:text-lg">{t.subtitle}</p>}
-              {t.en && (
-                <p className={`mt-3 ${EYEBROW}`} style={MUTED}>
-                  {t.en}
-                </p>
-              )}
-            </div>
-          ))}
-        </Reveal>
-      )}
-      {data.note && (
-        <Reveal delay={0.3}>
-          <p className="mt-12 font-serif-tc text-base leading-[1.8] sm:mt-[9vh] sm:text-xl">
-            <Accented text={data.note} />
-          </p>
-        </Reveal>
-      )}
-    </>
-  );
-}
-
-function CountsScreen({ data }: { data: NonNullable<typeof manifesto.counts> }) {
-  const items = data.items ?? [];
-  const chain = data.chain ?? [];
-  return (
-    <>
-      <Reveal>
-        {data.title && (
-          <h2 className="font-serif-tc text-3xl leading-[1.35] font-semibold sm:text-5xl">
-            <BambooAccent text={data.title} words={["系統"]} />
-          </h2>
-        )}
-        {data.body && (
-          <p className="mt-5 max-w-4xl text-sm leading-[1.95] sm:font-serif-tc sm:text-lg" style={MUTED}>
-            {data.body}
-          </p>
-        )}
-      </Reveal>
-      {items.length > 0 && (
-        <Reveal delay={0.15} className="mt-10 grid grid-cols-2 gap-y-8 sm:mt-[7vh] sm:grid-cols-4 sm:gap-0">
-          {items.map((it, i) => (
-            <div key={i} className={i > 0 ? `pr-4 sm:border-l sm:px-8 ${RULE}` : "pr-4 sm:pr-8"}>
-              {it.en && (
-                <p className={EYEBROW} style={MUTED}>
-                  {it.en}
-                </p>
-              )}
-              <p className="mt-2 font-serif-tc text-6xl leading-none font-semibold sm:mt-3 sm:text-[clamp(3.5rem,11vh,6.5rem)]">
-                {it.value}
-              </p>
-              <p className="mt-3 font-serif-tc text-base sm:text-lg">{it.label}</p>
-            </div>
-          ))}
-        </Reveal>
-      )}
-      {chain.length > 0 && (
-        <Reveal delay={0.3} className="mt-12 sm:mt-[8vh]">
-          {data.chainLabel && (
-            <p className={EYEBROW} style={MUTED}>
-              {data.chainLabel}
-            </p>
-          )}
-          {/* 竹構生成鏈：一條細線串起各步驟，頭（原料）尾（使用）兩個點加大 */}
-          <div className="relative mt-5 sm:mt-6">
-            <div className={`absolute top-[5px] right-[6px] left-[6px] border-t ${RULE}`} />
-            <ol className="relative flex justify-between">
-              {chain.map((step, i) => {
-                const end = i === 0 || i === chain.length - 1;
-                return (
-                  <li key={i} className={`flex flex-col ${i === 0 ? "items-start" : i === chain.length - 1 ? "items-end" : "items-center"}`}>
-                    <span
-                      className={`block rounded-full bg-[var(--foreground)] ${end ? "size-3" : "mt-[2px] size-2 opacity-60"}`}
-                    />
-                    <span className={`mt-3 font-serif-tc text-xs sm:text-base ${end ? "font-semibold" : ""}`}>{step}</span>
-                  </li>
-                );
-              })}
-            </ol>
-          </div>
-        </Reveal>
-      )}
-    </>
-  );
-}
-
-// 第六屏「兩案預告」：理念到作品的過渡。
-// - 上半部：標題＋原本單頁宣言的三個面向（☉，排成一行）＋兩句引言
-// - 中間一條細線，線上小字「兩組實驗場域」
-// - 下半部左右對分，跟下一屏的兩欄展覽同一個分界（左右各 50%、中間不留空），各放手稿、案名、
-//   地點年份類型、一句簡介。往下捲就是兩案的滿版封面，同一個左右位置從手稿變成實體照片。
-// 手稿完整顯示不裁切（object-contain），用 mix-blend-multiply 讓掃描紙張的淺色底融進白色頁面，
-// 只留下線條。還沒上傳時顯示虛線佔位框。手稿比文字晚一點淡入，像正在被畫出來。
-function BridgeScreen({
+// 第二屏「為什麼 → 系統 → 兩案」（2026-10-16 改版）由上而下：
+//   1. 三個面向（☉，一行）
+//   2. 為什麼要做竹小屋：四格關鍵字＋一句說明（bridge.reasons）
+//   3. A ＋ B ＝ ？一行公式
+//   4. 系統提供可能，業主決定結果。
+//   5. 兩組實驗場域：兩案往中間靠（整組置中、中間只留一點距離，看起來是同一組），各放封面照片／手稿、案名、一句簡介
+//   6. 「看兩個案子 ↓」：捲到兩欄展覽（跟往下滾一樣，不直接進各案，避免跳過兩案並排）
+// 手稿先出現、約 1.6 秒後淡出換成封面照片；沒有手稿就直接顯示封面照片。
+function SystemScreen({
   data,
+  formula,
+  closing,
   projects,
 }: {
   data: NonNullable<typeof manifesto.bridge>;
+  formula?: typeof manifesto.formula;
+  closing?: typeof manifesto.closing;
   projects: [BridgeProject, BridgeProject];
 }) {
+  const terms = formula?.terms ?? [];
   const points = (data.points ?? "").split("\n").filter((l) => l.trim());
+  const reasons = (data.reasons ?? []).filter((r) => r.title || r.text);
   return (
     <>
       <Reveal>
-        {data.title && (
-          <h2 className="font-serif-tc text-3xl leading-[1.35] font-semibold sm:text-4xl">
-            <BambooAccent text={data.title} words={["竹構"]} />
-          </h2>
-        )}
         {points.length > 0 && (
-          <ul className="mt-5 flex flex-col gap-2 font-serif-tc text-base sm:mt-6 sm:flex-row sm:flex-wrap sm:gap-x-12 sm:text-xl">
+          <ul className="flex flex-col gap-1 font-serif-tc text-xl leading-[1.4] font-semibold sm:flex-row sm:flex-wrap sm:gap-x-10 sm:text-3xl">
             {points.map((p, i) => (
               <li key={i}>
-                <span className="mr-2" style={MUTED}>
+                <span className="mr-2 font-normal" style={{ color: ACCENT }}>
                   ☉
                 </span>
-                {p}
+                {/* （2026-10-16）三個面向的關鍵詞（常民使用／模組化／共同創造）用竹棕色 */}
+                <BambooAccent text={p} words={["常民使用", "模組化", "共同創造"]} />
               </li>
             ))}
           </ul>
         )}
-        {data.quote && (
-          <p className="mt-5 text-sm leading-[1.9] whitespace-pre-line sm:mt-6 sm:font-serif-tc sm:text-base" style={MUTED}>
-            {data.quote}
+      </Reveal>
+
+      {reasons.length > 0 && (
+        <Reveal delay={0.1} className="mt-4 sm:mt-[2.5vh]">
+          {data.reasonsLabel && (
+            <p className={EYEBROW} style={MUTED}>
+              {data.reasonsLabel}
+            </p>
+          )}
+          <div className={`mt-3 grid grid-cols-2 gap-x-5 gap-y-4 border-t ${RULE} pt-4 sm:grid-cols-4 sm:gap-x-8`}>
+            {reasons.map((r, i) => (
+              <div key={i}>
+                <p className="font-serif-tc text-base font-semibold sm:text-lg">{r.title}</p>
+                <p className="mt-1 text-xs leading-[1.75] sm:font-serif-tc sm:text-sm" style={MUTED}>
+                  {r.text}
+                </p>
+              </div>
+            ))}
+          </div>
+        </Reveal>
+      )}
+
+      <Reveal delay={0.2} className="mt-5 sm:mt-[3vh]">
+        {terms.length > 0 && (
+          // A 模組化系統 ＋ B 人的參與 ＝ ？（每一項：大字符號＋小字標題）
+          <p className="flex flex-wrap items-baseline gap-x-4 gap-y-1 font-serif-tc sm:gap-x-5">
+            {terms.map((t, i) => (
+              <Fragment key={i}>
+                {i > 0 && (
+                  <span className="text-xl sm:text-3xl" style={MUTED}>
+                    {i === terms.length - 1 ? "=" : "+"}
+                  </span>
+                )}
+                <span className="inline-flex items-baseline gap-2">
+                  <span className="text-2xl font-semibold sm:text-4xl">
+                    <Accented text={t.symbol} />
+                  </span>
+                  {t.title && (
+                    <span className="text-sm sm:text-base" style={MUTED}>
+                      {t.title}
+                    </span>
+                  )}
+                </span>
+              </Fragment>
+            ))}
+          </p>
+        )}
+        {(closing?.title || closing?.emphasis) && (
+          <p className="mt-2 font-serif-tc text-xl leading-[1.4] font-semibold sm:mt-[1.5vh] sm:text-3xl">
+            {closing.title}
+            {closing.emphasis && <span style={{ color: ACCENT }}>{closing.emphasis}</span>}
           </p>
         )}
       </Reveal>
 
-      <Reveal delay={0.1} className="mt-8 flex items-center gap-4 sm:mt-[4vh]">
+      <Reveal delay={0.3} className="mt-5 flex items-center gap-4 sm:mt-[3vh]">
         <span className={`flex-1 border-t ${RULE}`} />
         {data.divider && (
           <span className={EYEBROW} style={MUTED}>
@@ -496,16 +439,14 @@ function BridgeScreen({
         <span className={`flex-1 border-t ${RULE}`} />
       </Reveal>
 
-      {/* 左右兩半貼齊畫面左右邊緣（抵掉 Screen 的左右內距），分界正好在畫面中線，跟兩欄展覽一致 */}
-      <div className="-mx-6 mt-6 grid grid-cols-2 sm:-mx-16 sm:mt-[4vh] lg:-mx-24">
+      {/* 兩案往中間靠：整組置中、最寬 980px，中間只留 48px，看起來是同一組的兩個案例 */}
+      <div className="mx-auto mt-5 grid w-full max-w-[980px] grid-cols-2 gap-4 sm:mt-[2.5vh] sm:gap-12">
         {projects.map((p, i) => {
           const intro = data.intros?.[p.slug];
           return (
-            <div key={p.slug} className="flex flex-col items-center px-3 text-center sm:px-10 lg:px-16">
-              <Reveal delay={0.35 + i * 0.15} className="w-full">
-                <div className="relative mx-auto aspect-[3/2] w-full max-w-[560px] sm:h-[clamp(140px,26vh,380px)] sm:w-auto sm:max-w-full">
-                  {/* （2026-10-16）手稿先出現，約 1.6 秒後淡出、換成這一案的首頁封面照片——往下捲時同一張照片在
-                      兩欄展覽滿版放大，理念到實體之間有個銜接，不是突然冒出一張大圖。沒有手稿就直接顯示封面照片。 */}
+            <div key={p.slug} className="flex flex-col items-center text-center">
+              <Reveal delay={0.4 + i * 0.12} className="w-full">
+                <div className="relative mx-auto aspect-[3/2] w-full sm:h-[clamp(78px,calc(100vh-720px),260px)] sm:w-auto sm:max-w-full">
                   {p.cover && (
                     <motion.div
                       className="absolute inset-0"
@@ -514,7 +455,7 @@ function BridgeScreen({
                       viewport={{ amount: 0.5 }}
                       transition={{ duration: 1.2, delay: p.sketch ? 1.6 : 0, ease: "easeInOut" }}
                     >
-                      <Image src={p.cover} alt={p.name} fill sizes="(max-width: 640px) 50vw, 40vw" className="object-cover" />
+                      <Image src={p.cover} alt={p.name} fill sizes="(max-width: 640px) 50vw, 30vw" className="object-cover" />
                     </motion.div>
                   )}
                   {p.sketch ? (
@@ -529,26 +470,21 @@ function BridgeScreen({
                         src={p.sketch}
                         alt={`${p.name} 手稿`}
                         fill
-                        sizes="(max-width: 640px) 50vw, 40vw"
+                        sizes="(max-width: 640px) 50vw, 30vw"
                         className="object-contain mix-blend-multiply"
                       />
                     </motion.div>
                   ) : p.cover ? null : (
-                    <div
-                      className={`flex h-full w-full items-center justify-center border border-dashed ${RULE} ${EYEBROW}`}
-                      style={MUTED}
-                    >
+                    <div className={`flex h-full w-full items-center justify-center border border-dashed ${RULE} ${EYEBROW}`} style={MUTED}>
                       手稿
                     </div>
                   )}
                 </div>
               </Reveal>
-              <Reveal delay={0.2 + i * 0.15}>
-                <p className="mt-5 font-serif-tc text-lg font-semibold sm:mt-[2.5vh] sm:text-2xl">{p.name}</p>
-                {/* （2026-10-16）案名下方改放一兩句讓人馬上懂這個案子在做什麼的簡介（後台「策展宣言」第 6 區塊
-                    填寫）；地點 · 年份 · 類型只在沒填簡介時當備用 */}
+              <Reveal delay={0.35 + i * 0.12}>
+                <p className="mt-3 font-serif-tc text-base font-semibold sm:mt-[1.8vh] sm:text-xl">{p.name}</p>
                 {intro ? (
-                  <p className="mx-auto mt-3 max-w-md font-serif-tc text-sm leading-[1.8] sm:text-base" style={MUTED}>
+                  <p className="mx-auto mt-1.5 max-w-md font-serif-tc text-xs leading-[1.75] sm:text-sm" style={MUTED}>
                     {intro}
                   </p>
                 ) : (
@@ -563,64 +499,23 @@ function BridgeScreen({
           );
         })}
       </div>
-    </>
-  );
-}
 
-function ClosingScreen({ data }: { data: NonNullable<typeof manifesto.closing> }) {
-  const variables = (data.variables ?? "").split("\n").filter((l) => l.trim());
-  return (
-    <>
-      <Reveal>
-        {data.title && <p className="font-serif-tc text-2xl font-semibold sm:text-4xl">{data.title}</p>}
-        {data.emphasis && (
-          // （2026-10-16）第二行（業主決定結果。）整行竹棕色
-          <h2
-            className="mt-2 font-serif-tc text-4xl leading-[1.25] font-semibold sm:mt-3 sm:text-6xl lg:text-7xl"
-            style={{ color: ACCENT }}
+      {data.cta && (
+        <Reveal delay={0.6} className="mt-4 flex justify-center sm:mt-[2vh]">
+          <button
+            onClick={scrollToExhibition}
+            className="group inline-flex items-center gap-2 border px-5 py-2 font-serif-tc text-sm font-semibold transition-colors hover:text-[#f7f3ec] sm:text-base"
+            style={{ borderColor: ACCENT, color: ACCENT }}
+            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = ACCENT)}
+            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "")}
           >
-            {data.emphasis}
-          </h2>
-        )}
-      </Reveal>
-      <Reveal delay={0.15} className={`mt-10 grid gap-10 border-t ${RULE} pt-8 sm:mt-[7vh] sm:grid-cols-2 sm:gap-16 sm:pt-[5vh] lg:gap-24`}>
-        <div>
-          {(data.from || data.to) && (
-            <div className="font-serif-tc">
-              {data.from && (
-                <p className="text-lg sm:text-xl" style={MUTED}>
-                  {data.from}
-                </p>
-              )}
-              {data.from && data.to && (
-                <svg aria-hidden className="my-3" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" style={MUTED}>
-                  <path d="M12 4v16M6 14l6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              )}
-              {data.to && <p className="text-xl font-semibold sm:text-2xl">{data.to}</p>}
-            </div>
-          )}
-          {data.shiftBody && (
-            <p className="mt-6 text-sm leading-[1.95] whitespace-pre-line sm:text-base" style={MUTED}>
-              {data.shiftBody}
-            </p>
-          )}
-        </div>
-        <div>
-          {variables.length > 0 && (
-            <ul className="space-y-2 font-serif-tc text-xl font-semibold sm:text-2xl">
-              {variables.map((v, i) => (
-                <li key={i}>{v}</li>
-              ))}
-            </ul>
-          )}
-          {data.variablesBody && (
-            <p className="mt-6 text-sm leading-[1.95] whitespace-pre-line sm:text-base" style={MUTED}>
-              {data.variablesBody}
-            </p>
-          )}
-        </div>
-      </Reveal>
+            {data.cta}
+            <span aria-hidden className="transition-transform group-hover:translate-y-0.5">
+              ↓
+            </span>
+          </button>
+        </Reveal>
+      )}
     </>
   );
 }

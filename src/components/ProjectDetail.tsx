@@ -108,14 +108,14 @@ export function ProjectDetail({
           目錄的位置改放這一案的目標（GoalsSection，沒填就跳過）。 */}
       <div className={`pt-10 pb-24 sm:pt-0 sm:pb-40 ${insetX}`}>
         <div className="min-w-0">
-          {goals && <GoalsSection goals={goals} />}
+          {goals && <GoalsSection goals={goals} variant={variant} />}
 
           {chapters.map((chapter, i) => {
             const frame = { number: chapterNumber(i), first: i === 0 };
             return chapter.key === "team" ? (
               <TeamSection key={chapter.key} chapter={chapter} {...frame} />
             ) : chapter.key === "video" ? (
-              <VideoSection key={chapter.key} chapter={chapter} {...frame} />
+              <VideoSection key={chapter.key} chapter={chapter} {...frame} variant={variant} />
             ) : chapter.key === "assembly" ? (
               <AssemblySection
                 key={chapter.key}
@@ -144,7 +144,6 @@ export function ProjectDetail({
             number={chapterNumber(chapters.length)}
             title={chapterTitle("site")}
             first={chapters.length === 0}
-            alignTo="text"
             // （2026-10-16）地圖改放左欄、文字下方；右欄放基地照片（chapter.images），其餘照片放 More in Detail
             // （chapter.moreImages）。沒有文字時左欄只有地圖。
             left={
@@ -616,8 +615,11 @@ const RIGHT_OFFSET = {
   // 往下約 8px（行距多出來的 4.1px＋字型本身字身框上方 4px，2026-10-14 用 canvas 量的）
   text: "sm:pt-[132px] lg:pt-[144px]",
   unit: "sm:pt-[140px] lg:pt-[152px]",
-  title: "sm:pt-[68px] lg:pt-[80px]",
+  // （2026-10-16）＋6px：對齊章節名稱「字」的上緣（24px 字、32px 行高，字頂在框頂往下約 5.5px，canvas 量的）
+  title: "sm:pt-[74px] lg:pt-[86px]",
 } as const;
+// （2026-10-16）預設改成對齊章節名稱的字上緣（原本預設對齊第一段內文），圖片比較早出現在畫面上；
+// 團隊介紹（rows 模式）不受影響，圖片照舊對齊各單位小標。
 
 function ChapterFrame({
   id,
@@ -626,7 +628,7 @@ function ChapterFrame({
   first,
   left,
   right,
-  alignTo = "text",
+  alignTo = "title",
   rows,
   sticky = true,
   wide = false,
@@ -646,7 +648,7 @@ function ChapterFrame({
   wide?: boolean;
 }) {
   const fadeRef = useFadeInView<HTMLElement>();
-  const sectionClass = `${FADE_CLASS} flex scroll-mt-10 flex-col ${first ? "" : "border-t pt-10"} sm:grid sm:min-h-screen sm:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] sm:items-start sm:gap-x-12 sm:border-0 sm:pt-28 sm:pb-28 lg:gap-x-20`;
+  const sectionClass = `${FADE_CLASS} flex scroll-mt-10 flex-col ${first ? "" : "border-t pt-10"} sm:grid sm:min-h-screen sm:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] sm:items-start sm:gap-x-12 sm:border-0 sm:pt-16 sm:pb-20 lg:gap-x-20`; // （2026-10-16）上下內距 112→64／80px，章節整體抬高，從首頁開的浮起視窗（比畫面矮 106px）也放得下
   const sectionStyle = first
     ? undefined
     : { borderColor: "var(--border-subtle)" };
@@ -698,12 +700,12 @@ function ChapterFrame({
     // （原本還加了捲動吸附到章節開頭，會跟滑鼠滾輪搶捲動、造成卡頓，已拿掉。）
     // 右欄上緣跟左欄的哪個東西切齊見上面的 RIGHT_OFFSET。
     <section ref={fadeRef} id={id} className={sectionClass} style={sectionStyle}>
-      <div className={`contents sm:block sm:self-start ${sticky ? "sm:sticky sm:top-28" : ""}`}>
+      <div className={`contents sm:block sm:self-start ${sticky ? "sm:sticky sm:top-16" : ""}`}>
         {header}
         {left}
       </div>
       <div
-        className={`contents sm:flex sm:flex-col sm:gap-6 sm:[&>*]:mt-0 ${RIGHT_OFFSET[left ? alignTo : "title"]}`}
+        className={`contents sm:flex sm:flex-col sm:gap-6 sm:[&>*]:mt-0 ${RIGHT_OFFSET[alignTo]}`}
       >
         {right}
       </div>
@@ -717,7 +719,7 @@ function ChapterFrame({
 // 說明＋對照表（一行一列、| 分欄、第一行表頭）＋例圖（一排四張、圖說在下）。內容在各案後台「案例目標」填，
 // 留空的欄位不顯示。視覺沿用網站語彙（襯線、灰階、細線），不搬簡報的綠色色塊。
 // 手機版：上下排列，例圖一排兩張。
-function GoalsSection({ goals }: { goals: ProjectGoals }) {
+function GoalsSection({ goals, variant }: { goals: ProjectGoals; variant: "page" | "modal" }) {
   const fadeRef = useFadeInView<HTMLElement>();
   const muted = { color: "var(--foreground-muted)" };
   const rule = { borderColor: "var(--border-subtle)" };
@@ -733,7 +735,7 @@ function GoalsSection({ goals }: { goals: ProjectGoals }) {
     <section
       ref={fadeRef}
       id="goals"
-      className={`${FADE_CLASS} flex flex-col gap-8 pb-10 sm:grid sm:min-h-screen sm:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] sm:content-center sm:items-start sm:gap-x-12 sm:py-8 lg:gap-x-20`}
+      className={`${FADE_CLASS} flex flex-col gap-8 pb-10 sm:grid ${variant === "modal" ? "sm:min-h-[calc(100dvh-106px)]" : "sm:min-h-screen"} sm:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] sm:content-center sm:items-start sm:gap-x-12 sm:py-8 lg:gap-x-20`}
     >
       <div>
         {/* 跟其他章節同一套開頭：大編號「00」＋章節名「核心目標」（ChapterFrame 的 header），左側直書導覽
@@ -827,7 +829,7 @@ function GoalsSection({ goals }: { goals: ProjectGoals }) {
               width={1600}
               height={800}
               sizes="(max-width: 640px) 100vw, 55vw"
-              className="h-auto w-full object-contain object-left sm:max-h-[calc(100vh-600px)] sm:w-auto"
+              className={`h-auto w-full object-contain object-left sm:w-auto ${variant === "modal" ? "sm:max-h-[calc(100dvh-706px)]" : "sm:max-h-[calc(100vh-600px)]"}`}
             />
             {images[0].caption && (
               <figcaption className="mt-2 font-serif-tc text-xs sm:text-sm" style={muted}>
@@ -969,10 +971,12 @@ function VideoSection({
   chapter,
   number,
   first,
+  variant,
 }: {
   chapter: Chapter;
   number: string;
   first: boolean;
+  variant: "page" | "modal";
 }) {
   const videos = (chapter.videos ?? []).filter((v) => v.url?.trim());
   return (
@@ -991,6 +995,9 @@ function VideoSection({
               {chapter.text.trim()}
             </p>
           )}
+          {/* （2026-10-16）影片寬度上限：讓 16:9 的高度剛好放得進一個畫面（扣掉上方章節標題與上下留白；
+              浮起視窗比畫面矮 106px，再多扣一些），寬螢幕上一樣接近最大寬度，矮螢幕上自動縮小、不被切到 */}
+          <div style={{ maxWidth: `calc((100dvh - ${variant === "modal" ? 380 : 274}px) * 16 / 9)` }}>
           {videos.length > 0 ? (
           videos.map((v) => (
             <div key={v.id} className="mt-8">
@@ -1013,6 +1020,7 @@ function VideoSection({
             影片待補
           </div>
           )}
+          </div>
         </>
       }
     />
@@ -1203,7 +1211,6 @@ function NarrativeSection({
       number={number}
       title={chapterTitle(chapter.key)}
       first={first}
-      alignTo={blocks.some((b) => b.type === "paragraph") ? "text" : "title"}
       left={paragraphNodes}
       right={
         <>

@@ -118,7 +118,7 @@ function Screen({
           {String(index + 1).padStart(2, "0")} / {String(total).padStart(2, "0")}
           {label ? ` · ${label}` : ""}
         </p>
-        {/* 最後一屏中間已經有「看兩個案子 ↓」，右下角不重複放 */}
+        {/* 最後一屏中間已經有「看兩個計畫 ↓」，右下角不重複放 */}
         {!last && (
           <button
             onClick={scrollToExhibition}
@@ -342,7 +342,7 @@ function IntroScreen({
 //   3. A ＋ B ＝ ？一行公式
 //   4. 系統提供可能，業主決定結果。
 //   5. 兩組實驗場域：兩案往中間靠（整組置中、中間只留一點距離，看起來是同一組），各放封面照片／手稿、案名、一句簡介
-//   6. 「看兩個案子 ↓」：捲到兩欄展覽（跟往下滾一樣，不直接進各案，避免跳過兩案並排）
+//   6. 「看兩個計畫 ↓」：捲到兩欄展覽（跟往下滾一樣，不直接進各案，避免跳過兩案並排）
 // 手稿先出現、約 1.6 秒後淡出換成封面照片；沒有手稿就直接顯示封面照片。
 function SystemScreen({
   data,
@@ -439,8 +439,8 @@ function SystemScreen({
         <span className={`flex-1 border-t ${RULE}`} />
       </Reveal>
 
-      {/* 兩案往中間靠：整組置中、最寬 980px，中間只留 48px，看起來是同一組的兩個案例 */}
-      <div className="mx-auto mt-5 grid w-full max-w-[980px] grid-cols-2 gap-4 sm:mt-[2.5vh] sm:gap-12">
+      {/* 兩案往中間靠：整組置中、最寬 1100px，中間留 96px（同日由 48px 稍微拉開），看起來是同一組的兩個案例 */}
+      <div className="mx-auto mt-5 grid w-full max-w-[1100px] grid-cols-2 gap-6 sm:mt-[2.5vh] sm:gap-24">
         {projects.map((p, i) => {
           const intro = data.intros?.[p.slug];
           return (

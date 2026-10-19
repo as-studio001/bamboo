@@ -243,7 +243,92 @@
       "key": "engineering",
       "title": "結構設計",
       "text": "主結構由三組 A 字組合竹柱撐起：每組以 10cm 孟宗竹組成 A 字形，柱腳落在混凝土墩座上，柱頂以接合鋼板與橫梁、縱梁相接。\n\n兩跨之間以 10cm 孟宗竹抗剪組合梁交叉補強，中段以 M20 雙頭螺紋圓桿鎖固，形成向下張開的桁架，承擔屋頂荷重並抵抗側向變形；屋頂四角的防颱抗拉桿件，因應颱風季節的上揚風力。\n\n所有竹構件均經 VSD 防腐處理，縱梁需揀選「膨尾」竹。",
-      "images": []
+      "images": [
+        {
+          "id": "project-one-force-fx-dl",
+          "tone": "bg-neutral-300",
+          "caption": "D+L 靜載重＋活載重｜軸力 Axial（kgf）",
+          "src": "/images/project-one/force-fx-dl.png",
+          "kind": "drawing"
+        },
+        {
+          "id": "project-one-force-fyz-dl",
+          "tone": "bg-neutral-300",
+          "caption": "D+L 靜載重＋活載重｜剪力 Shear（kgf）",
+          "src": "/images/project-one/force-fyz-dl.png",
+          "kind": "drawing"
+        },
+        {
+          "id": "project-one-force-myz-dl",
+          "tone": "bg-neutral-300",
+          "caption": "D+L 靜載重＋活載重｜彎矩 Moment（kgf·m）",
+          "src": "/images/project-one/force-myz-dl.png",
+          "kind": "drawing"
+        },
+        {
+          "id": "project-one-force-fx-ex",
+          "tone": "bg-neutral-300",
+          "caption": "Ex X 向地震力｜軸力 Axial（kgf）",
+          "src": "/images/project-one/force-fx-ex.png",
+          "kind": "drawing"
+        },
+        {
+          "id": "project-one-force-fyz-ex",
+          "tone": "bg-neutral-300",
+          "caption": "Ex X 向地震力｜剪力 Shear（kgf）",
+          "src": "/images/project-one/force-fyz-ex.png",
+          "kind": "drawing"
+        },
+        {
+          "id": "project-one-force-myz-ex",
+          "tone": "bg-neutral-300",
+          "caption": "Ex X 向地震力｜彎矩 Moment（kgf·m）",
+          "src": "/images/project-one/force-myz-ex.png",
+          "kind": "drawing"
+        },
+        {
+          "id": "project-one-force-fx-ey",
+          "tone": "bg-neutral-300",
+          "caption": "Ey Y 向地震力｜軸力 Axial（kgf）",
+          "src": "/images/project-one/force-fx-ey.png",
+          "kind": "drawing"
+        },
+        {
+          "id": "project-one-force-fyz-ey",
+          "tone": "bg-neutral-300",
+          "caption": "Ey Y 向地震力｜剪力 Shear（kgf）",
+          "src": "/images/project-one/force-fyz-ey.png",
+          "kind": "drawing"
+        },
+        {
+          "id": "project-one-force-myz-ey",
+          "tone": "bg-neutral-300",
+          "caption": "Ey Y 向地震力｜彎矩 Moment（kgf·m）",
+          "src": "/images/project-one/force-myz-ey.png",
+          "kind": "drawing"
+        },
+        {
+          "id": "project-one-force-fx-wx",
+          "tone": "bg-neutral-300",
+          "caption": "W 風力｜軸力 Axial（kgf）",
+          "src": "/images/project-one/force-fx-wx.png",
+          "kind": "drawing"
+        },
+        {
+          "id": "project-one-force-fyz-wx",
+          "tone": "bg-neutral-300",
+          "caption": "W 風力｜剪力 Shear（kgf）",
+          "src": "/images/project-one/force-fyz-wx.png",
+          "kind": "drawing"
+        },
+        {
+          "id": "project-one-force-myz-wx",
+          "tone": "bg-neutral-300",
+          "caption": "W 風力｜彎矩 Moment（kgf·m）",
+          "src": "/images/project-one/force-myz-wx.png",
+          "kind": "drawing"
+        }
+      ]
     },
     {
       "key": "construction",

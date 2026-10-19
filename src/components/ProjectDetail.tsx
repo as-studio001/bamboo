@@ -65,7 +65,8 @@ export function ProjectDetail({
   // 標題的空章節；基地位置一律顯示（沒座標時顯示「地圖待補」）。活動區塊只放在首頁，內頁不再顯示。
   // （2026-10-15）「影片」章節一律保留位置（還沒有影片時顯示「影片待補」），兩案章節編號才會一致
   const chapters = orderedChapters(project).filter(
-    (c) => c.key !== "site" && (c.key === "video" || hasContent(c)),
+    // （2026-10-19）「結構設計」也一律保留位置：內容還沒填時只顯示章節編號與名稱，章節編號不會跳號
+    (c) => c.key !== "site" && (c.key === "video" || c.key === "engineering" || hasContent(c)),
   );
   const insetX =
     variant === "modal" ? "px-8 sm:px-12 lg:px-16" : "px-4 sm:px-8 lg:px-12";
@@ -116,6 +117,8 @@ export function ProjectDetail({
               <TeamSection key={chapter.key} chapter={chapter} {...frame} />
             ) : chapter.key === "video" ? (
               <VideoSection key={chapter.key} chapter={chapter} {...frame} variant={variant} />
+            ) : chapter.key === "engineering" && isDiagramChapter(chapter) ? (
+              <DiagramSection key={chapter.key} chapter={chapter} {...frame} />
             ) : chapter.key === "assembly" ? (
               <AssemblySection
                 key={chapter.key}
@@ -1215,6 +1218,7 @@ function NarrativeSection({
       right={
         <>
           {photos}
+
           {chapter.moreImages && chapter.moreImages.length > 0 && (
             <div style={{ order: blocks.length }}>
               <ReadMoreGallery
@@ -1365,6 +1369,67 @@ function AssemblySection({
             <AssemblyBook project={project} pdf={chapter.pdf} accent={accent} />
           </div>
         )
+      }
+    />
+  );
+}
+
+// 「結構設計」力圖（2026-10-19）：後台主要照片的圖說寫成「組名｜圖名」（例如「D+L 靜載重＋活載重｜軸力 Axial（kgf）」）
+// 時，依「｜」前面的組名分組：每一組一排、三張橫向並排（軸力／剪力／彎矩），四組由上往下排（D+L、Ex、Ey、Wu）。
+// 版面跟其他章節一樣左文右圖：右欄每組一列三張縮小並排。點圖片會在新分頁打開原尺寸，方便看清楚色階數字。
+function isDiagramChapter(chapter: Chapter) {
+  return (chapter.images ?? []).some((img) => img.src && img.caption?.includes("｜"));
+}
+
+function DiagramSection({ chapter, number, first }: { chapter: Chapter; number: string; first: boolean }) {
+  const groups: { label: string; items: { id: string; src: string; caption: string }[] }[] = [];
+  for (const img of chapter.images ?? []) {
+    if (!img.src) continue;
+    const at = img.caption?.indexOf("｜") ?? -1;
+    const label = at >= 0 ? img.caption!.slice(0, at).trim() : "";
+    const caption = at >= 0 ? img.caption!.slice(at + 1).trim() : (img.caption ?? "");
+    let g = groups.find((x) => x.label === label);
+    if (!g) groups.push((g = { label, items: [] }));
+    g.items.push({ id: img.id, src: img.src, caption });
+  }
+  const paragraphs = (chapter.text ?? "").split("\n\n").filter((p) => p.trim());
+  // （同日）維持跟其他章節一樣的左文右圖：左欄編號＋名稱＋內文，右欄由上往下排各組力圖（每組三張橫向並排、縮小）
+  return (
+    <ChapterFrame
+      id={chapter.key}
+      number={number}
+      title={chapterTitle(chapter.key)}
+      first={first}
+      left={paragraphs.map((p, i) => (
+        <p key={i} className={`mt-6 max-w-2xl sm:max-w-none ${BODY_TEXT}`} style={{ order: i }}>
+          <RichText text={p} />
+        </p>
+      ))}
+      right={
+        <div className="mt-6 flex flex-col gap-8 sm:mt-0 sm:gap-10" style={{ order: 50 }}>
+          {groups.map((g) => (
+            <div key={g.label || "_"}>
+              {g.label && (
+                <div className="flex items-baseline gap-3 border-b pb-2" style={{ borderColor: "var(--border-subtle)" }}>
+                  <span className="font-mono text-[10px] tracking-[0.25em] uppercase" style={{ color: "var(--foreground-muted)" }}>
+                    Load case
+                  </span>
+                  <span className={`font-serif-tc text-sm font-bold ${TEXT_PRIMARY}`}>{g.label}</span>
+                </div>
+              )}
+              <div className="mt-3 grid grid-cols-3 gap-3 sm:gap-4">
+                {g.items.map((it) => (
+                  <figure key={it.id} className="m-0 min-w-0">
+                    <a href={it.src} target="_blank" rel="noreferrer" className="block cursor-zoom-in" title="開啟原尺寸">
+                      <Image src={it.src} alt={`${g.label} ${it.caption}`} width={0} height={0} sizes="(max-width: 640px) 33vw, 20vw" className="block h-auto w-full" />
+                    </a>
+                    <PhotoCaption text={it.caption} />
+                  </figure>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
       }
     />
   );

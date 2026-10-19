@@ -33,12 +33,14 @@ export type ChapterVideoItem = { id: string; url: string; title?: string };
 // 「團隊介紹」（team）分成兩個固定單位（2026-10-14）：設計單位、業主單位，各自有文字跟圖片，存在
 // chapter.units。文字照後台輸入的換行顯示、不切段落；圖片排在文字右邊（見 ProjectDetail.tsx 的
 // TeamSection）。
-export type TeamUnitKey = "designer" | "owner";
+export type TeamUnitKey = "designer" | "builder" | "owner";
 // name：單位名稱（例如「初樸建築師事務所」），顯示在小標「設計單位」右邊；text 是下面的介紹內文
 export type TeamUnit = { key: TeamUnitKey; name?: string; text?: string; images?: ProjectImage[] };
-export const TEAM_UNITS: { key: TeamUnitKey; title: string }[] = [
-  { key: "designer", title: "設計單位" },
-  { key: "owner", title: "業主單位" },
+// （2026-10-19）分成 A、B 兩組，對應首頁公式「A 模組化設計施工 ＋ B 業主的參與」：A＝設計單位、施工單位（新增），B＝業主單位
+export const TEAM_UNITS: { key: TeamUnitKey; title: string; group: "A" | "B" }[] = [
+  { key: "designer", title: "設計單位", group: "A" },
+  { key: "builder", title: "施工單位", group: "A" },
+  { key: "owner", title: "業主單位", group: "B" },
 ];
 
 export const CHAPTER_ORDER: ChapterKey[] = [

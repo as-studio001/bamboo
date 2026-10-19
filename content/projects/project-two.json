@@ -49,33 +49,40 @@
       "units": [
         {
           "key": "designer",
-          "name": "諸野竹木構／黃韋維(左)、游智傑(右)",
-          "text": "諸野竹木構專門有限公司（JHUYEH LLC.） 2022 年成立於臺灣，是一間專注於竹構造與木構造的在地設計施作團隊。透過設計與施工的實踐，探索在地永續與工藝文化的交會，定義竹木構造在當代建築中的角色與未來可能。",
+          "name": "諸野竹木構／黃韋維",
+          "text": "黃韋維，承億集團文旅品牌與文化實踐者，曾任承億文旅藝術長，長期投入旅宿、藝術、設計與地方文化的整合。關注旅宿空間如何成為城市文化的一部分，透過空間、藝術與策展創造旅人的地方體驗。",
           "images": [
             {
               "id": "project-two-u0krazx",
               "tone": "bg-neutral-300",
               "caption": "",
               "src": "/images/project-two/1792058644221-16431826629970306088.jpg"
-            },
-            {
-              "id": "project-two-dpw4hph",
-              "tone": "bg-neutral-300",
-              "caption": "",
-              "src": "/images/project-two/team-you-zhijie-crop.jpg"
             }
           ]
         },
         {
           "key": "owner",
           "name": "竹育股份有限公司",
-          "text": "竹育是為數不多具有全竹加工利用能力的公司。目前已獲得WCA/ISO等多項國際認證。基於SDGs觀念已經將材料利用/生產制程/人性管理/社會回饋等理念融合與國際潮流接軌。公司的核心理念以國產竹材為橋透過實際行動，在台灣建立一個有價值/更包容/能永續的經濟循環。\n讓國材國用產業發展留在台灣這塊土地上。",
+          "text": "竹育是為數不多具有全竹加工利用能力的公司。目前已獲得WCA/ISO等多項國際認證。基於SDGs觀念已經將材料利用/生產制程/人性管理/社會回饋等理念融合與國際潮流接軌。公司的核心理念以國產竹材為橋透過實際行動，在台灣建立一個有價值/更包容/能永續的經濟循環。讓國材國用產業發展留在台灣這塊土地上。",
           "images": [
             {
               "id": "project-two-j9od2a1",
               "tone": "bg-neutral-300",
               "caption": "",
               "src": "/images/project-two/1792058763666-images.png"
+            }
+          ]
+        },
+        {
+          "key": "builder",
+          "name": "諸野竹木構／游智傑",
+          "text": "諸野竹木構專門有限公司（JHUYEH LLC.） 2022 年成立於臺灣，是一間專注於竹構造與木構造的在地設計施作團隊。透過設計與施工的實踐，探索在地永續與工藝文化的交會，定義竹木構造在當代建築中的角色與未來可能。",
+          "images": [
+            {
+              "id": "project-two-dpw4hph",
+              "tone": "bg-neutral-300",
+              "caption": "",
+              "src": "/images/project-two/team-you-zhijie-crop.jpg"
             }
           ]
         }
@@ -412,6 +419,12 @@
           "src": "/images/project-two/1792059994090-LINE_ALBUM_20260902_D4隔熱冷凍板_鋼構底座_水泥基座_260903_2.jpg"
         }
       ]
+    },
+    {
+      "key": "finished",
+      "title": "成品照片",
+      "text": "",
+      "images": []
     },
     {
       "key": "assembly",

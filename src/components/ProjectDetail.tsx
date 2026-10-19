@@ -2,6 +2,7 @@
 
 import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
+import { manifesto } from "@/lib/manifesto";
 import { createPortal } from "react-dom";
 import {
   accentOnLight,
@@ -888,11 +889,12 @@ function TeamSection({
   first: boolean;
 }) {
   const units = chapter.units?.length
-    ? TEAM_UNITS.map(({ key, title }) => {
+    ? TEAM_UNITS.map(({ key, title, group }) => {
         const unit = chapter.units?.find((u) => u.key === key);
         return {
           key,
           title,
+          group: group as string,
           name: unit?.name,
           text: unit?.text,
           images: unit?.images,
@@ -902,75 +904,116 @@ function TeamSection({
         {
           key: "legacy",
           title: "",
+          group: "",
           name: "",
           text: chapter.text,
           images: chapter.images,
         },
       ];
+  // （2026-10-19）施工單位是新增的，還沒填內容時也先列出來（顯示「待補」），其他單位沒內容就不顯示
   const shown = units.filter(
-    (u) => u.name?.trim() || u.text?.trim() || u.images?.some((img) => img.src),
+    (u) => u.key === "builder" || u.name?.trim() || u.text?.trim() || u.images?.some((img) => img.src),
   );
+  // A／B 分組標題沿用首頁第二頁公式的文字（manifesto.formula.terms：A 模組化設計施工、B 業主的參與）
+  const groupTitle = (g: string) => manifesto.formula?.terms?.find((t) => t.symbol === g)?.title ?? "";
 
+  // （2026-10-19）三欄並排，一個畫面放得下：每個單位一欄（照片在上、單位名稱、介紹文字），
+  // 上方的 A／B 分組標題橫跨該組的欄數（A＝設計單位＋施工單位兩欄、B＝業主單位一欄）。
+  // 手機版改成由上往下：分組標題 → 該組的單位。電腦版用明確的列／欄位置排，DOM 順序維持手機版的閱讀順序。
+  const groups: { group: string; units: typeof shown }[] = [];
+  for (const u of shown) {
+    const last = groups[groups.length - 1];
+    if (last && last.group === u.group) last.units.push(u);
+    else groups.push({ group: u.group, units: [u] });
+  }
+  const cols = Math.max(shown.length, 1);
+  let col = 1;
   return (
     <ChapterFrame
       id={chapter.key}
       number={number}
       title={chapterTitle(chapter.key)}
       first={first}
-      // 每個單位一列：左邊小標＋內文、右邊圖片。右邊圖片上緣貼齊單位名稱那一行「字」的上緣：
-      // 小標行高 24px、字的上緣在行框內往下 4.5px（canvas 量的），所以右邊往下推 4.5px（沒有小標的單位改對齊內文的字，推 8px），
-      // 圖片上緣就跟這個單位的內文第一行切齊；沒有小標的單位就不推。左欄不固定，圖片跟文字一起捲動。
-      rows={shown.map((unit) => {
-        const hasHeading = !!(unit.title || unit.name?.trim());
-        const images = (unit.images ?? []).filter((img) => img.src);
-        return {
-          left: (
-            <div className="mt-8 sm:mt-10">
-              {/* 單位小標：「設計單位　初樸建築師事務所」——類別跟單位名稱同一行、中間空一格，跟章節標題同一套
-                  字體（襯線粗體、主文字色），字級跟內文一樣；下面只放介紹內文 */}
-              {hasHeading && (
-                <h4
-                  className={`font-serif-tc text-sm font-bold tracking-wide sm:text-base sm:leading-6 ${TEXT_PRIMARY}`}
-                >
-                  {unit.title}
-                  {unit.name?.trim() && (
-                    <span className={unit.title ? "ml-[1em]" : ""}>
-                      {unit.name.trim()}
+      sticky={false}
+      wide
+      left={
+        <div
+          className="mt-8 grid grid-cols-1 gap-x-10 gap-y-6 sm:mt-7 sm:grid-cols-[repeat(var(--team-cols),minmax(0,1fr))] sm:gap-y-4 lg:gap-x-14"
+          style={{ ["--team-cols" as string]: cols } as React.CSSProperties}
+        >
+          {groups.map((g) => {
+            const groupStart = col;
+            col += g.units.length;
+            return (
+              <Fragment key={g.group || "_"}>
+                {g.group && (
+                  <div
+                    className="relative mt-4 flex items-baseline gap-3 border-b pb-2 sm:mt-0 sm:[grid-column:var(--gc)] sm:[grid-row:1]"
+                    style={{ borderColor: "var(--border-subtle)", ["--gc" as string]: `${groupStart} / span ${g.units.length}` } as React.CSSProperties}
+                  >
+                    {/* A ＋ B：第二組以後，在兩組之間的空隙正中間放一個「＋」（跟首頁公式一樣） */}
+                    {groupStart > 1 && (
+                      <span
+                        aria-hidden
+                        className={`absolute right-full bottom-2 hidden translate-x-1/2 font-serif-tc text-5xl leading-none font-light sm:block sm:mr-5 lg:mr-7 ${TEXT_PRIMARY}`}
+                      >
+                        +
+                      </span>
+                    )}
+                    <span className={`font-serif-tc text-4xl leading-none font-bold sm:text-6xl ${TEXT_PRIMARY}`}>{g.group}</span>
+                    <span className={`font-serif-tc text-base font-semibold sm:text-xl ${TEXT_PRIMARY}`}>
+                      {groupTitle(g.group)}
                     </span>
-                  )}
-                </h4>
-              )}
-              {unit.text?.trim() && (
-                <p className={`mt-3 whitespace-pre-line ${BODY_TEXT}`}>
-                  {unit.text.trim()}
-                </p>
-              )}
-            </div>
-          ),
-          right: images.length ? (
-            <div
-              // （2026-10-15）多張圖時電腦版左右並排、向右貼齊，每張維持單張時的大小（右欄 30% 寬的正方形）
-              className={`mt-6 flex flex-col gap-3 sm:mt-10 sm:ml-auto sm:flex-row sm:justify-end sm:gap-4 ${hasHeading ? "sm:pt-[4.5px]" : "sm:pt-2"} ${
-                images.length > 1 ? "sm:w-[calc(60%+1rem)] sm:[&>*]:min-w-0 sm:[&>*]:flex-1" : "sm:w-[30%]"
-              }`}
-            >
-              {images.map((img) => (
-                // next/image 自動縮圖、轉 WebP（不直接載原圖，捲動比較順）；電腦版裁成正方形
-                <Image
-                  key={img.id}
-                  src={img.src!}
-                  alt={img.caption ?? ""}
-                  width={0}
-                  height={0}
-                  sizes="(max-width: 640px) 100vw, 30vw"
-                  // object-top：直式人像裁成正方形時保留上緣，不切到頭（2026-10-15，黃韋維照片被切到頭）
-                  className="block h-auto w-full sm:aspect-square sm:object-cover sm:object-top"
-                />
-              ))}
-            </div>
-          ) : null,
-        };
-      })}
+                  </div>
+                )}
+                {g.units.map((unit, k) => {
+                  const images = (unit.images ?? []).filter((img) => img.src);
+                  return (
+                    <div key={unit.key} style={{ ["--gc" as string]: groupStart + k } as React.CSSProperties} className="min-w-0 sm:[grid-column:var(--gc)] sm:[grid-row:2]">
+                      {images.length > 0 && (
+                        <div className="mb-3 flex gap-3">
+                          {images.map((img) => (
+                            <Image
+                              key={img.id}
+                              src={img.src!}
+                              alt={img.caption ?? ""}
+                              width={0}
+                              height={0}
+                              // 照片最大約 210px 正方形；橫式照片裁成正方形時只用到中間一部分，所以載 2 倍寬的縮圖才不會糊
+                              sizes="(max-width: 640px) 60vw, 420px"
+                              // 正方形、從上緣裁（人像不切到頭），高度跟著畫面高度縮放，一個畫面放得下
+                              className="block aspect-square h-auto w-[clamp(110px,calc(30vh-50px),210px)] object-cover object-top"
+                            />
+                          ))}
+                        </div>
+                      )}
+                      {(unit.title || unit.name?.trim()) && (
+                        <h4 className={`font-serif-tc text-sm font-bold tracking-wide sm:text-base sm:leading-6 ${TEXT_PRIMARY}`}>
+                          <span className="block text-xs font-normal sm:text-sm" style={{ color: "var(--foreground-muted)" }}>
+                            {unit.title}
+                          </span>
+                          {unit.name?.trim()}
+                        </h4>
+                      )}
+                      {unit.text?.trim() ? (
+                        <p className={`mt-2 whitespace-pre-line text-sm leading-[1.8] sm:max-w-[22em] sm:font-serif-tc sm:text-[15px] ${TEXT_BODY}`}>
+                          {unit.text.trim()}
+                        </p>
+                      ) : (
+                        unit.key === "builder" && (
+                          <p className="mt-2 font-serif-tc text-sm" style={{ color: "var(--foreground-muted)" }}>
+                            待補
+                          </p>
+                        )
+                      )}
+                    </div>
+                  );
+                })}
+              </Fragment>
+            );
+          })}
+        </div>
+      }
     />
   );
 }

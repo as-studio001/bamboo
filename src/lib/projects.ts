@@ -25,6 +25,7 @@ export type ChapterKey =
   | "construction"
   | "assembly"
   | "video"
+  | "finished" // （2026-10-19）成品：首頁兩欄（施工之後、組裝之前）與案例內頁 07「成品照片」都有，還沒有照片時顯示「待補」
   | "site";
 
 export type ChapterVideoItem = { id: string; url: string; title?: string };
@@ -47,12 +48,13 @@ export const CHAPTER_ORDER: ChapterKey[] = [
   "structure",
   "engineering",
   "construction",
+  "finished", // （2026-10-19）07 成品照片
   "assembly",
   "video",
   "site",
 ];
 
-export const HOME_CHAPTER_KEYS: ChapterKey[] = ["design", "module", "structure", "construction", "assembly", "site"];
+export const HOME_CHAPTER_KEYS: ChapterKey[] = ["design", "module", "structure", "construction", "finished", "assembly", "site"];
 
 // 主色（accent）同時用在「疊在封面照片上的地點／年份字」跟「白色頁面上的按鈕、導覽字」（More in Detail、
 // 左側章節導覽、組裝說明書按鈕、地圖待補提示…）。後台把主色設成白色或很淺的顏色時，前者看得清楚、後者
@@ -70,7 +72,10 @@ export function accentOnLight(accent: string): string {
 // 依固定順序取出這個案例有的章節（JSON 裡的陣列順序不算數；資料裡沒有的章節就跳過）。
 // keys 可以限定只取哪些章節（例如首頁只取 HOME_CHAPTER_KEYS）。
 export function orderedChapters(project: Project, keys: ChapterKey[] = CHAPTER_ORDER): Chapter[] {
-  return keys.map((key) => project.chapters.find((c) => c.key === key)).filter((c): c is Chapter => !!c);
+  // 「成品」（finished）是 2026-10-19 新增的首頁章節，舊資料還沒有這一章時補一個空的，首頁選單跟「圖片待補」照樣出現
+  return keys
+    .map((key) => project.chapters.find((c) => c.key === key) ?? (key === "finished" ? { key, title: "成品", images: [] } : undefined))
+    .filter((c): c is Chapter => !!c);
 }
 
 export type Chapter = {

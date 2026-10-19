@@ -88,7 +88,7 @@
         {
           "id": "project-one-deck-scene-market",
           "tone": "bg-neutral-300",
-          "caption": "市集攤位－活動攤商（情境示意，AI 生成）",
+          "caption": "市集攤位－活動攤商",
           "src": "/images/project-one/deck-scene-market-clean.jpg",
           "kind": "photo"
         }
@@ -97,14 +97,14 @@
         {
           "id": "project-one-deck-scene-camp",
           "tone": "bg-neutral-300",
-          "caption": "主題式帳幕－露營（情境示意，AI 生成）",
+          "caption": "主題式帳幕－露營",
           "src": "/images/project-one/deck-scene-camp-clean.jpg",
           "kind": "photo"
         },
         {
           "id": "project-one-deck-scene-yoga",
           "tone": "bg-neutral-300",
-          "caption": "療育基地－林間瑜珈（情境示意，AI 生成）",
+          "caption": "療育基地－林間瑜珈",
           "src": "/images/project-one/deck-scene-yoga-clean.jpg",
           "kind": "photo"
         }

@@ -66,7 +66,7 @@ export function ProjectDetail({
   // （2026-10-15）「影片」章節一律保留位置（還沒有影片時顯示「影片待補」），兩案章節編號才會一致
   const chapters = orderedChapters(project).filter(
     // （2026-10-19）「結構設計」也一律保留位置：內容還沒填時只顯示章節編號與名稱，章節編號不會跳號
-    (c) => c.key !== "site" && (c.key === "video" || c.key === "engineering" || hasContent(c)),
+    (c) => c.key !== "site" && (c.key === "video" || c.key === "engineering" || c.key === "finished" || hasContent(c)),
   );
   const insetX =
     variant === "modal" ? "px-8 sm:px-12 lg:px-16" : "px-4 sm:px-8 lg:px-12";
@@ -276,7 +276,7 @@ function DetailHero({
         {/* （2026-10-14）電腦版字體與大小跟首頁封面上的案名（SplitExhibition.tsx 的封面大標）一致：
             大標 48px（lg 57.6px）粗黑、資訊小字 18px 一般字重、跟內文同一套字體（不是等寬字）。手機版維持原樣。 */}
         <h1
-          className={`font-serif-tc font-black leading-[1.05] tracking-tight uppercase text-4xl sm:text-5xl lg:text-[57.6px] ${heroTitleColor}`}
+          className={`font-serif-tc font-black leading-[1.05] tracking-tight uppercase text-4xl sm:text-5xl ${heroTitleColor}`}
         >
           {project.name}
         </h1>
@@ -355,38 +355,46 @@ function ChapterEdgeNav({ items, variant }: { items: TocItem[]; variant: "page" 
     };
   }, [firstKey]);
 
+  // （2026-10-19）章節增加到 11 項（多了 07 成品照片），完整名稱全部直書排開會比畫面高、字也被縮到 8px。改成：
+  // 平常只排一列編號（00～10，固定 12px），目前閱讀中的章節才在編號下方展開直書名稱；滑鼠移到其他編號上，
+  // 那一章也在編號下方展開名稱，編號跟名稱一樣是淡字（整個按鈕 60%）。
+  // 整列從固定高度往下排（不是垂直置中）：置中時名稱一展開，整列會往上移、滑鼠下的編號跑掉又收起，來回閃出殘影。
   const nav = (
     <nav
       aria-hidden={!visible || undefined}
-      className={`fixed inset-y-0 left-0 flex flex-col items-center justify-center transition-opacity duration-500 ${
-        variant === "modal"
-          ? "z-[105] hidden w-[60px] sm:flex"
-          : "z-40 w-[18px] gap-5 sm:w-[30px]"
-      } sm:gap-[1.6em] sm:text-[clamp(8px,1.1vh,12px)] ${visible ? "opacity-100" : "pointer-events-none opacity-0"}`}
+      className={`fixed inset-y-0 left-0 flex flex-col items-center justify-start gap-3 pt-[calc(50dvh-200px)] transition-opacity duration-500 ${
+        variant === "modal" ? "z-[105] hidden w-[60px] sm:flex" : "z-40 w-[18px] sm:w-[30px]"
+      } sm:gap-4 ${visible ? "opacity-100" : "pointer-events-none opacity-0"}`}
     >
-      {/* （同日）加了「00 核心目標」後共 9 項，固定 12px 字＋28px 間距會比畫面高（900px 高的畫面上下各超出
-          約 13px）。電腦版字級跟著畫面高度縮放（最大 12px、最小 8px），間距用 em 跟著字級走，整排永遠放得下。
-          （同日）竹輕亭填滿 10 項（00～09）後再縮一點：1.1vh、間距 1.6em。 */}
-      {/* 每個直書章節名稱上方加章節編號（01、02…，跟目錄、章節開頭的大編號同一套），編號橫排不轉向。
-          字體、字級、字距、顏色跟右側邊框的「2026常民竹小屋」（EdgeTitle.tsx）一樣：襯線字 10／12px、
-          字距 0.2em、主文字色 */}
-      {items.map((item) => (
-        <button
-          key={item.key}
-          onClick={() => goTo(item.key)}
-          aria-current={active === item.key || undefined}
-          // 目前所在的章節維持深色，其他變淡（跟首頁頂部章節列同一套：opacity 0.35，滑鼠移上去 0.7）
-          className={`flex flex-col items-center gap-1.5 font-serif-tc text-[10px] text-[var(--foreground)] uppercase transition-opacity duration-300 sm:gap-[0.4em] sm:text-[1em] ${
-            active && active !== item.key ? "opacity-35 hover:opacity-70" : ""
-          }`}
-        >
-          <span className="tabular-nums">{item.number}</span>
-          <span className="[writing-mode:vertical-rl] tracking-[0.2em]">{item.title}</span>
-        </button>
-      ))}
+      {items.map((item) => {
+        const on = active === item.key;
+        return (
+          <button
+            key={item.key}
+            onClick={() => goTo(item.key)}
+            aria-current={on || undefined}
+            aria-label={`${item.number} ${item.title}`}
+            className={`group relative flex flex-col items-center font-serif-tc text-[10px] text-[var(--foreground)] uppercase transition-opacity duration-300 sm:text-xs ${
+              active && !on ? "opacity-35 hover:opacity-60" : ""
+            }`}
+          >
+            <span className="tabular-nums">{item.number}</span>
+            {/* 目前章節：編號下方展開直書名稱；（同日）滑鼠移到其他編號上，也在編號下方展開那一章的名稱（淡字） */}
+            <span
+              aria-hidden
+              className={`overflow-hidden [writing-mode:vertical-rl] tracking-[0.2em] transition-[max-height,opacity,margin] duration-300 ${
+                on
+                  ? "mt-1.5 max-h-[12em] opacity-100"
+                  : "mt-0 max-h-0 opacity-0 group-hover:mt-1.5 group-hover:max-h-[12em] group-hover:opacity-100"
+              }`}
+            >
+              {item.title}
+            </span>
+          </button>
+        );
+      })}
     </nav>
   );
-
   if (variant === "page") return nav;
   return mounted ? createPortal(nav, document.body) : null;
 }
@@ -1218,7 +1226,15 @@ function NarrativeSection({
       right={
         <>
           {photos}
-
+          {chapter.key === "finished" && shownImages.length === 0 && (
+            // （2026-10-19）成品照片還沒上傳時保留一個虛線框，在後台「成品照片」的主要照片上傳就會換上
+            <div
+              className="flex aspect-[4/3] w-full items-center justify-center border border-dashed font-serif-tc text-sm tracking-[0.2em]"
+              style={{ borderColor: "var(--border-subtle)", color: "var(--foreground-muted)" }}
+            >
+              成品照片待補
+            </div>
+          )}
           {chapter.moreImages && chapter.moreImages.length > 0 && (
             <div style={{ order: blocks.length }}>
               <ReadMoreGallery

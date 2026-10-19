@@ -365,7 +365,7 @@ function TopChapterNav({ projects }: { projects: [Project, Project] }) {
   return (
     <div className="relative flex h-[52px] shrink-0 items-center justify-center gap-4 min-[400px]:gap-6 sm:h-[76px] sm:gap-10">
       {/* （2026-10-15，只有電腦版）兩案案名放在這一列的左右兩端（左案在左欄正上方、右案在右欄正上方），
-          取代原本兩側邊框的直書案名（EdgeTitle 在這一屏改成不顯示）。跟章節標籤同一套字（襯線粗體、
+          取代原本兩側邊框的直書案名（EdgeTitle 在這一屏改成不顯示）。（2026-10-19 改成深灰實心標籤，跟章節小標區隔）跟章節標籤同一套字（襯線粗體、
           同大小同顏色）；那一欄還停在封面時不顯示（封面上已經有案名大標），往下捲離開封面才淡入。
           點案名打開該案的案例頁（從首頁點會被攔截成彈出視窗）。 */}
       {projects.map((p, i) => (
@@ -375,10 +375,9 @@ function TopChapterNav({ projects }: { projects: [Project, Project] }) {
           prefetch={false}
           aria-hidden={!pastCovers[i] || undefined}
           tabIndex={pastCovers[i] ? undefined : -1}
-          className={`absolute top-1/2 hidden -translate-y-1/2 font-serif-tc text-sm font-bold tracking-wide text-foreground uppercase transition-opacity duration-500 sm:block ${
+          className={`absolute top-1/2 hidden -translate-y-1/2 rounded-[3px] bg-[#5a5651] px-3 py-1.5 font-serif-tc text-sm leading-none font-bold tracking-wide text-[#f4f1ea] uppercase transition-[opacity,background-color] duration-500 hover:bg-[#3f3c38] sm:block ${
             i === 0 ? "left-8" : "right-8"
           } ${pastCovers[i] ? "opacity-100" : "pointer-events-none opacity-0"}`}
-          style={navStyle}
         >
           {p.name}
         </Link>
@@ -520,7 +519,7 @@ function Panel({
                   pastCover ? "opacity-0" : "opacity-100"
                 } ${side === "left" ? "items-end text-right" : "items-start text-left"}`}
               >
-                <h2 className="font-serif-tc text-5xl leading-[1.05] font-black tracking-tight text-white uppercase lg:text-[57.6px]">{project.name}</h2>
+                <h2 className="font-serif-tc text-5xl leading-[1.05] font-black tracking-tight text-white uppercase">{project.name}</h2>
                 <p className="mt-3 font-serif-tc text-[18px] font-normal tracking-wide uppercase" style={{ color: project.accent }}>
                   {project.location} · {project.year} · {project.type}
                 </p>

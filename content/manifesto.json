@@ -1,11 +1,11 @@
 {
   "eyebrow": "2026 常民竹小屋 · 策展理念",
   "cover": {
-    "label": "Curatorial Concept",
+    "label": "Curatorial Statement",
     "title": "常民竹小屋實驗計畫",
-    "subtitle": "Bamboo, Reconfigured",
+    "subtitle": "Everyday Bamboo Houses, 2026",
     "tagline": "竹構的下一步——一套可以持續生成的系統，而不是一件完成品。",
-    "credit": "計畫發起人｜財團法人雲林縣利仁教育基金會\n策展人｜原型建築有限公司",
+    "credit": "指導單位｜農業部林業及自然保育署\n主辦單位｜財團法人雲林縣利仁教育基金會\n承辦單位｜原型建築有限公司",
     "notes": "兩組實驗場域｜竹輕亭 | 簇樂 、 一籌\n四條展示軸線｜竹構大樣 · 竹構施工組裝動畫 · 竹構工法 · 竹構線上資源庫",
     "figure": "/images/manifesto/bamboo-section.png",
     "backdrop": "/images/manifesto/cover-mist-bamboo.jpg"
@@ -16,16 +16,16 @@
     "body": "展覽不從「竹很美」出發，而從「竹構如何被建造」出發：\n標準化構件、節點、尺寸與組裝邏輯，一套可拆解、可替換、可再利用的零件語言。",
     "contrasts": [
       {
-        "label": "Not",
-        "text": "一棟被完成的房子"
+        "label": "不只是",
+        "text": "建築師的竹構作品"
       },
       {
-        "label": "Not",
-        "text": "一次被詮釋的自然材"
+        "label": "不只是",
+        "text": "竹師傅的手藝"
       },
       {
-        "label": "But",
-        "text": "一套可以被生成的系統"
+        "label": "而是",
+        "text": "每個人都能組裝、使用的竹屋"
       }
     ]
   },
@@ -92,7 +92,7 @@
     ]
   },
   "bridge": {
-    "label": "From sketch to site",
+    "label": "Why Bamboo Houses",
     "title": "竹構的下一步",
     "points": "常民使用的當代竹構\n模組化的未來竹構\n可與業主共同創造的竹構",
     "quote": "竹，不只是傳統材料，也不只是被重新詮釋的自然建材。\n本展覽從「竹構如何被建造」出發，重新思考竹構建築的可能性。",

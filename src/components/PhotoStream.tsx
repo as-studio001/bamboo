@@ -9,6 +9,7 @@ import { visibleImages } from "@/lib/photoLayout";
 import { usePdfCover } from "@/lib/usePdfCover";
 import { pdfCoverId } from "@/lib/pdfPages";
 import { SHARED_ELEMENT_TRANSITION } from "@/components/theme";
+import { chapterLabel } from "@/lib/chapters";
 
 // 首頁雙欄的「圖片＋簡短說明」索引：一張一列、原始比例顯示（直式就直式、橫式就橫式），
 // 不套用統一形狀的裁切遮罩，風格參考 herzogdemeuron.com 的 process 頁面。
@@ -64,7 +65,8 @@ export function PhotoStream({ project }: { project: Project }) {
   //
   // （2026-10-14）只取首頁會出現的章節（團隊介紹、結構設計只在案例內頁），照固定順序（見 projects.ts）。
   const groups = orderedChapters(project, HOME_CHAPTER_KEYS).filter(
-    (chapter) => chapter.key !== "site" && (visibleImages(chapter.text, chapter.images).length > 0 || chapter.pdf),
+    // （2026-10-19）「成品」一律保留一頁：還沒有照片時顯示「圖片待補」佔位
+    (chapter) => chapter.key !== "site" && (chapter.key === "finished" || visibleImages(chapter.text, chapter.images).length > 0 || chapter.pdf),
   );
 
   return (
@@ -82,7 +84,9 @@ export function PhotoStream({ project }: { project: Project }) {
                     isFirst={groupIndex === 0 && i === 0}
                   />
                 ))
-              : chapter.pdf && (
+              : chapter.key === "finished" ? (
+                  <PendingItem label={`${chapterLabel("finished")}圖片待補`} isFirst={groupIndex === 0} />
+                ) : chapter.pdf && (
                   <AssemblyCoverItem project={project} chapter={chapter} isFirst={groupIndex === 0} />
                 )}
           </div>
@@ -203,5 +207,24 @@ function AssemblyCoverItem({ project, chapter, isFirst }: { project: Project; ch
         )}
       </motion.div>
     </Link>
+  );
+}
+
+// 還沒有照片的章節（目前是「成品」）：電腦版佔滿一頁（--slot-h），中間一個橫式虛線框寫「圖片待補」，
+// 掛 data-snap 讓滾輪一頁一頁翻時也會停在這一頁；手機版是一個 4:3 的虛線框。
+function PendingItem({ label, isFirst }: { label: string; isFirst: boolean }) {
+  return (
+    <div
+      data-snap
+      className={`block sm:flex sm:h-[var(--slot-h)] sm:flex-col sm:items-center sm:justify-center sm:pt-0 ${isFirst ? "pt-0" : "pt-8"}`}
+      style={{ "--tpl-r": 4 / 3, "--cap-h": "0px" } as React.CSSProperties}
+    >
+      <div
+        className="tpl-frame flex aspect-[4/3] w-full items-center justify-center border border-dashed font-serif-tc text-sm tracking-[0.2em]"
+        style={{ borderColor: "var(--border-subtle)", color: "var(--foreground-muted)" }}
+      >
+        {label}
+      </div>
+    </div>
   );
 }

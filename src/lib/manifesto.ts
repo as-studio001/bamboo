@@ -25,7 +25,8 @@ export type ManifestoStatement = {
   label?: string;
   title?: string; // 主張大字，可換行
   body?: string;
-  contrasts?: { label: string; text: string }[]; // NOT／NOT／BUT，最後一格是答案（深色強調）
+  contrasts?: { label: string; text: string }[]; // 不只是／不只是／而是（原 NOT／NOT／BUT），最後一格是答案（竹棕色強調）
+  en?: string; // （2026-10-19）主張句的英文，顯示在主張句下方
 };
 
 export type ManifestoFormula = {

@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment } from "react";
+import { Fragment, useEffect, useState } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { manifesto } from "@/lib/manifesto";
@@ -211,7 +211,7 @@ export function CuratorialManifesto({ projects }: { projects?: [BridgeProject, B
       projects && {
         key: "bridge",
         label: bridge.label,
-        body: <SystemScreen data={bridge} formula={formula} closing={closing} projects={projects} />,
+        body: <SystemScreen data={bridge} formula={formula} closing={closing} />,
       },
   ].filter((s): s is { key: string; label: string | undefined; body: React.ReactElement } => !!s);
 
@@ -287,31 +287,15 @@ function IntroScreen({
             <BambooAccent text={statement.title.replace(/\s*\n\s*/g, "")} />
           </p>
         )}
+        {statement?.en && (
+          // 主張句的英文（2026-10-19）
+          <p className="mt-1.5 font-serif-tc text-sm italic sm:text-lg" style={MUTED}>
+            {statement.en}
+          </p>
+        )}
       </Reveal>
 
-      {contrasts.length > 0 && (
-        // NOT／NOT／BUT：一排三格小格，最後一格（BUT）竹棕色實底
-        <Reveal delay={0.12} className="mt-6 grid gap-2 sm:mt-[3.5vh] sm:grid-cols-3 sm:gap-4">
-          {contrasts.map((c, i) => {
-            const answer = i === contrasts.length - 1;
-            return (
-              <div
-                key={i}
-                className={`flex flex-col gap-1 border px-4 py-3 sm:px-5 sm:py-4 ${answer ? "border-transparent shadow-[0_8px_24px_rgb(120_60_20/0.16)]" : RULE}`}
-                style={answer ? { backgroundColor: ACCENT, color: "#f7f3ec" } : undefined}
-              >
-                <span className={EYEBROW} style={answer ? { color: "rgb(247 243 236 / 0.8)" } : MUTED}>
-                  {c.label}
-                </span>
-                <span className={`font-serif-tc text-base sm:text-lg ${answer ? "font-semibold" : ""}`} style={answer ? undefined : MUTED}>
-                  {c.text}
-                </span>
-              </div>
-            );
-          })}
-        </Reveal>
-      )}
-
+      {contrasts.length > 0 && <Contrasts items={contrasts} />}
       {credits.length > 0 && (
         <Reveal delay={0.24} className={`mt-8 border-t ${RULE} pt-5 sm:mt-[5vh] sm:pt-6`}>
           <dl className="grid grid-cols-[auto_1fr] items-baseline gap-x-8 gap-y-2 sm:gap-x-12">
@@ -341,19 +325,17 @@ function IntroScreen({
 //   2. 為什麼要做竹小屋：四格關鍵字＋一句說明（bridge.reasons）
 //   3. A ＋ B ＝ ？一行公式
 //   4. 系統提供可能，業主決定結果。
-//   5. 兩組實驗場域：兩案往中間靠（整組置中、中間只留一點距離，看起來是同一組），各放封面照片／手稿、案名、一句簡介
-//   6. 「看兩個計畫 ↓」：捲到兩欄展覽（跟往下滾一樣，不直接進各案，避免跳過兩案並排）
-// 手稿先出現、約 1.6 秒後淡出換成封面照片；沒有手稿就直接顯示封面照片。
+//   5. 「看兩個計畫 ↓」：捲到兩欄展覽（跟往下滾一樣，不直接進各案，避免跳過兩案並排）
+// （2026-10-19）原本第 5 項「兩組實驗場域」兩案預告（封面照片／手稿、案名、簡介）拿掉，只留按鈕；上方文字整體放大。
+// 資料（bridge.intros、各案 sketchImages）保留不刪，之後要加回來不用重填。
 function SystemScreen({
   data,
   formula,
   closing,
-  projects,
 }: {
   data: NonNullable<typeof manifesto.bridge>;
   formula?: typeof manifesto.formula;
   closing?: typeof manifesto.closing;
-  projects: [BridgeProject, BridgeProject];
 }) {
   const terms = formula?.terms ?? [];
   const points = (data.points ?? "").split("\n").filter((l) => l.trim());
@@ -362,7 +344,7 @@ function SystemScreen({
     <>
       <Reveal>
         {points.length > 0 && (
-          <ul className="flex flex-col gap-1 font-serif-tc text-xl leading-[1.4] font-semibold sm:flex-row sm:flex-wrap sm:gap-x-10 sm:text-3xl">
+          <ul className="flex flex-col gap-1 font-serif-tc text-xl leading-[1.4] font-semibold sm:flex-row sm:flex-wrap sm:gap-x-12 sm:text-4xl">
             {points.map((p, i) => (
               <li key={i}>
                 <span className="mr-2 font-normal" style={{ color: ACCENT }}>
@@ -377,17 +359,17 @@ function SystemScreen({
       </Reveal>
 
       {reasons.length > 0 && (
-        <Reveal delay={0.1} className="mt-4 sm:mt-[2.5vh]">
+        <Reveal delay={0.1} className="mt-6 sm:mt-[5vh]">
           {data.reasonsLabel && (
             <p className={EYEBROW} style={MUTED}>
               {data.reasonsLabel}
             </p>
           )}
-          <div className={`mt-3 grid grid-cols-2 gap-x-5 gap-y-4 border-t ${RULE} pt-4 sm:grid-cols-4 sm:gap-x-8`}>
+          <div className={`mt-3 grid grid-cols-2 gap-x-5 gap-y-5 border-t ${RULE} pt-5 sm:grid-cols-4 sm:gap-x-10 sm:pt-6`}>
             {reasons.map((r, i) => (
               <div key={i}>
-                <p className="font-serif-tc text-base font-semibold sm:text-lg">{r.title}</p>
-                <p className="mt-1 text-xs leading-[1.75] sm:font-serif-tc sm:text-sm" style={MUTED}>
+                <p className="font-serif-tc text-lg font-semibold sm:text-2xl">{r.title}</p>
+                <p className="mt-2 text-sm leading-[1.8] sm:font-serif-tc sm:text-base" style={MUTED}>
                   {r.text}
                 </p>
               </div>
@@ -396,23 +378,23 @@ function SystemScreen({
         </Reveal>
       )}
 
-      <Reveal delay={0.2} className="mt-5 sm:mt-[3vh]">
+      <Reveal delay={0.2} className="mt-8 sm:mt-[6vh]">
         {terms.length > 0 && (
           // A 模組化系統 ＋ B 人的參與 ＝ ？（每一項：大字符號＋小字標題）
           <p className="flex flex-wrap items-baseline gap-x-4 gap-y-1 font-serif-tc sm:gap-x-5">
             {terms.map((t, i) => (
               <Fragment key={i}>
                 {i > 0 && (
-                  <span className="text-xl sm:text-3xl" style={MUTED}>
+                  <span className="text-2xl sm:text-4xl" style={MUTED}>
                     {i === terms.length - 1 ? "=" : "+"}
                   </span>
                 )}
                 <span className="inline-flex items-baseline gap-2">
-                  <span className="text-2xl font-semibold sm:text-4xl">
+                  <span className="text-3xl font-semibold sm:text-6xl">
                     <Accented text={t.symbol} />
                   </span>
                   {t.title && (
-                    <span className="text-sm sm:text-base" style={MUTED}>
+                    <span className="text-base sm:text-xl" style={MUTED}>
                       {t.title}
                     </span>
                   )}
@@ -422,89 +404,18 @@ function SystemScreen({
           </p>
         )}
         {(closing?.title || closing?.emphasis) && (
-          <p className="mt-2 font-serif-tc text-xl leading-[1.4] font-semibold sm:mt-[1.5vh] sm:text-3xl">
+          <p className="mt-3 font-serif-tc text-2xl leading-[1.4] font-semibold sm:mt-[2.5vh] sm:text-5xl">
             {closing.title}
             {closing.emphasis && <span style={{ color: ACCENT }}>{closing.emphasis}</span>}
           </p>
         )}
       </Reveal>
 
-      <Reveal delay={0.3} className="mt-5 flex items-center gap-4 sm:mt-[3vh]">
-        <span className={`flex-1 border-t ${RULE}`} />
-        {data.divider && (
-          <span className={EYEBROW} style={MUTED}>
-            {data.divider}
-          </span>
-        )}
-        <span className={`flex-1 border-t ${RULE}`} />
-      </Reveal>
-
-      {/* 兩案往中間靠：整組置中、最寬 1100px，中間留 96px（同日由 48px 稍微拉開），看起來是同一組的兩個案例 */}
-      <div className="mx-auto mt-5 grid w-full max-w-[1100px] grid-cols-2 gap-6 sm:mt-[2.5vh] sm:gap-24">
-        {projects.map((p, i) => {
-          const intro = data.intros?.[p.slug];
-          return (
-            <div key={p.slug} className="flex flex-col items-center text-center">
-              <Reveal delay={0.4 + i * 0.12} className="w-full">
-                <div className="relative mx-auto aspect-[3/2] w-full sm:h-[clamp(78px,calc(100vh-720px),260px)] sm:w-auto sm:max-w-full">
-                  {p.cover && (
-                    <motion.div
-                      className="absolute inset-0"
-                      initial={{ opacity: p.sketch ? 0 : 1 }}
-                      whileInView={{ opacity: 1 }}
-                      viewport={{ amount: 0.5 }}
-                      transition={{ duration: 1.2, delay: p.sketch ? 1.6 : 0, ease: "easeInOut" }}
-                    >
-                      <Image src={p.cover} alt={p.name} fill sizes="(max-width: 640px) 50vw, 30vw" className="object-cover" />
-                    </motion.div>
-                  )}
-                  {p.sketch ? (
-                    <motion.div
-                      className="absolute inset-0"
-                      initial={{ opacity: 1 }}
-                      whileInView={{ opacity: p.cover ? 0 : 1 }}
-                      viewport={{ amount: 0.5 }}
-                      transition={{ duration: 1.2, delay: 1.6, ease: "easeInOut" }}
-                    >
-                      <Image
-                        src={p.sketch}
-                        alt={`${p.name} 手稿`}
-                        fill
-                        sizes="(max-width: 640px) 50vw, 30vw"
-                        className="object-contain mix-blend-multiply"
-                      />
-                    </motion.div>
-                  ) : p.cover ? null : (
-                    <div className={`flex h-full w-full items-center justify-center border border-dashed ${RULE} ${EYEBROW}`} style={MUTED}>
-                      手稿
-                    </div>
-                  )}
-                </div>
-              </Reveal>
-              <Reveal delay={0.35 + i * 0.12}>
-                <p className="mt-3 font-serif-tc text-base font-semibold sm:mt-[1.8vh] sm:text-xl">{p.name}</p>
-                {intro ? (
-                  <p className="mx-auto mt-1.5 max-w-md font-serif-tc text-xs leading-[1.75] sm:text-sm" style={MUTED}>
-                    {intro}
-                  </p>
-                ) : (
-                  p.meta && (
-                    <p className="mt-1 text-xs sm:text-sm" style={MUTED}>
-                      {p.meta}
-                    </p>
-                  )
-                )}
-              </Reveal>
-            </div>
-          );
-        })}
-      </div>
-
       {data.cta && (
-        <Reveal delay={0.6} className="mt-4 flex justify-center sm:mt-[2vh]">
+        <Reveal delay={0.4} className="mt-10 flex justify-center sm:mt-[6vh]">
           <button
             onClick={scrollToExhibition}
-            className="group inline-flex items-center gap-2 border px-5 py-2 font-serif-tc text-sm font-semibold transition-colors hover:text-[#f7f3ec] sm:text-base"
+            className="group inline-flex items-center gap-2 border px-7 py-3 font-serif-tc text-base font-semibold transition-colors hover:text-[#f7f3ec] sm:text-xl"
             style={{ borderColor: ACCENT, color: ACCENT }}
             onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = ACCENT)}
             onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "")}
@@ -517,5 +428,69 @@ function SystemScreen({
         </Reveal>
       )}
     </>
+  );
+}
+
+// 「不只是／不只是／而是」三格（2026-10-19）：電腦版每格文字不換行，最後一格（字最多）依文字寬度自動加寬；版面維持一排三格，依序輪流強調、一直循環——
+// 當下那格稍微放大（不抬升）、透明底＋深色框、字加粗，其他兩格變淡；輪到「而是」時是竹棕色實底。每格約 2.5 秒。
+// 「不只是」兩格平常用深一點的灰字（原本太淡）。系統「減少動態效果」時不播動畫，停在「而是」強調的狀態。
+const CONTRAST_STEP_MS = 2500;
+function Contrasts({ items }: { items: { label: string; text: string }[] }) {
+  const last = items.length - 1;
+  const [active, setActive] = useState(-1); // -1：還沒開始
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      const done = () => setActive(last);
+      done();
+      return;
+    }
+    let interval = 0;
+    const start = window.setTimeout(() => {
+      setActive(0);
+      interval = window.setInterval(() => setActive((a) => (a + 1) % items.length), CONTRAST_STEP_MS);
+    }, 900);
+    return () => {
+      window.clearTimeout(start);
+      window.clearInterval(interval);
+    };
+  }, [items, last]);
+  const playing = active >= 0;
+  return (
+    <Reveal delay={0.12} className="mt-6 grid gap-2 sm:mt-[3.5vh] sm:grid-cols-[1fr_1fr_auto] sm:gap-4">
+      {items.map((c, i) => {
+        const answer = i === last;
+        const on = i === active;
+        const dim = playing && !on;
+        // 「而是」只有輪到它（或播完）才變竹棕色實底；之前跟其他格一樣是框線
+        const filled = answer && active === last;
+        return (
+          <div
+            key={i}
+            className={`flex flex-col gap-1 border px-4 py-3 origin-center transition-[opacity,background-color,border-color,box-shadow,scale] duration-700 sm:px-5 sm:py-4 ${
+              filled ? "border-transparent shadow-[0_8px_24px_rgb(120_60_20/0.16)]" : on ? "border-[var(--foreground)] shadow-[0_8px_24px_rgb(40_30_20/0.12)]" : RULE
+            } ${on ? "scale-[1.06]" : "scale-100"}`}
+            style={{
+              opacity: dim ? 0.35 : 1,
+              backgroundColor: filled ? ACCENT : undefined, // 輪到「不只是」時不加底色，維持透明
+              color: filled ? "#f7f3ec" : undefined,
+            }}
+          >
+            <span
+              className="font-serif-tc text-xs tracking-[0.15em] sm:text-sm"
+              style={{ color: filled ? "rgb(247 243 236 / 0.85)" : "var(--foreground-muted)" }}
+            >
+              {c.label}
+            </span>
+            <span
+              className={`font-serif-tc text-base sm:text-lg sm:whitespace-nowrap ${filled || on ? "font-semibold" : ""}`}
+              // 小調整：「不只是」的內容字從淺灰改成接近內文的深灰
+              style={{ color: filled ? undefined : on ? "var(--foreground)" : "rgb(38 34 30 / 0.78)" }}
+            >
+              {c.text}
+            </span>
+          </div>
+        );
+      })}
+    </Reveal>
   );
 }

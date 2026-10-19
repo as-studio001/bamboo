@@ -118,7 +118,7 @@ export function ProjectDetail({
             ) : chapter.key === "video" ? (
               <VideoSection key={chapter.key} chapter={chapter} {...frame} variant={variant} />
             ) : chapter.key === "engineering" && isDiagramChapter(chapter) ? (
-              <DiagramSection key={chapter.key} chapter={chapter} {...frame} />
+              <DiagramSection key={chapter.key} chapter={chapter} {...frame} variant={variant} />
             ) : chapter.key === "assembly" ? (
               <AssemblySection
                 key={chapter.key}
@@ -1381,7 +1381,17 @@ function isDiagramChapter(chapter: Chapter) {
   return (chapter.images ?? []).some((img) => img.src && img.caption?.includes("｜"));
 }
 
-function DiagramSection({ chapter, number, first }: { chapter: Chapter; number: string; first: boolean }) {
+function DiagramSection({
+  chapter,
+  number,
+  first,
+  variant,
+}: {
+  chapter: Chapter;
+  number: string;
+  first: boolean;
+  variant: "page" | "modal";
+}) {
   const groups: { label: string; items: { id: string; src: string; caption: string }[] }[] = [];
   for (const img of chapter.images ?? []) {
     if (!img.src) continue;
@@ -1392,43 +1402,74 @@ function DiagramSection({ chapter, number, first }: { chapter: Chapter; number: 
     if (!g) groups.push((g = { label, items: [] }));
     g.items.push({ id: img.id, src: img.src, caption });
   }
+  const columns = groups[0]?.items.map((it) => it.caption) ?? [];
   const paragraphs = (chapter.text ?? "").split("\n\n").filter((p) => p.trim());
-  // （同日）維持跟其他章節一樣的左文右圖：左欄編號＋名稱＋內文，右欄由上往下排各組力圖（每組三張橫向並排、縮小）
+  // （2026-10-19）四組力圖一個畫面放得下：軸力／剪力／彎矩當欄位標題只寫一次（每張圖不再各自放圖說），
+  // 圖片高度依畫面高度自動縮放（扣掉章節上方留白、欄位標題、四組組名與間距；浮起視窗再多扣 106px）
+  const imgMaxH = `calc((100dvh - ${variant === "modal" ? 500 : 394}px) / ${Math.max(groups.length, 1)})`;
   return (
     <ChapterFrame
       id={chapter.key}
       number={number}
       title={chapterTitle(chapter.key)}
       first={first}
-      left={paragraphs.map((p, i) => (
-        <p key={i} className={`mt-6 max-w-2xl sm:max-w-none ${BODY_TEXT}`} style={{ order: i }}>
-          <RichText text={p} />
-        </p>
-      ))}
+      sticky={false}
+      left={paragraphs.map((p, i) => {
+        // 段落第一行以「｜」或「|」結尾（例如「GLB 集成竹材 |」）就當成粗體小標，其餘行照原本換行顯示
+        const lines = p.split("\n");
+        const head = /[|｜]\s*$/.test(lines[0]) ? lines[0].replace(/\s*[|｜]\s*$/, "") : null;
+        const body = (head ? lines.slice(1) : lines).join("\n");
+        return (
+          <div key={i} className="mt-5 sm:mt-6" style={{ order: i }}>
+            {head && <p className={`font-serif-tc text-sm font-bold sm:text-base ${TEXT_PRIMARY}`}>{head}</p>}
+            {body.trim() && (
+              <p className={`whitespace-pre-line ${head ? "mt-1" : ""} ${BODY_TEXT}`}>
+                <RichText text={body.trim()} />
+              </p>
+            )}
+          </div>
+        );
+      })}
       right={
-        <div className="mt-6 flex flex-col gap-8 sm:mt-0 sm:gap-10" style={{ order: 50 }}>
-          {groups.map((g) => (
-            <div key={g.label || "_"}>
-              {g.label && (
-                <div className="flex items-baseline gap-3 border-b pb-2" style={{ borderColor: "var(--border-subtle)" }}>
-                  <span className="font-mono text-[10px] tracking-[0.25em] uppercase" style={{ color: "var(--foreground-muted)" }}>
-                    Load case
-                  </span>
-                  <span className={`font-serif-tc text-sm font-bold ${TEXT_PRIMARY}`}>{g.label}</span>
-                </div>
-              )}
-              <div className="mt-3 grid grid-cols-3 gap-3 sm:gap-4">
-                {g.items.map((it) => (
-                  <figure key={it.id} className="m-0 min-w-0">
-                    <a href={it.src} target="_blank" rel="noreferrer" className="block cursor-zoom-in" title="開啟原尺寸">
-                      <Image src={it.src} alt={`${g.label} ${it.caption}`} width={0} height={0} sizes="(max-width: 640px) 33vw, 20vw" className="block h-auto w-full" />
-                    </a>
-                    <PhotoCaption text={it.caption} />
-                  </figure>
-                ))}
-              </div>
+        <div className="mt-6 sm:mt-0" style={{ order: 50 }}>
+          {columns.length > 0 && (
+            <div className="grid grid-cols-3 gap-3 sm:gap-4">
+              {columns.map((c, i) => (
+                <p key={i} className={`text-[10px] leading-relaxed sm:text-xs ${TEXT_BODY}`}>
+                  {c}
+                </p>
+              ))}
             </div>
-          ))}
+          )}
+          <div className="mt-2 flex flex-col gap-3">
+            {groups.map((g) => (
+              <div key={g.label || "_"}>
+                {g.label && (
+                  <div className="flex items-baseline gap-3 border-b pb-1" style={{ borderColor: "var(--border-subtle)" }}>
+                    <span className="font-mono text-[10px] tracking-[0.25em] uppercase" style={{ color: "var(--foreground-muted)" }}>
+                      Load case
+                    </span>
+                    <span className={`font-serif-tc text-sm font-bold ${TEXT_PRIMARY}`}>{g.label}</span>
+                  </div>
+                )}
+                <div className="mt-1.5 grid grid-cols-3 gap-3 sm:gap-4">
+                  {g.items.map((it) => (
+                    <a key={it.id} href={it.src} target="_blank" rel="noreferrer" className="block min-w-0 cursor-zoom-in" title={`${it.caption}（開啟原尺寸）`}>
+                      <Image
+                        src={it.src}
+                        alt={`${g.label} ${it.caption}`}
+                        width={0}
+                        height={0}
+                        sizes="(max-width: 640px) 33vw, 20vw"
+                        className="block h-auto w-auto max-w-full"
+                        style={{ maxHeight: imgMaxH }}
+                      />
+                    </a>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       }
     />

@@ -445,8 +445,11 @@
   "published": true,
   "titleAlign": "left",
   "coordinates": {
-    "lat": 23.744961161161275,
-    "lng": 120.6700766905575
+    "lat": 23.7449725,
+    "lng": 120.6700879,
+    "place": "南投漆彈場-狙擊手漆彈場",
+    "address": "南投竹山 狙擊手漆彈場內",
+    "street": "南投縣竹山鎮沉潭巷26之7號"
   },
   "homeCoverId": "project-one-tvm4krx"
 }

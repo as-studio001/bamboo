@@ -1499,13 +1499,15 @@ function renderCaseEditor(){
             <div class="label">基地座標（coordinates）</div>
             <div class="field-hint" style="margin-top:0; margin-bottom:10px;">填地址、經緯度，案例內頁「基地位置」左欄文字下方就會顯示地圖；三個都留空的話會顯示「地圖待補」。</div>
             <div class="two-col">
-              <input type="text" id="f_coord_address" placeholder="地址" value="${item.coordinates ? esc(item.coordinates.address || "") : ""}">
+              <input type="text" id="f_coord_address" placeholder="區域名稱（顯示在地圖下方，例如 斗六糖廠竹創基地 洞洞館旁）" value="${item.coordinates ? esc(item.coordinates.address || "") : ""}">
               <input type="text" id="f_coord_zoom" placeholder="地圖縮放（選填，例如 16，預設 15）" value="${item.coordinates && item.coordinates.zoom != null ? esc(item.coordinates.zoom) : ""}">
             </div>
             <div class="two-col" style="margin-top:10px;">
               <input type="text" id="f_coord_lat" placeholder="緯度 lat（例如 25.0330）" value="${item.coordinates ? esc(item.coordinates.lat) : ""}">
               <input type="text" id="f_coord_lng" placeholder="經度 lng（例如 121.5654）" value="${item.coordinates ? esc(item.coordinates.lng) : ""}">
             </div>
+            <input type="text" id="f_coord_street" style="margin-top:10px;" placeholder="地址（選填，顯示在區域名稱下方，例如 雲林縣斗六市糖廠55號）" value="${item.coordinates ? esc(item.coordinates.street || "") : ""}">
+            <input type="text" id="f_coord_place" style="margin-top:10px;" placeholder="Google 地圖地點名稱（選填，例如 南投漆彈場-狙擊手漆彈場；填了地圖會顯示該地點的名稱標示）" value="${item.coordinates ? esc(item.coordinates.place || "") : ""}">
           </div>
           <div class="field-block">
             <div class="label">基地照片（顯示在右欄，建議 2 張）</div>
@@ -1764,6 +1766,10 @@ function collectEditorFields(ed){
     item.coordinates = { lat: Number(lat), lng: Number(lng) };
     if(address) item.coordinates.address = address;
     if(zoom) item.coordinates.zoom = Number(zoom);
+    const place = document.getElementById("f_coord_place").value.trim();
+    if(place) item.coordinates.place = place;
+    const street = document.getElementById("f_coord_street").value.trim();
+    if(street) item.coordinates.street = street;
   }else{
     delete item.coordinates;
   }

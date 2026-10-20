@@ -106,7 +106,10 @@ export type Chapter = {
 
 // 欄位對齊 Internal-Pages（as-studio001/Internal-Pages）content/projects/*.json 的 map 欄位設計，
 // 同樣是 { address, lat, lng, zoom }，方便之後兩邊的內容格式互通。
-export type Coordinates = { lat: number; lng: number; address?: string; zoom?: number };
+// place：Google 地圖上的地點名稱（例如「南投漆彈場-狙擊手漆彈場」），有填時地圖用名稱標示，
+// 會顯示該地點的名稱標籤；沒填就只用經緯度標一個紅點。
+// address：地圖下方第一行的區域名稱（例如「斗六糖廠竹創基地 洞洞館旁」）；street：第二行的門牌地址。
+export type Coordinates = { lat: number; lng: number; address?: string; street?: string; zoom?: number; place?: string };
 
 // （2026-10-15）案例目標：案例內頁封面之後的第一個畫面（取代原本的目錄頁），一個畫面的篇幅。
 // 左欄：標題（例如「設計目標與核心策略」）＋設計定位（一行一項）；右欄：策略小標＋策略標題＋說明＋

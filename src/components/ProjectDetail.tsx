@@ -24,6 +24,7 @@ import {
 import { usePhotosWithRatio } from "@/lib/usePhotosWithRatio";
 import { ImagePlaceholder } from "@/components/ImagePlaceholder";
 import { ChapterMap, ChapterVideo } from "@/components/ChapterExtras";
+import { Partners } from "@/components/EventsSection";
 import { AssemblyBook } from "@/components/AssemblyBook";
 import { chapterTitle } from "@/lib/chapters";
 import { PANEL_BG, TEXT_PRIMARY, TEXT_BODY } from "@/components/theme";
@@ -177,6 +178,8 @@ export function ProjectDetail({
               </>
             }
           />
+          {/* （2026-10-20）頁面最尾端：單位 LOGO 列，跟首頁最下面同一列（EventsSection.tsx 的 Partners） */}
+          <Partners className="mt-4 sm:mt-0" />
         </div>
       </div>
     </div>

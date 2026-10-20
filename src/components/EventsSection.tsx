@@ -64,9 +64,11 @@ export function EventsSection({ variant, id }: { variant: "screen" | "inline"; i
 
 // 單位 LOGO 列：主辦／承辦／參加團隊左右排開，每組上面一個小標；LOGO 統一高度，有網址就連到該單位官網（另開分頁）。
 // 還沒有 LOGO 的單位先用名稱文字佔位。
-function Partners() {
+// （2026-10-20）案例內頁（獨立頁面／彈出視窗）最尾端也共用這一列，見 ProjectDetail.tsx。
+export function Partners({ className = "mt-12 sm:mt-10" }: { className?: string }) {
+  if (!partnerGroups.some((g) => g.items.length)) return null;
   return (
-    <footer className="mt-12 border-t pt-6 sm:mt-10" style={{ borderColor: "var(--border-subtle)" }}>
+    <footer className={`border-t pt-6 ${className}`} style={{ borderColor: "var(--border-subtle)" }}>
       <div className="flex flex-wrap gap-x-14 gap-y-6 lg:gap-x-20">
         {partnerGroups
           .filter((g) => g.items.length)

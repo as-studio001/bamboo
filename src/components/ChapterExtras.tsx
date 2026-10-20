@@ -50,13 +50,6 @@ export function ChapterPdf({ pdf, accent }: { pdf: { url: string; label: string 
   );
 }
 
-// 座標格式化成「23.0003° N, 120.1962° E」這種可讀的degree文字，照 Internal-Pages
-// （as-studio001/Internal-Pages 的 js/render.js formatCoords）同一套呈現方式。
-function formatCoords(lat: number, lng: number) {
-  const ns = lat >= 0 ? "N" : "S";
-  const ew = lng >= 0 ? "E" : "W";
-  return `${Math.abs(lat).toFixed(4)}° ${ns}, ${Math.abs(lng).toFixed(4)}° ${ew}`;
-}
 
 // 基地地圖：嵌入 Google 地圖（衛星圖，t=k），用 maps.google.com 的 output=embed 網址——不需要
 // API 金鑰、不用綁帳單，座標直接沿用後台「基地」章節填的經緯度／縮放。
@@ -74,7 +67,7 @@ export function ChapterMap({ project }: { project: Project }) {
           <div className="group relative h-52 w-full overflow-hidden sm:h-72" onMouseLeave={() => setActive(false)}>
             <iframe
               title={`${project.name} 基地位置`}
-              src={`https://maps.google.com/maps?q=${coords.lat},${coords.lng}&t=k&z=${coords.zoom ?? 15}&hl=zh-TW&output=embed`}
+              src={`https://maps.google.com/maps?q=${coords.place?.trim() ? encodeURIComponent(coords.place.trim()) : `${coords.lat},${coords.lng}`}&ll=${coords.lat},${coords.lng}&t=k&z=${coords.zoom ?? 15}&hl=zh-TW&output=embed`}
               className="h-full w-full border-0"
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
@@ -93,14 +86,13 @@ export function ChapterMap({ project }: { project: Project }) {
               </button>
             )}
           </div>
-          <div className="mt-3 text-center">
-            {coords.address && (
-              <p className={`text-[10px] sm:text-[11px] ${TEXT_BODY}`}>{coords.address}</p>
-            )}
-            <p className={`mt-1 font-mono text-[9px] tabular-nums sm:text-[10px] ${TEXT_BODY}`}>
-              {formatCoords(coords.lat, coords.lng)}
-            </p>
-          </div>
+          {/* （2026-10-20）地圖下方放區域名稱（address）＋門牌地址（street），不顯示經緯度 */}
+          {(coords.address || coords.street) && (
+            <div className={`mt-3 text-center ${TEXT_BODY}`}>
+              {coords.address && <p className="font-serif-tc text-xs font-bold sm:text-sm">{coords.address}</p>}
+              {coords.street && <p className="mt-0.5 text-[10px] sm:text-[11px]">{coords.street}</p>}
+            </div>
+          )}
         </>
       ) : (
         <div

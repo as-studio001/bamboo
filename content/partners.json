@@ -1,0 +1,23 @@
+{
+  "groups": [
+    {
+      "label": "指導單位",
+      "items": [{ "name": "農業部林業及自然保育署", "logo": "/images/partners/forest.svg", "url": "https://www.forest.gov.tw/" }]
+    },
+    {
+      "label": "主辦單位",
+      "items": [{ "name": "財團法人雲林縣利仁教育基金會", "logo": "/images/partners/lizen.png", "url": "https://www.lizenfdt.org/" }]
+    },
+    {
+      "label": "承辦單位",
+      "items": [{ "name": "原型建築有限公司", "logo": "/images/partners/prototype.png", "url": "https://as-studio001.github.io/asarch/" }]
+    },
+    {
+      "label": "參加團隊",
+      "items": [
+        { "name": "初樸建築師事務所", "logo": "/images/partners/protoplain.png", "url": "https://protoplain.format.com/" },
+        { "name": "諸野竹木構", "logo": "/images/partners/jhuyeh.png", "url": "https://jhuyeh.com/about/" }
+      ]
+    }
+  ]
+}

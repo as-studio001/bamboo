@@ -1,6 +1,7 @@
 import { exhibitionEvents, type EventPoster } from "@/lib/events";
 import { chapterLabel } from "@/lib/chapters";
 import { TEXT_PRIMARY } from "@/components/theme";
+import { partnerGroups } from "@/lib/partners";
 
 // 「活動」區塊：整個展覽共用一份內容（content/events.json，見 lib/events.ts），兩種擺法——
 // - variant="screen"：首頁最尾端、接在兩欄展覽後面的第三個滿版畫面（整頁 scroll-snap 的一屏），
@@ -35,22 +36,70 @@ export function EventsSection({ variant, id }: { variant: "screen" | "inline"; i
     );
   }
 
+  // （2026-10-20）網頁最尾端加上單位 LOGO 列：活動內容在上方置中，LOGO 列貼齊畫面底部，海報高度扣掉 LOGO 列，一個畫面放得下
+  const hasPartners = partnerGroups.some((g) => g.items.length);
   return (
     <section
       id={id}
-      className="flex min-h-[100dvh] w-full shrink-0 snap-start flex-col justify-center bg-[var(--background)] px-6 py-20 text-[var(--foreground)] sm:px-12 lg:px-20"
+      className="flex min-h-[100dvh] w-full shrink-0 snap-start flex-col bg-[var(--background)] px-6 pt-20 pb-10 text-[var(--foreground)] sm:px-12 sm:pt-16 sm:pb-8 lg:px-20"
     >
-      <div className={posters.length ? "grid items-center gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)] lg:gap-16" : ""}>
-        <div>
-          <p className="font-mono text-[10px] tracking-[0.25em] uppercase sm:text-xs" style={{ color: "var(--foreground-muted)" }}>
-            Events
-          </p>
-          <h2 className="mt-6 font-serif-tc text-2xl font-medium sm:mt-8 sm:text-3xl lg:text-[2.35rem]">{title}</h2>
-          {body}
+      <div className="flex flex-1 flex-col justify-center">
+        <div className={posters.length ? "grid items-center gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)] lg:gap-16" : ""}>
+          <div>
+            <p className="font-mono text-[10px] tracking-[0.25em] uppercase sm:text-xs" style={{ color: "var(--foreground-muted)" }}>
+              Events
+            </p>
+            <h2 className="mt-6 font-serif-tc text-2xl font-medium sm:mt-8 sm:text-3xl lg:text-[2.35rem]">{title}</h2>
+            {body}
+          </div>
+          {posters.length > 0 && (
+            <Posters posters={posters} imgClassName={hasPartners ? "max-h-[60vh] lg:max-h-[calc(100dvh-300px)]" : "max-h-[60vh] lg:max-h-[80vh]"} />
+          )}
         </div>
-        {posters.length > 0 && <Posters posters={posters} imgClassName="max-h-[60vh] lg:max-h-[80vh]" />}
       </div>
+      {hasPartners && <Partners />}
     </section>
+  );
+}
+
+// 單位 LOGO 列：主辦／承辦／參加團隊左右排開，每組上面一個小標；LOGO 統一高度，有網址就連到該單位官網（另開分頁）。
+// 還沒有 LOGO 的單位先用名稱文字佔位。
+function Partners() {
+  return (
+    <footer className="mt-12 border-t pt-6 sm:mt-10" style={{ borderColor: "var(--border-subtle)" }}>
+      <div className="flex flex-wrap gap-x-14 gap-y-6 lg:gap-x-20">
+        {partnerGroups
+          .filter((g) => g.items.length)
+          .map((g) => (
+            <div key={g.label}>
+              <p className="font-serif-tc text-xs font-bold tracking-wide" style={{ color: "var(--foreground-muted)" }}>
+                {g.label}
+              </p>
+              <ul className="mt-3 flex flex-wrap items-center gap-x-8 gap-y-3">
+                {g.items.map((p) => {
+                  const inner = p.logo ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={p.logo} alt={p.name} title={p.name} className="block h-9 w-auto max-w-[220px] object-contain sm:h-10" />
+                  ) : (
+                    <span className={`block font-serif-tc text-sm font-bold leading-10 sm:text-base ${TEXT_PRIMARY}`}>{p.name}</span>
+                  );
+                  return (
+                    <li key={p.name}>
+                      {p.url ? (
+                        <a href={p.url} target="_blank" rel="noopener noreferrer" aria-label={p.name} className="block transition-opacity hover:opacity-70">
+                          {inner}
+                        </a>
+                      ) : (
+                        inner
+                      )}
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          ))}
+      </div>
+    </footer>
   );
 }
 

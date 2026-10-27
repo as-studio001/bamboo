@@ -30,6 +30,34 @@ export function pdfCoverId(project: { slug: string }) {
 
 const pageCache = new Map<string, Promise<PdfPage[]>>();
 
+// （2026-10-27）翻書視窗的「放大」檢視：只把正在看的那一兩頁用較高解析度重畫一次（scale 3.5），
+// 小字放大後才不會糊。PDF 文件本身也快取，不用每放大一頁就重新下載解析整份檔案。
+const docCache = new Map<string, Promise<import("pdfjs-dist").PDFDocumentProxy>>();
+const hiResCache = new Map<string, Promise<string>>();
+
+export function renderPdfPageHiRes(url: string, index: number, scale = 3.5): Promise<string> {
+  const key = `${url}#${index}@${scale}`;
+  const cached = hiResCache.get(key);
+  if (cached) return cached;
+  const promise = (async () => {
+    let docPromise = docCache.get(url);
+    if (!docPromise) {
+      docPromise = getPdfjs().then((pdfjs) => pdfjs.getDocument({ url }).promise);
+      docCache.set(url, docPromise);
+    }
+    const doc = await docPromise;
+    const page = await doc.getPage(index + 1);
+    const viewport = page.getViewport({ scale });
+    const canvas = document.createElement("canvas");
+    canvas.width = viewport.width;
+    canvas.height = viewport.height;
+    await page.render({ canvas, viewport }).promise;
+    return canvas.toDataURL("image/jpeg", 0.9);
+  })();
+  hiResCache.set(key, promise);
+  return promise;
+}
+
 // 同一份 PDF 網址快取結果——封面縮圖跟翻書視窗都會呼叫這個函式，使用者點開翻書之前
 // 縮圖那次呼叫通常已經把頁面畫好了，翻書視窗打開時可以直接複用，不用重畫一次。
 export function renderPdfPages(url: string, scale = 1.4): Promise<PdfPage[]> {

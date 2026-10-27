@@ -2,7 +2,7 @@
 
 import { forwardRef, useEffect, useRef, useState } from "react";
 import HTMLFlipBook from "react-pageflip";
-import { renderPdfPages, type PdfPage } from "@/lib/pdfPages";
+import { renderPdfPageHiRes, renderPdfPages, type PdfPage } from "@/lib/pdfPages";
 
 // 翻書檢視視窗：整份 PDF 先用 pdf.js 逐頁畫成圖片（見 pdfPages.ts），再交給 react-pageflip
 // （包 page-flip 這個 library）做出翻頁動畫——跟參考站
@@ -47,6 +47,8 @@ export function PdfFlipbook({
   const [pages, setPages] = useState<PdfPage[] | null>(null);
   const [error, setError] = useState(false);
   const [current, setCurrent] = useState(0);
+  // （2026-10-27）放大檢視：null＝一般翻書；數字＝放大倍率（相對翻書時的頁面高度）
+  const [zoom, setZoom] = useState<number | null>(null);
   const flipRef = useRef<{ pageFlip: () => PageFlipInstance } | null>(null);
 
   useEffect(() => {
@@ -65,13 +67,15 @@ export function PdfFlipbook({
 
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
+      // 放大檢視裡的按鍵交給 ZoomView 自己處理（Esc 先退出放大，不是直接關掉整個視窗）
+      if (zoom !== null) return;
       if (e.key === "Escape") onClose();
       if (e.key === "ArrowRight") flipRef.current?.pageFlip().flipNext();
       if (e.key === "ArrowLeft") flipRef.current?.pageFlip().flipPrev();
     }
     document.addEventListener("keydown", onKeyDown);
     return () => document.removeEventListener("keydown", onKeyDown);
-  }, [onClose]);
+  }, [onClose, zoom]);
 
   const firstPage = pages?.[0];
   const [bookSize, setBookSize] = useState({ width: 320, height: 440 });
@@ -103,6 +107,14 @@ export function PdfFlipbook({
         <div className="mb-4 flex w-full max-w-3xl items-center justify-between gap-4 px-2">
           <p className="truncate font-mono text-[10px] tracking-wide text-white/80 uppercase sm:text-xs">{label}</p>
           <div className="flex shrink-0 items-center gap-4">
+            {pages && pages.length > 0 && (
+              <button
+                onClick={() => setZoom(2)}
+                className="font-mono text-[10px] tracking-wide text-white uppercase underline underline-offset-2 hover:opacity-70 sm:text-xs"
+              >
+                放大檢視
+              </button>
+            )}
             <a
               href={url}
               download
@@ -207,6 +219,168 @@ export function PdfFlipbook({
             </div>
           </>
         )}
+      </div>
+
+      {zoom !== null && pages && (
+        <ZoomView
+          url={url}
+          pages={pages}
+          baseHeight={bookSize.height}
+          current={current}
+          zoom={zoom}
+          setZoom={setZoom}
+          onNavigate={(i) => {
+            setCurrent(i);
+            flipRef.current?.pageFlip().turnToPage(i);
+          }}
+        />
+      )}
+    </div>
+  );
+}
+
+// 翻書是 showCover 模式：第 1 頁（封面）單獨一頁，之後兩頁一組攤開（2–3、4–5…）。
+// 回傳某一頁所在的那一組頁碼（從 0 起算）。
+function spreadOf(index: number, count: number) {
+  if (index <= 0) return [0];
+  const left = index % 2 === 1 ? index : index - 1;
+  return left + 1 < count ? [left, left + 1] : [left];
+}
+
+const ZOOM_STEPS = [1.5, 2, 3, 4];
+
+// 放大檢視：把目前攤開的那一組頁面放大顯示，可以拖曳／捲動移動畫面，＋／－ 切換倍率，
+// ‹ › 換到上一組／下一組（背後的翻書也會同步翻到同一頁，退出放大時停在原處）。
+// 頁面先顯示翻書用的圖，高解析度版畫好後再換上去。
+function ZoomView({
+  url,
+  pages,
+  baseHeight,
+  current,
+  zoom,
+  setZoom,
+  onNavigate,
+}: {
+  url: string;
+  pages: PdfPage[];
+  baseHeight: number;
+  current: number;
+  zoom: number;
+  setZoom: (z: number | null) => void;
+  onNavigate: (index: number) => void;
+}) {
+  const spread = spreadOf(current, pages.length);
+  const spreadKey = spread.join(",");
+  const [hiRes, setHiRes] = useState<Record<number, string>>({});
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const drag = useRef<{ x: number; y: number; left: number; top: number } | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    for (const i of spread) {
+      if (hiRes[i]) continue;
+      renderPdfPageHiRes(url, i).then((src) => {
+        if (!cancelled) setHiRes((h) => ({ ...h, [i]: src }));
+      });
+    }
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [url, spreadKey]);
+
+  const stepIndex = ZOOM_STEPS.indexOf(zoom);
+  const zoomIn = () => setZoom(ZOOM_STEPS[Math.min(ZOOM_STEPS.length - 1, stepIndex + 1)]);
+  const zoomOut = () => setZoom(ZOOM_STEPS[Math.max(0, stepIndex - 1)]);
+  const prev = () => spread[0] > 0 && onNavigate(Math.max(0, spread[0] - 2));
+  const next = () => {
+    const after = spread[spread.length - 1] + 1;
+    if (after < pages.length) onNavigate(after);
+  };
+
+  useEffect(() => {
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape") setZoom(null);
+      if (e.key === "ArrowRight") next();
+      if (e.key === "ArrowLeft") prev();
+      if (e.key === "+" || e.key === "=") zoomIn();
+      if (e.key === "-") zoomOut();
+    }
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  });
+
+  // 換頁或改倍率時，畫面回到上方置中
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    el.scrollTop = 0;
+    el.scrollLeft = (el.scrollWidth - el.clientWidth) / 2;
+  }, [zoom, spreadKey]);
+
+  const btn =
+    "flex h-9 min-w-9 items-center justify-center rounded-full bg-white/10 px-3 text-sm text-white transition-opacity hover:opacity-70 disabled:opacity-30";
+  const pageLabel = spread.map((i) => i + 1).join("–");
+
+  return (
+    <div className="absolute inset-0 z-20 flex flex-col bg-black/95">
+      <div className="flex shrink-0 items-center justify-between gap-3 px-4 py-3 sm:px-6">
+        <p className="font-mono text-[10px] tracking-wide text-white/80 sm:text-xs">
+          第 {pageLabel} 頁 ／ 共 {pages.length} 頁
+        </p>
+        <div className="flex items-center gap-2">
+          <button onClick={prev} disabled={spread[0] === 0} aria-label="上一頁" className={btn}>
+            ‹
+          </button>
+          <button onClick={next} disabled={spread[spread.length - 1] >= pages.length - 1} aria-label="下一頁" className={btn}>
+            ›
+          </button>
+          <span className="mx-1 h-5 w-px bg-white/20" />
+          <button onClick={zoomOut} disabled={stepIndex <= 0} aria-label="縮小" className={btn}>
+            －
+          </button>
+          <span className="w-10 text-center font-mono text-[11px] text-white/80 tabular-nums">{Math.round(zoom * 100)}%</span>
+          <button onClick={zoomIn} disabled={stepIndex >= ZOOM_STEPS.length - 1} aria-label="放大" className={btn}>
+            ＋
+          </button>
+          <span className="mx-1 h-5 w-px bg-white/20" />
+          <button onClick={() => setZoom(null)} className={`${btn} font-mono text-[11px]`}>
+            返回翻頁
+          </button>
+        </div>
+      </div>
+
+      <div
+        ref={scrollRef}
+        className="flex-1 cursor-grab overflow-auto active:cursor-grabbing"
+        onPointerDown={(e) => {
+          const el = scrollRef.current;
+          if (!el) return;
+          drag.current = { x: e.clientX, y: e.clientY, left: el.scrollLeft, top: el.scrollTop };
+          el.setPointerCapture(e.pointerId);
+        }}
+        onPointerMove={(e) => {
+          const el = scrollRef.current;
+          if (!el || !drag.current) return;
+          el.scrollLeft = drag.current.left - (e.clientX - drag.current.x);
+          el.scrollTop = drag.current.top - (e.clientY - drag.current.y);
+        }}
+        onPointerUp={() => (drag.current = null)}
+        onPointerCancel={() => (drag.current = null)}
+      >
+        <div className="mx-auto flex w-max p-6">
+          {spread.map((i) => (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              key={i}
+              src={hiRes[i] ?? pages[i].src}
+              alt={`第 ${i + 1} 頁`}
+              draggable={false}
+              className="block bg-white select-none"
+              style={{ height: Math.round(baseHeight * zoom), width: "auto" }}
+            />
+          ))}
+        </div>
       </div>
     </div>
   );

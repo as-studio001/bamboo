@@ -23,19 +23,19 @@
       "id": "project-one-tvm4krx",
       "tone": "bg-neutral-300",
       "caption": "",
-      "src": "/images/project-one/1791439511301-Snipaste_2026-10-08_12-00-21.jpg"
+      "src": "/images/project-one/cover-2026-01a-market.jpg"
     },
     {
       "id": "project-one-x5iz24a",
       "tone": "bg-neutral-300",
       "caption": "",
-      "src": "/images/project-one/1792034789397-圖片1.jpg"
+      "src": "/images/project-one/cover-2026-01b-yoga.jpg"
     },
     {
       "id": "project-one-ri1hxyf",
       "tone": "bg-neutral-300",
       "caption": "",
-      "src": "/images/project-one/1792034789418-圖片2.jpg"
+      "src": "/images/project-one/cover-2026-01c-camping.jpg"
     }
   ],
   "chapters": [
@@ -380,7 +380,58 @@
       "key": "finished",
       "title": "成品照片",
       "text": "",
-      "images": []
+      "images": [
+        {
+          "id": "project-one-ih3amrn",
+          "tone": "bg-neutral-300",
+          "caption": "",
+          "src": "/images/project-one/1793084912530-LINE_ALBUM_常民竹小屋_261021_11.jpg"
+        },
+        {
+          "id": "project-one-pu0k3ij",
+          "tone": "bg-neutral-300",
+          "caption": "",
+          "src": "/images/project-one/1793084912554-LINE_ALBUM_常民竹小屋_261021_13.jpg"
+        }
+      ],
+      "moreImages": [
+        {
+          "id": "project-one-e8pkip6",
+          "tone": "bg-neutral-300",
+          "caption": "",
+          "src": "/images/project-one/1793084923153-LINE_ALBUM_常民竹小屋_261021_1.jpg"
+        },
+        {
+          "id": "project-one-hg07yev",
+          "tone": "bg-neutral-300",
+          "caption": "",
+          "src": "/images/project-one/1793084923172-LINE_ALBUM_常民竹小屋_261021_4.jpg"
+        },
+        {
+          "id": "project-one-pd9om3w",
+          "tone": "bg-neutral-300",
+          "caption": "",
+          "src": "/images/project-one/1793084923197-LINE_ALBUM_常民竹小屋_261021_5.jpg"
+        },
+        {
+          "id": "project-one-4bericc",
+          "tone": "bg-neutral-300",
+          "caption": "",
+          "src": "/images/project-one/1793084923216-LINE_ALBUM_常民竹小屋_261021_6.jpg"
+        },
+        {
+          "id": "project-one-uwpdhj3",
+          "tone": "bg-neutral-300",
+          "caption": "",
+          "src": "/images/project-one/1793084923242-LINE_ALBUM_常民竹小屋_261021_7.jpg"
+        },
+        {
+          "id": "project-one-22smxv5",
+          "tone": "bg-neutral-300",
+          "caption": "",
+          "src": "/images/project-one/1793084923263-LINE_ALBUM_常民竹小屋_261021_10.jpg"
+        }
+      ]
     },
     {
       "key": "assembly",
@@ -388,8 +439,8 @@
       "text": "組裝說明書把竹輕亭的搭建拆解成可以依序執行的步驟，搭配構件組裝圖與模組構件尺寸表，照著圖就能完成組立。後續將整理成圖解施工手冊（A4 雙語），並附上教學影片 QR Code，讓施工知識也成為可以流通的產品。",
       "images": [],
       "pdf": {
-        "url": "/files/project-one/assembly.pdf",
-        "label": "組裝說明書 PDF（範例檔案，待替換成正式版本）"
+        "url": "/files/project-one/assembly-v03.pdf",
+        "label": "組裝說明書 PDF"
       }
     },
     {
@@ -400,7 +451,7 @@
       "videos": [
         {
           "id": "video-mv7kss4i0",
-          "url": "https://youtu.be/GXRVkXpPa4U",
+          "url": "https://youtu.be/xATRZAtG2tQ",
           "title": ""
         }
       ]
@@ -447,8 +498,8 @@
   "coordinates": {
     "lat": 23.7449725,
     "lng": 120.6700879,
-    "place": "南投漆彈場-狙擊手漆彈場",
     "address": "南投竹山 狙擊手漆彈場內",
+    "place": "南投漆彈場-狙擊手漆彈場",
     "street": "南投縣竹山鎮沉潭巷26之7號"
   },
   "homeCoverId": "project-one-tvm4krx"

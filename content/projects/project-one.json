@@ -366,13 +366,31 @@
           "id": "project-one-b4fzceh",
           "tone": "bg-neutral-300",
           "caption": "",
-          "src": "/images/project-one/1792122051994-7C9FBCB3-2EFC-4711-B150-1BDE1FBCEAFD_3282B9B5-90AB-4832-8B3D-EF39FE138FF3_encrypted_0.jpg"
+          "src": "/images/project-one/construction-bw-3.jpg"
         },
         {
           "id": "project-one-72b9ite",
           "tone": "bg-neutral-300",
           "caption": "",
-          "src": "/images/project-one/1792122061354-68D7FDEE-84CF-4BC2-AAC5-CC7BE8A93E1D_032452A0-4D0A-4DB9-84D0-43C1BBC52261_encrypted_0.jpg"
+          "src": "/images/project-one/construction-bw-4.jpg"
+        },
+        {
+          "id": "project-one-awr4stf",
+          "tone": "bg-neutral-300",
+          "caption": "",
+          "src": "/images/project-one/construction-bw-5.jpg"
+        },
+        {
+          "id": "project-one-6l1nnv7",
+          "tone": "bg-neutral-300",
+          "caption": "",
+          "src": "/images/project-one/construction-bw-6.jpg"
+        },
+        {
+          "id": "project-one-dwmvx6s",
+          "tone": "bg-neutral-300",
+          "caption": "",
+          "src": "/images/project-one/construction-bw-7.jpg"
         }
       ]
     },

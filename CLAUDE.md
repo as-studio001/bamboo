@@ -150,7 +150,7 @@ Project = { slug, shortLabel, name, location, year, type, intro, accent, titleAl
 - **project-one（常民竹小屋）**：10 張真實工地現場照片（`public/images/project-one/`），已分散用在各章節；`intro`／各章節 `text` 都還是「〔佔位文字，抓版面用〕」開頭的草稿；`location`／`year`／`type` 都是「待補」；`coordinates` 還沒有值
 - **project-two（一籌）**：只有 1 張真實照片（封面），其餘照片全部是從 picsum.photos 下載的免版權風景照（`public/images/stock/`，已存進專案不是外連），標「〔網路免版權風景照，待替換〕」；其餘欄位狀態同 project-one
 - **首頁「策展宣言」文字**：已有一版正式文案（「竹構的下一步｜Bamboo, Reconfigured」），存在 `content/manifesto.json`，可以直接用 `/admin` 修改
-- **組裝說明書 PDF**：兩案都是同一份範例檔案（`public/files/project-*/assembly.pdf`），不是正式內容
+- **組裝說明書 PDF**：竹輕亭是正式版 v03（`public/files/project-one/assembly-v03.pdf`，2026-10-27 換上）；一籌還是範例檔案（`public/files/project-two/assembly.pdf`），不是正式內容
 - **這些全部都可以直接用 `/admin` 後台編輯，不需要改程式碼、不需要重新部署**——這是這整套架構存在的目的
 
 ## 目前狀態 / 待辦

@@ -26,7 +26,7 @@ import { ImagePlaceholder } from "@/components/ImagePlaceholder";
 import { ChapterMap, ChapterVideo } from "@/components/ChapterExtras";
 import { Partners } from "@/components/EventsSection";
 import { AssemblyBook } from "@/components/AssemblyBook";
-import { chapterTitle } from "@/lib/chapters";
+import { chapterShortTitle, chapterTitle } from "@/lib/chapters";
 import { PANEL_BG, TEXT_PRIMARY, TEXT_BODY } from "@/components/theme";
 
 // 案例內頁：架構直接照抄 Internal-Pages（as-studio001/Internal-Pages 的 js/render.js）的順序——
@@ -88,11 +88,12 @@ export function ProjectDetail({
   // 章節清單（封面底部那一排、左側直書導覽共用）：有填「核心目標」時排第一個、編號 00，其餘章節 01 起
   const goals = hasGoals(project.goals) ? project.goals : undefined;
   const toc: TocItem[] = [
-    ...(goals ? [{ key: "goals", number: "00", title: GOALS_TITLE }] : []),
+    ...(goals ? [{ key: "goals", number: "00", title: GOALS_TITLE, short: GOALS_SHORT }] : []),
     ...[...chapters.map((c) => c.key), "site" as ChapterKey].map((key, i) => ({
       key,
       number: chapterNumber(i),
       title: chapterTitle(key),
+      short: chapterShortTitle(key),
     })),
   ];
 
@@ -190,7 +191,9 @@ const HERO_INTERVAL_MS = 5000;
 
 // 「核心目標」（封面之後、第一章之前的那一個畫面）的名稱與編號 00，見 GoalsSection
 const GOALS_TITLE = "核心目標";
-type TocItem = { key: string; number: string; title: string };
+const GOALS_SHORT = "目標";
+// short：左側直書導覽用的兩字名稱（從四字完整名稱縮短，見 lib/chapters.ts 的 chapterShortTitle）
+type TocItem = { key: string; number: string; title: string; short: string };
 
 function DetailHero({
   project,
@@ -248,7 +251,7 @@ function DetailHero({
           aria-hidden={i !== active || undefined}
           className={`absolute inset-0 transition-opacity duration-1000 ease-in-out sm:bottom-14 ${i === active ? "opacity-100" : "opacity-0"}`}
         >
-          <ImagePlaceholder image={img} fill layoutId={img.id === finalImage?.id ? finalImage.id : undefined} />
+          <ImagePlaceholder image={img} fill sizes="100vw" layoutId={img.id === finalImage?.id ? finalImage.id : undefined} />
         </div>
       ))}
       {hasCarousel && (
@@ -359,10 +362,10 @@ function ChapterEdgeNav({ items, variant }: { items: TocItem[]; variant: "page" 
     };
   }, [firstKey]);
 
-  // （2026-10-19）章節增加到 11 項（多了 07 成品照片），完整名稱全部直書排開會比畫面高、字也被縮到 8px。改成：
-  // 平常只排一列編號（00～10，固定 12px），目前閱讀中的章節才在編號下方展開直書名稱；滑鼠移到其他編號上，
-  // 那一章也在編號下方展開名稱，編號跟名稱一樣是淡字（整個按鈕 60%）。
-  // 整列從固定高度往下排（不是垂直置中）：置中時名稱一展開，整列會往上移、滑鼠下的編號跑掉又收起，來回閃出殘影。
+  // （2026-10-28）改成只有文字、不放編號：每章一個兩字名稱（目標、團隊、概念…，從四字完整名稱縮短），
+  // 全部直書排開、一直顯示；目前閱讀中的章節深色，其他淡字（滑鼠移上去稍微加深）。
+  // （2026-10-19 原本是一列編號 00～10、只有目前章節展開完整名稱——完整名稱全部排開會比畫面高，改用兩字短名就放得下）
+  // 整列從固定高度往下排（不是垂直置中）。
   const nav = (
     <nav
       aria-hidden={!visible || undefined}
@@ -378,21 +381,12 @@ function ChapterEdgeNav({ items, variant }: { items: TocItem[]; variant: "page" 
             onClick={() => goTo(item.key)}
             aria-current={on || undefined}
             aria-label={`${item.number} ${item.title}`}
-            className={`group relative flex flex-col items-center font-serif-tc text-[10px] text-[var(--foreground)] uppercase transition-opacity duration-300 sm:text-xs ${
+            className={`relative flex flex-col items-center font-serif-tc text-[10px] text-[var(--foreground)] transition-opacity duration-300 sm:text-xs ${
               active && !on ? "opacity-35 hover:opacity-60" : ""
             }`}
           >
-            <span className="tabular-nums">{item.number}</span>
-            {/* 目前章節：編號下方展開直書名稱；（同日）滑鼠移到其他編號上，也在編號下方展開那一章的名稱（淡字） */}
-            <span
-              aria-hidden
-              className={`overflow-hidden [writing-mode:vertical-rl] tracking-[0.2em] transition-[max-height,opacity,margin] duration-300 ${
-                on
-                  ? "mt-1.5 max-h-[12em] opacity-100"
-                  : "mt-0 max-h-0 opacity-0 group-hover:mt-1.5 group-hover:max-h-[12em] group-hover:opacity-100"
-              }`}
-            >
-              {item.title}
+            <span aria-hidden className="[writing-mode:vertical-rl] tracking-[0.2em]">
+              {item.short}
             </span>
           </button>
         );
@@ -913,24 +907,24 @@ function TeamSection({
           images: chapter.images,
         },
       ];
-  // （2026-10-19）施工單位是新增的，還沒填內容時也先列出來（顯示「待補」），其他單位沒內容就不顯示
-  const shown = units.filter(
-    (u) => u.key === "builder" || u.name?.trim() || u.text?.trim() || u.images?.some((img) => img.src),
-  );
-  // A／B 分組標題沿用首頁第二頁公式的文字（manifesto.formula.terms：A 模組化設計施工、B 業主的參與）
+  // 沒內容的單位不顯示
+  const shown = units.filter((u) => u.name?.trim() || u.text?.trim() || u.images?.some((img) => img.src));
+  // A／B／？分組標題沿用首頁第二頁公式的文字（manifesto.formula.terms）
   const groupTitle = (g: string) => manifesto.formula?.terms?.find((t) => t.symbol === g)?.title ?? "";
 
-  // （2026-10-19）三欄並排，一個畫面放得下：每個單位一欄（照片在上、單位名稱、介紹文字），
-  // 上方的 A／B 分組標題橫跨該組的欄數（A＝設計單位＋施工單位兩欄、B＝業主單位一欄）。
+  // （2026-10-28）A ＋ B ＝ ？三組各一欄，三組一律列出（某組還沒填內容時只有標題、下面空白）；
+  // 同一組有兩個單位時在該欄上下排（例如一籌的 A：承億集團／黃韋維＋諸野竹木構／游智傑）。
   // 手機版改成由上往下：分組標題 → 該組的單位。電腦版用明確的列／欄位置排，DOM 順序維持手機版的閱讀順序。
-  const groups: { group: string; units: typeof shown }[] = [];
-  for (const u of shown) {
-    const last = groups[groups.length - 1];
-    if (last && last.group === u.group) last.units.push(u);
-    else groups.push({ group: u.group, units: [u] });
-  }
-  const cols = Math.max(shown.length, 1);
-  let col = 1;
+  const groups: { group: string; units: typeof shown }[] = chapter.units?.length
+    ? [...new Set(TEAM_UNITS.map((u) => u.group as string))].map((group) => ({
+        group,
+        units: shown.filter((u) => u.group === group),
+      }))
+    : [{ group: "", units: shown }];
+  // 欄寬：有兩個單位、照片在左文字在右的那組加寬（2fr），還沒填內容的組縮窄（0.6fr），其他 1fr
+  const colTemplate = groups
+    .map((g) => `minmax(0,${g.units.length > 1 ? 2 : g.units.length === 0 ? 0.6 : 1}fr)`)
+    .join(" ");
   return (
     <ChapterFrame
       id={chapter.key}
@@ -941,40 +935,51 @@ function TeamSection({
       wide
       left={
         <div
-          className="mt-8 grid grid-cols-1 gap-x-10 gap-y-6 sm:mt-7 sm:grid-cols-[repeat(var(--team-cols),minmax(0,1fr))] sm:gap-y-4 lg:gap-x-14"
-          style={{ ["--team-cols" as string]: cols } as React.CSSProperties}
+          className="mt-8 grid grid-cols-1 gap-x-10 gap-y-6 sm:mt-7 sm:grid-cols-[var(--team-cols)] sm:gap-y-4 lg:gap-x-14"
+          style={{ ["--team-cols" as string]: colTemplate } as React.CSSProperties}
         >
-          {groups.map((g) => {
-            const groupStart = col;
-            col += g.units.length;
+          {groups.map((g, gi) => {
+            const groupStart = gi + 1;
+            const stacked = g.units.length > 1;
             return (
               <Fragment key={g.group || "_"}>
                 {g.group && (
                   <div
                     className="relative mt-4 flex items-baseline gap-3 border-b pb-2 sm:mt-0 sm:[grid-column:var(--gc)] sm:[grid-row:1]"
-                    style={{ borderColor: "var(--border-subtle)", ["--gc" as string]: `${groupStart} / span ${g.units.length}` } as React.CSSProperties}
+                    style={{ borderColor: "var(--border-subtle)", ["--gc" as string]: groupStart } as React.CSSProperties}
                   >
-                    {/* A ＋ B：第二組以後，在兩組之間的空隙正中間放一個「＋」（跟首頁公式一樣） */}
+                    {/* A ＋ B ＝ ？：第二組以後，在兩組之間的空隙正中間放「＋」，？前面放「＝」（跟首頁公式一樣） */}
                     {groupStart > 1 && (
                       <span
                         aria-hidden
                         className={`absolute right-full bottom-2 hidden translate-x-1/2 font-serif-tc text-5xl leading-none font-light sm:block sm:mr-5 lg:mr-7 ${TEXT_PRIMARY}`}
                       >
-                        +
+                        {g.group === "?" ? "=" : "+"}
                       </span>
                     )}
-                    <span className={`font-serif-tc text-4xl leading-none font-bold sm:text-6xl ${TEXT_PRIMARY}`}>{g.group}</span>
+                    {/* 「？」用竹棕色，跟首頁公式一樣 */}
+                    <span
+                      className={`font-serif-tc text-4xl leading-none font-bold sm:text-6xl ${TEXT_PRIMARY}`}
+                      style={g.group === "?" ? { color: "#b4541f" } : undefined}
+                    >
+                      {g.group}
+                    </span>
                     <span className={`font-serif-tc text-base font-semibold sm:text-xl ${TEXT_PRIMARY}`}>
                       {groupTitle(g.group)}
                     </span>
                   </div>
                 )}
-                {g.units.map((unit, k) => {
+                <div
+                  style={{ ["--gc" as string]: groupStart } as React.CSSProperties}
+                  className={`flex min-w-0 flex-col sm:[grid-column:var(--gc)] sm:[grid-row:2] ${stacked ? "gap-6" : "gap-8"}`}
+                >
+                {g.units.map((unit) => {
                   const images = (unit.images ?? []).filter((img) => img.src);
                   return (
-                    <div key={unit.key} style={{ ["--gc" as string]: groupStart + k } as React.CSSProperties} className="min-w-0 sm:[grid-column:var(--gc)] sm:[grid-row:2]">
+                    // 同一組有兩個單位（stacked）時，每個單位改成照片在左、文字在右，兩個單位一個畫面放得下
+                    <div key={unit.key} className={`min-w-0 ${stacked ? "flex items-start gap-4" : ""}`}>
                       {images.length > 0 && (
-                        <div className="mb-3 flex gap-3">
+                        <div className={stacked ? "flex shrink-0 flex-col gap-3" : "mb-3 flex gap-3"}>
                           {images.map((img) => (
                             <Image
                               key={img.id}
@@ -984,12 +989,14 @@ function TeamSection({
                               height={0}
                               // 照片最大約 210px 正方形；橫式照片裁成正方形時只用到中間一部分，所以載 2 倍寬的縮圖才不會糊
                               sizes="(max-width: 640px) 60vw, 420px"
-                              // 正方形、從上緣裁（人像不切到頭），高度跟著畫面高度縮放，一個畫面放得下
+                              // 正方形、從上緣裁（人像不切到頭），高度跟著畫面高度縮放，一個畫面放得下；
+                              // 左右排時照片一樣大，這一組的欄位加寬（見上面 colTemplate）
                               className="block aspect-square h-auto w-[clamp(110px,calc(30vh-50px),210px)] object-cover object-top"
                             />
                           ))}
                         </div>
                       )}
+                      <div className="min-w-0">
                       {(unit.title || unit.name?.trim()) && (
                         <h4 className={`font-serif-tc text-sm font-bold tracking-wide sm:text-base sm:leading-6 ${TEXT_PRIMARY}`}>
                           <span className="block text-xs font-normal sm:text-sm" style={{ color: "var(--foreground-muted)" }}>
@@ -998,20 +1005,16 @@ function TeamSection({
                           {unit.name?.trim()}
                         </h4>
                       )}
-                      {unit.text?.trim() ? (
+                      {unit.text?.trim() && (
                         <p className={`mt-2 whitespace-pre-line text-sm leading-[1.8] sm:max-w-[22em] sm:font-serif-tc sm:text-[15px] ${TEXT_BODY}`}>
                           {unit.text.trim()}
                         </p>
-                      ) : (
-                        unit.key === "builder" && (
-                          <p className="mt-2 font-serif-tc text-sm" style={{ color: "var(--foreground-muted)" }}>
-                            待補
-                          </p>
-                        )
                       )}
+                      </div>
                     </div>
                   );
                 })}
+                </div>
               </Fragment>
             );
           })}
@@ -1022,8 +1025,8 @@ function TeamSection({
 }
 
 // 「影片」章節（2026-10-14）：chapter.videos 由上往下排，每支有選填的標題（跟內文同字級的襯線粗體小標），
-// 下面是播放器（ChapterVideo：YouTube 連結用嵌入播放器，其他網址用原生 <video>）。章節內文（text）有填
-// 的話放在最上面。
+// 下面是播放器（ChapterVideo：YouTube 連結用嵌入播放器，其他網址用原生 <video>）。
+// （2026-10-28）改成跟其他章節一樣的左右兩欄：左欄章節標題＋影片介紹文字（chapter.text），右欄影片。
 function VideoSection({
   chapter,
   number,
@@ -1043,42 +1046,36 @@ function VideoSection({
       number={number}
       title={chapterTitle(chapter.key)}
       first={first}
-      // （2026-10-16）影片橫跨整個內容寬度（不分左右欄），文字放在影片上方
-      wide
       left={
-        <>
-          {chapter.text?.trim() && (
-            <p className={`mt-4 max-w-3xl whitespace-pre-line sm:mt-6 ${BODY_TEXT}`}>
-              {chapter.text.trim()}
-            </p>
-          )}
-          {/* （2026-10-16）影片寬度上限：讓 16:9 的高度剛好放得進一個畫面（扣掉上方章節標題與上下留白；
-              浮起視窗比畫面矮 106px，再多扣一些），寬螢幕上一樣接近最大寬度，矮螢幕上自動縮小、不被切到 */}
-          <div style={{ maxWidth: `calc((100dvh - ${variant === "modal" ? 380 : 274}px) * 16 / 9)` }}>
+        chapter.text?.trim() && (
+          <p className={`mt-4 whitespace-pre-line sm:mt-6 ${BODY_TEXT}`}>{chapter.text.trim()}</p>
+        )
+      }
+      right={
+        // （2026-10-16）影片寬度上限：讓 16:9 的高度放得進一個畫面（浮起視窗比畫面矮，再多扣一些），
+        // 矮螢幕上自動縮小、不被切到
+        <div style={{ maxWidth: `calc((100dvh - ${variant === "modal" ? 380 : 274}px) * 16 / 9)` }}>
           {videos.length > 0 ? (
-          videos.map((v) => (
-            <div key={v.id} className="mt-8">
-              {v.title?.trim() && (
-                <h4
-                  className={`font-serif-tc text-sm font-bold tracking-wide sm:text-base ${TEXT_PRIMARY}`}
-                >
-                  {v.title.trim()}
-                </h4>
-              )}
-              <ChapterVideo src={v.url.trim()} inset={false} />
+            videos.map((v, i) => (
+              <div key={v.id} className={i > 0 ? "mt-8" : "mt-8 sm:mt-0"}>
+                {v.title?.trim() && (
+                  <h4 className={`mb-2 font-serif-tc text-sm font-bold tracking-wide sm:text-base ${TEXT_PRIMARY}`}>
+                    {v.title.trim()}
+                  </h4>
+                )}
+                <ChapterVideo src={v.url.trim()} inset={false} />
+              </div>
+            ))
+          ) : (
+            // 還沒有影片：保留一個 16:9 的虛線框佔位，在後台「影片」章節貼上連結就會換成影片
+            <div
+              className="mt-8 flex aspect-video w-full items-center justify-center border border-dashed font-serif-tc text-sm tracking-[0.2em] sm:mt-0"
+              style={{ borderColor: "var(--border-subtle)", color: "var(--foreground-muted)" }}
+            >
+              影片待補
             </div>
-          ))
-        ) : (
-          // 還沒有影片：保留一個 16:9 的虛線框佔位，在後台「影片」章節貼上連結就會換成影片
-          <div
-            className="mt-8 flex aspect-video w-full items-center justify-center border border-dashed font-serif-tc text-sm tracking-[0.2em]"
-            style={{ borderColor: "var(--border-subtle)", color: "var(--foreground-muted)" }}
-          >
-            影片待補
-          </div>
           )}
-          </div>
-        </>
+        </div>
       }
     />
   );
@@ -1278,7 +1275,7 @@ function NarrativeSection({
               className="flex aspect-[4/3] w-full items-center justify-center border border-dashed font-serif-tc text-sm tracking-[0.2em]"
               style={{ borderColor: "var(--border-subtle)", color: "var(--foreground-muted)" }}
             >
-              成品照片待補
+              {chapterTitle("finished")}待補
             </div>
           )}
           {chapter.moreImages && chapter.moreImages.length > 0 && (

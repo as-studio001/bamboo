@@ -33,7 +33,11 @@ export function AssemblyBook({ project, pdf, accent }: { project: Project; pdf: 
         data-photo-anchor
         onClick={() => setOpen(true)}
         aria-label={`翻閱${pdf.label}`}
-        className="group relative block h-64 w-full scroll-mt-4 overflow-hidden text-left sm:h-96 lg:h-[28rem]"
+        // （2026-10-28）預覽框改成直式，跟 PDF 本身的 A 規格直式（1:1.414）同比例——原本是固定高度的
+        // 橫向框，直式封面縮在中間、左右空一大塊。電腦版高度不超過畫面（扣掉上下留白），框加一條細邊
+        // 讓白底的封面頁跟頁面背景分得開
+        className="group relative mx-auto block aspect-[1/1.414] w-full max-w-[calc((100dvh-260px)/1.414)] scroll-mt-4 overflow-hidden border text-left"
+        style={{ borderColor: "var(--border-subtle)" }}
       >
         {coverSrc && (
           // PDF 頁面是完整版面（含邊界留白），用 object-cover 會裁掉四周——這裡改
@@ -50,7 +54,7 @@ export function AssemblyBook({ project, pdf, accent }: { project: Project; pdf: 
         </span>
       </motion.button>
 
-      <div className="mt-4 flex flex-wrap items-center gap-x-6 gap-y-2">
+      <div className="mt-4 flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
         <button
           onClick={() => setOpen(true)}
           className="font-mono text-[10px] tracking-wide uppercase underline underline-offset-2 sm:text-xs"

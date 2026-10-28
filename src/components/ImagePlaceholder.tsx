@@ -22,6 +22,7 @@ export function ImagePlaceholder({
   natural = false,
   className = "",
   layoutId,
+  sizes,
 }: {
   image: ProjectImage | undefined;
   aspect?: string;
@@ -29,6 +30,9 @@ export function ImagePlaceholder({
   natural?: boolean;
   className?: string;
   layoutId?: string;
+  // （2026-10-28）圖片實際顯示的寬度，給 next/image 挑解析度用。預設是半個畫面寬（首頁兩欄）；
+  // 滿版的案例封面要傳 "100vw"，不然瀏覽器只會拿到半寬的圖、放大鋪滿後看起來很糊。
+  sizes?: string;
 }) {
   if (!image) {
     console.error("ImagePlaceholder received undefined image");
@@ -69,7 +73,7 @@ export function ImagePlaceholder({
           src={image.src}
           alt={image.caption ?? ""}
           fill
-          sizes="(max-width: 640px) 100vw, 50vw"
+          sizes={sizes ?? "(max-width: 640px) 100vw, 50vw"}
           className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.02]"
         />
       ) : (

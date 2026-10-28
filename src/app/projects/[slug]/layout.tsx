@@ -1,3 +1,4 @@
+import { BackHomeButton } from "@/components/BackHomeButton";
 import { EdgeTitle } from "@/components/EdgeTitle";
 import { getProjectBySlug } from "@/lib/projects";
 
@@ -14,6 +15,7 @@ export default async function ProjectLayout({ children, params }: LayoutProps<"/
   return (
     <div className="relative min-h-[100dvh]">
       <EdgeTitle side="right" projectName={project?.name} />
+      <BackHomeButton />
       <main className="min-h-[100dvh] pt-[18px] pr-[18px] pl-[18px] sm:pt-[30px] sm:pr-[30px] sm:pl-[30px]">
         {children}
       </main>

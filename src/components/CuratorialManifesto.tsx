@@ -1,8 +1,8 @@
 "use client";
 
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { motion } from "framer-motion";
+import { MotionConfig, motion, useInView, useReducedMotion } from "framer-motion";
 import { manifesto } from "@/lib/manifesto";
 
 // 首頁最上面的「策展宣言」，點進網站先看到這裡，往下捲完才進到兩欄並列的展覽（SplitExhibition）。
@@ -29,6 +29,64 @@ const EYEBROW = "font-mono text-[10px] tracking-[0.25em] uppercase sm:text-xs";
 
 function scrollToExhibition() {
   document.getElementById("exhibition")?.scrollIntoView({ behavior: "smooth" });
+}
+
+// 第二屏三個標題：進場跟輪流強調是同一個節奏、同一種動作（2026-10-28）——
+// 每 POINT_HOLD_MS 換一句當「亮的那句」（全彩、微放大），其他已出現的句子變淡（第一輪出現時快一點，每 POINT_ENTER_MS）；
+// 還沒輪到的句子先藏著（透明、縮小一點），輪到時從小放大浮現、直接成為亮的那句。
+// 三句都出現後就一直這樣循環。離開這一屏就重置，回來再從頭播。
+// 系統「減少動態效果」時不播，三句都維持全彩
+const POINT_WORDS = ["生活中", "像組積木", "和你一起"];
+const POINT_HOLD_MS = 3000;
+const POINT_ENTER_MS = 1500;
+
+function PointsRotator({ points }: { points: string[] }) {
+  const ref = useRef<HTMLUListElement>(null);
+  const inView = useInView(ref, { amount: 0.3 });
+  const reduce = useReducedMotion();
+  const [step, setStep] = useState(-1); // 第幾拍；-1：還沒開始（三句都藏著）
+  useEffect(() => {
+    if (!inView || reduce) return;
+    let timer = 0;
+    // 第一輪（三句依序出現）每 POINT_ENTER_MS 換一句，比較快；之後的輪播每 POINT_HOLD_MS 換一句
+    const tick = (s: number) => {
+      setStep(s);
+      timer = window.setTimeout(() => tick(s + 1), s < points.length - 1 ? POINT_ENTER_MS : POINT_HOLD_MS);
+    };
+    // 稍等一下再開始，讓第一句也有從藏著到出現的過渡
+    timer = window.setTimeout(() => tick(0), 150);
+    return () => {
+      window.clearTimeout(timer);
+      setStep(-1);
+    };
+  }, [inView, reduce, points.length]);
+  const active = step >= 0 ? step % points.length : -1;
+  return (
+    <ul
+      ref={ref}
+      className="flex flex-col gap-1 font-serif-tc text-xl leading-[1.4] font-semibold sm:flex-row sm:flex-wrap sm:gap-x-8 sm:text-3xl"
+    >
+      {points.map((p, i) => {
+        const shown = reduce || step >= i; // 已經輪到過
+        const on = !reduce && active === i;
+        return (
+          <li
+            key={i}
+            className="origin-left transition-[opacity,transform] duration-[900ms] ease-in-out"
+            style={{
+              opacity: !shown ? 0 : on || reduce ? 1 : 0.3,
+              transform: !shown ? "scale(0.98)" : on ? "scale(1.02)" : "scale(1)",
+            }}
+          >
+            <span className="mr-2 font-normal" style={{ color: ACCENT }}>
+              ☉
+            </span>
+            <BambooAccent text={p} words={POINT_WORDS} />
+          </li>
+        );
+      })}
+    </ul>
+  );
 }
 
 // 進到畫面時淡入上移（全站動效原則：20px／0.7s），每次回到這一屏都重播
@@ -216,7 +274,8 @@ export function CuratorialManifesto({ projects }: { projects?: [BridgeProject, B
   ].filter((s): s is { key: string; label: string | undefined; body: React.ReactElement } => !!s);
 
   return (
-    <>
+    // 系統開了「減少動態效果」時不做位移動畫
+    <MotionConfig reducedMotion="user">
       {screens.map((s, i) => (
         <Screen
           key={s.key}
@@ -231,7 +290,7 @@ export function CuratorialManifesto({ projects }: { projects?: [BridgeProject, B
           {s.body}
         </Screen>
       ))}
-    </>
+    </MotionConfig>
   );
 }
 
@@ -282,9 +341,14 @@ function IntroScreen({
           </p>
         )}
         {statement?.title && (
-          // 主張一句：原本第二屏的大標，換行合成一行
+          // 主張一句：原本第二屏的大標，放得下就排成一行；放不下時只在原本換行的地方
+          // （逗號後）斷開，不會斷在詞中間（例如「竹／小屋」）
           <p className="mt-7 font-serif-tc text-xl leading-[1.5] font-semibold sm:mt-[5vh] sm:text-3xl">
-            <BambooAccent text={statement.title.replace(/\s*\n\s*/g, "")} />
+            {statement.title.split(/\s*\n\s*/).map((seg, i) => (
+              <span key={i} className="inline-block">
+                <BambooAccent text={seg} words={["竹小屋", "竹子", "竹構", "竹"]} />
+              </span>
+            ))}
           </p>
         )}
         {statement?.en && (
@@ -340,79 +404,88 @@ function SystemScreen({
   const terms = formula?.terms ?? [];
   const points = (data.points ?? "").split("\n").filter((l) => l.trim());
   const reasons = (data.reasons ?? []).filter((r) => r.title || r.text);
+  // （2026-10-28）只有最上面三個標題有浮現動畫，下面的內容一開始就在、不做進場動畫
   return (
     <>
-      <Reveal>
-        {points.length > 0 && (
-          <ul className="flex flex-col gap-1 font-serif-tc text-xl leading-[1.4] font-semibold sm:flex-row sm:flex-wrap sm:gap-x-12 sm:text-4xl">
-            {points.map((p, i) => (
-              <li key={i}>
-                <span className="mr-2 font-normal" style={{ color: ACCENT }}>
-                  ☉
-                </span>
-                {/* （2026-10-16）三個面向的關鍵詞（常民使用／模組化／共同創造）用竹棕色 */}
-                <BambooAccent text={p} words={["常民使用", "模組化", "共同創造"]} />
-              </li>
-            ))}
-          </ul>
-        )}
-      </Reveal>
+      {points.length > 0 && <PointsRotator points={points} />}
 
       {reasons.length > 0 && (
-        <Reveal delay={0.1} className="mt-6 sm:mt-[5vh]">
+        <div className="mt-8 sm:mt-[7vh]">
           {data.reasonsLabel && (
-            <p className={EYEBROW} style={MUTED}>
-              {data.reasonsLabel}
+            // 小標放大（2026-10-28），右邊接英文
+            <p className="flex flex-wrap items-baseline gap-x-4 font-serif-tc">
+              <span className="text-base font-semibold sm:text-lg" style={MUTED}>
+                {data.reasonsLabel}
+              </span>
+              {data.reasonsLabelEn && (
+                <span className="text-sm italic sm:text-base" style={MUTED}>
+                  {data.reasonsLabelEn}
+                </span>
+              )}
             </p>
           )}
           <div className={`mt-3 grid grid-cols-2 gap-x-5 gap-y-5 border-t ${RULE} pt-5 sm:grid-cols-4 sm:gap-x-10 sm:pt-6`}>
             {reasons.map((r, i) => (
               <div key={i}>
-                <p className="font-serif-tc text-lg font-semibold sm:text-2xl">{r.title}</p>
-                <p className="mt-2 text-sm leading-[1.8] sm:font-serif-tc sm:text-base" style={MUTED}>
+                <p className="font-serif-tc text-[15px] font-semibold sm:text-xl">{r.title}</p>
+                <p className="mt-2 text-sm leading-[1.8] sm:font-serif-tc sm:text-[15px]" style={MUTED}>
                   {r.text}
                 </p>
               </div>
             ))}
           </div>
-        </Reveal>
+        </div>
       )}
 
-      <Reveal delay={0.2} className="mt-8 sm:mt-[6vh]">
+      <div className="mt-10 sm:mt-[6vh]">
         {terms.length > 0 && (
-          // A 模組化系統 ＋ B 人的參與 ＝ ？（每一項：大字符號＋小字標題）
-          <p className="flex flex-wrap items-baseline gap-x-4 gap-y-1 font-serif-tc sm:gap-x-5">
+          // A ＋ B ＝ ？一橫排（2026-10-28 放大 2 倍）：第一列大字符號＋運算符號，第二列標題放在各自符號正下方
+          // （標題放符號旁邊的話，2 倍字寬一排放不下）。電腦版大字最大 7.5rem（原本 6xl 的 2 倍），
+          // 矮螢幕依畫面高度縮小，整屏才放得下
+          <div
+            className="grid items-center justify-start gap-x-2 font-serif-tc sm:gap-x-8"
+            style={{ gridTemplateColumns: `repeat(${terms.length * 2 - 1}, auto)` }}
+          >
             {terms.map((t, i) => (
               <Fragment key={i}>
                 {i > 0 && (
-                  <span className="text-2xl sm:text-4xl" style={MUTED}>
+                  <span className="row-start-1 text-3xl sm:text-[min(3.75rem,6.5vh)]" style={MUTED}>
                     {i === terms.length - 1 ? "=" : "+"}
                   </span>
                 )}
-                <span className="inline-flex items-baseline gap-2">
-                  <span className="text-3xl font-semibold sm:text-6xl">
-                    <Accented text={t.symbol} />
-                  </span>
-                  {t.title && (
-                    <span className="text-base sm:text-xl" style={MUTED}>
-                      {t.title}
-                    </span>
-                  )}
+                <span
+                  className="row-start-1 text-center text-5xl leading-none font-semibold sm:text-[min(7.5rem,13vh)]"
+                  style={{ gridColumn: i * 2 + 1 }}
+                >
+                  <Accented text={t.symbol} />
+                </span>
+                <span
+                  className="row-start-2 mt-1 text-center text-[11px] whitespace-nowrap sm:mt-[1vh] sm:text-[min(1.75rem,3.2vh)]"
+                  style={{ gridColumn: i * 2 + 1, ...MUTED }}
+                >
+                  {t.title}
                 </span>
               </Fragment>
             ))}
-          </p>
+          </div>
         )}
+      </div>
         {(closing?.title || closing?.emphasis) && (
-          <p className="mt-3 font-serif-tc text-2xl leading-[1.4] font-semibold sm:mt-[2.5vh] sm:text-5xl">
-            {closing.title}
-            {closing.emphasis && <span style={{ color: ACCENT }}>{closing.emphasis}</span>}
-          </p>
+          <div className="mt-6 sm:mt-[3.5vh]">
+            <p className="font-serif-tc text-xl leading-[1.4] font-semibold sm:text-4xl">
+              {/* 兩段各自不斷行，放不下時從逗號後換行 */}
+              <span className="inline-block">{closing.title}</span>
+              {closing.emphasis && (
+                <span className="inline-block" style={{ color: ACCENT }}>
+                  {closing.emphasis}
+                </span>
+              )}
+            </p>
+          </div>
         )}
-      </Reveal>
 
       {data.cta && (
-        <Reveal delay={0.4} className="mt-10 flex justify-center sm:mt-[6vh]">
+        <div className="mt-10 flex justify-center sm:mt-[3vh]">
           <button
             onClick={scrollToExhibition}
             className="group inline-flex items-center gap-2 border px-7 py-3 font-serif-tc text-base font-semibold transition-colors hover:text-[#f7f3ec] sm:text-xl"
@@ -425,7 +498,7 @@ function SystemScreen({
               ↓
             </span>
           </button>
-        </Reveal>
+        </div>
       )}
     </>
   );

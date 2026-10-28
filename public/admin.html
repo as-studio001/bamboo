@@ -675,8 +675,8 @@ const LABEL_DEFS = [
   { key: "module", label: "模矩", chapter: "建築設計" },
   { key: "structure", label: "構造", chapter: "細部設計" },
   { key: "construction", label: "施工", chapter: "施工細節" },
-  { key: "finished", label: "成品", chapter: "成品照片" },
-  { key: "assembly", label: "組裝", chapter: "組裝說明書" },
+  { key: "finished", label: "成品", chapter: "作品寫真" },
+  { key: "assembly", label: "組裝", chapter: "組裝手冊" },
   { key: "site", label: "位置", chapter: "基地位置" },
   // 「影片」只在案例內頁，首頁選單沒有，所以這裡不列（內頁名稱在下方「案例內頁的章節名稱」）
   { key: "events", label: "活動", chapter: "首頁活動畫面" },
@@ -1216,18 +1216,20 @@ const CHAPTER_DEFS = [
   { key: "structure", label: "細部設計", kind: "narrative", home: true },
   { key: "engineering", label: "結構設計", kind: "narrative", home: false },
   { key: "construction", label: "施工細節", kind: "narrative", home: true },
-  { key: "finished", label: "成品照片", kind: "narrative", home: true },
-  { key: "assembly", label: "組裝說明書", kind: "assembly", home: true },
-  { key: "video", label: "影片", kind: "video", home: false },
+  { key: "finished", label: "作品寫真", kind: "narrative", home: true },
+  { key: "assembly", label: "組裝手冊", kind: "assembly", home: true },
+  { key: "video", label: "組裝影片", kind: "video", home: false },
   { key: "site", label: "基地位置", kind: "site", home: true },
 ];
 
 // 「團隊介紹」的兩個固定單位（跟前台 src/lib/projects.ts 的 TEAM_UNITS 一致），存在 chapter.units：
 // [{ key, text, images }]。文字照輸入的換行顯示、不切段落；圖片排在文字右邊。
+// （2026-10-28）施工單位拿掉（舊資料保留不刪、前台不顯示），新增場地單位（對應首頁公式的「？」）
 const TEAM_UNITS = [
-  { key: "designer", label: "設計單位" },
-  { key: "builder", label: "施工單位" },
-  { key: "owner", label: "業主單位" },
+  { key: "designer", label: "設計單位（A）" },
+  { key: "designer2", label: "設計單位 2（A，排在上一個下面，選填）" },
+  { key: "owner", label: "業主單位（B）" },
+  { key: "venue", label: "場地單位（？）" },
 ];
 function teamUnit(chapter, key){
   chapter.units = chapter.units || [];
@@ -1429,7 +1431,7 @@ function renderCaseEditor(){
             <h3>${esc(def.label)}</h3>
             <span class="key">key: ${def.key}｜只在案例內頁顯示</span>
           </div>
-          <div class="field-hint" style="margin-top:0; margin-bottom:14px;">分成設計單位、業主單位。「名稱」會跟「設計單位／業主單位」排在同一行；介紹文字照你輸入的換行顯示（按 Enter 就換行，空白行也會保留），不會切成段落；圖片顯示在文字右邊，多張由上往下排。兩個單位都空白時，案例內頁不顯示這一章。</div>
+          <div class="field-hint" style="margin-top:0; margin-bottom:14px;">分成設計單位（A）、業主單位（B）、場地單位（？），沒填的單位不顯示。「名稱」顯示在單位小標下面；介紹文字照你輸入的換行顯示（按 Enter 就換行，空白行也會保留），不會切成段落；圖片顯示在文字右邊，多張由上往下排。兩個單位都空白時，案例內頁不顯示這一章。</div>
           ${TEAM_UNITS.map(u => {
             const unit = teamUnit(chapter, u.key);
             return `

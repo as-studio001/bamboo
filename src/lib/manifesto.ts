@@ -67,6 +67,7 @@ export type ManifestoBridge = {
   intros?: Record<string, string>; // 各案一句簡介，key 是案例 slug
   // （2026-10-16）第二屏「為什麼要做竹小屋」四格（關鍵字＋一句說明），放在三個面向與公式之間
   reasonsLabel?: string;
+  reasonsLabelEn?: string;
   reasons?: { title: string; text: string }[];
   cta?: string; // 兩案下方的按鈕文字，點了捲到兩欄展覽（例如「看兩個案子」）
 };

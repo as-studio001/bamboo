@@ -42,9 +42,9 @@ const DEFAULT_TITLES: Record<ChapterKey, string> = {
   structure: "細部設計",
   engineering: "結構設計",
   construction: "施工細節",
-  assembly: "組裝說明書",
-  video: "影片",
-  finished: "成品照片",
+  assembly: "組裝手冊",
+  video: "組裝影片",
+  finished: "作品寫真",
   site: "基地位置",
 };
 
@@ -58,6 +58,26 @@ export function chapterLabel(key: LabelKey): string {
 // 案例內頁的完整章節名稱
 export function chapterTitle(key: ChapterKey): string {
   return settings.titles?.[key]?.trim() || DEFAULT_TITLES[key];
+}
+
+// 案例內頁左側直書導覽的兩字名稱（2026-10-28）：每個都從上面的四字完整名稱縮短而來，
+// 跟首頁頂部選單的短名（labels，例如「模矩」「構造」）是不同的兩份，不要混用。
+// 完整名稱改了的話，這裡要跟著改。
+const SHORT_TITLES: Record<ChapterKey, string> = {
+  team: "團隊", // 團隊介紹
+  design: "概念", // 設計概念
+  module: "建築", // 建築設計
+  structure: "細部", // 細部設計
+  engineering: "結構", // 結構設計
+  construction: "施工", // 施工細節
+  finished: "寫真", // 作品寫真
+  assembly: "手冊", // 組裝手冊
+  video: "影片", // 組裝影片
+  site: "基地", // 基地位置
+};
+
+export function chapterShortTitle(key: ChapterKey): string {
+  return SHORT_TITLES[key];
 }
 
 // 只接受 #RGB／#RRGGBB 這類 hex 色碼，其他（後台手誤、格式不對）一律當作沒設定。

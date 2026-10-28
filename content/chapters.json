@@ -5,8 +5,14 @@
     "structure": "構造",
     "construction": "施工",
     "assembly": "組裝",
+    "finished": "成品",
     "site": "位置",
     "events": "活動"
+  },
+  "titles": {
+    "finished": "作品寫真",
+    "video": "組裝影片",
+    "assembly": "組裝手冊"
   },
   "navColor": {
     "light": "#575757"

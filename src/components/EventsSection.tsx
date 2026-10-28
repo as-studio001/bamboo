@@ -1,7 +1,7 @@
 import { exhibitionEvents, type EventPoster } from "@/lib/events";
 import { chapterLabel } from "@/lib/chapters";
 import { TEXT_PRIMARY } from "@/components/theme";
-import { partnerGroups } from "@/lib/partners";
+import { partnerGroups, type PartnerGroup } from "@/lib/partners";
 
 // 「活動」區塊：整個展覽共用一份內容（content/events.json，見 lib/events.ts），兩種擺法——
 // - variant="screen"：首頁最尾端、接在兩欄展覽後面的第三個滿版畫面（整頁 scroll-snap 的一屏），
@@ -64,13 +64,14 @@ export function EventsSection({ variant, id }: { variant: "screen" | "inline"; i
 
 // 單位 LOGO 列：主辦／承辦／參加團隊左右排開，每組上面一個小標；LOGO 統一高度，有網址就連到該單位官網（另開分頁）。
 // 還沒有 LOGO 的單位先用名稱文字佔位。
-// （2026-10-20）案例內頁（獨立頁面／彈出視窗）最尾端也共用這一列，見 ProjectDetail.tsx。
-export function Partners({ className = "mt-12 sm:mt-10" }: { className?: string }) {
-  if (!partnerGroups.some((g) => g.items.length)) return null;
+// （2026-10-20）案例內頁（獨立頁面／彈出視窗）最尾端也共用這一列，見 ProjectDetail.tsx；
+// （2026-10-28）案例內頁改傳 groups＝該案自己的單位（project.credits），不再顯示整個展覽共用的那一列。
+export function Partners({ className = "mt-12 sm:mt-10", groups = partnerGroups }: { className?: string; groups?: PartnerGroup[] }) {
+  if (!groups.some((g) => g.items.length)) return null;
   return (
     <footer className={`border-t pt-6 ${className}`} style={{ borderColor: "var(--border-subtle)" }}>
       <div className="flex flex-wrap gap-x-14 gap-y-6 lg:gap-x-20">
-        {partnerGroups
+        {groups
           .filter((g) => g.items.length)
           .map((g) => (
             <div key={g.label}>
@@ -83,7 +84,8 @@ export function Partners({ className = "mt-12 sm:mt-10" }: { className?: string 
                     // eslint-disable-next-line @next/next/no-img-element
                     <img src={p.logo} alt={p.name} title={p.name} className="block h-9 w-auto max-w-[220px] object-contain sm:h-10" />
                   ) : (
-                    <span className={`block font-serif-tc text-sm font-bold leading-10 sm:text-base ${TEXT_PRIMARY}`}>{p.name}</span>
+                    // 還沒有 LOGO 的單位用名稱文字（2026-10-28 放大一級，跟旁邊 LOGO 的份量比較接近）
+                    <span className={`block font-serif-tc text-lg font-bold leading-10 sm:text-xl ${TEXT_PRIMARY}`}>{p.name}</span>
                   );
                   return (
                     <li key={p.name}>

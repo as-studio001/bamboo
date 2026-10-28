@@ -179,8 +179,9 @@ export function ProjectDetail({
               </>
             }
           />
-          {/* （2026-10-20）頁面最尾端：單位 LOGO 列，跟首頁最下面同一列（EventsSection.tsx 的 Partners） */}
-          <Partners className="mt-4 sm:mt-0" />
+          {/* （2026-10-20）頁面最尾端：單位 LOGO 列（EventsSection.tsx 的 Partners）；
+              （2026-10-28）改成這一案自己的單位（建築設計／結構設計／施工單位／業主單位／其他廠商） */}
+          <Partners className="mt-4 sm:mt-0" groups={project.credits ?? []} />
         </div>
       </div>
     </div>

@@ -37,11 +37,11 @@ export type ChapterVideoItem = { id: string; url: string; title?: string };
 export type TeamUnitKey = "designer" | "designer2" | "builder" | "owner" | "venue";
 // name：單位名稱（例如「初樸建築師事務所」），顯示在小標「設計單位」右邊；text 是下面的介紹內文
 export type TeamUnit = { key: TeamUnitKey; name?: string; text?: string; images?: ProjectImage[] };
-// 分組對應首頁公式「A ＋ B ＝ ？」（2026-10-28）：A＝設計單位（最多兩個，同一欄上下排）、B＝業主單位、
-// ？＝場地單位（新增）
+// 分組對應首頁公式「A ＋ B ＝ ？」（2026-10-28）：A＝設計單位＋選填的施工單位（designer2，同一欄上下排，
+// 例如一籌的諸野）、B＝業主單位、？＝場地單位（新增）
 export const TEAM_UNITS: { key: TeamUnitKey; title: string; group: "A" | "B" | "?" }[] = [
   { key: "designer", title: "設計單位", group: "A" },
-  { key: "designer2", title: "設計單位", group: "A" },
+  { key: "designer2", title: "施工單位", group: "A" },
   { key: "owner", title: "業主單位", group: "B" },
   { key: "venue", title: "場地單位", group: "?" },
 ];
@@ -156,6 +156,9 @@ export type Project = {
   goals?: ProjectGoals;
   chapters: Chapter[];
   coordinates?: Coordinates; // 基地章節的地圖標記位置，待使用者提供實際地址／經緯度
+  // （2026-10-28）案例內頁最尾端的單位 LOGO 列：這一案的建築設計／結構設計／施工單位／業主單位／其他廠商，
+  // 取代原本整個展覽共用的那一列（首頁最下面那一列不變）。沒有項目的分類不顯示
+  credits?: PartnerGroup[];
   published: boolean;
 };
 
@@ -184,6 +187,7 @@ export type Project = {
 // 首頁的照片索引不再是獨立的 project.photos 扁平清單，改成**直接借用每個章節自己的
 // chapter.images**——這樣每張照片天生就知道自己屬於哪個章節，首頁頂部的章節標籤才能準確
 // 捲到對應的照片群組（同一個 id={`${slug}-${key}`} 錨點，首頁跟內頁共用同一套章節 key）。
+import type { PartnerGroup } from "@/lib/partners";
 import projectOneData from "../../content/projects/project-one.json";
 import projectTwoData from "../../content/projects/project-two.json";
 

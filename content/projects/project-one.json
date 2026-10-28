@@ -511,6 +511,20 @@
       ]
     }
   ],
+  "credits": [
+    {
+      "label": "建築設計",
+      "items": [{ "name": "初樸建築師事務所", "logo": "/images/partners/protoplain.png", "url": "https://protoplain.format.com/" }]
+    },
+    {
+      "label": "結構設計",
+      "items": [{ "name": "原型結構工程顧問有限公司", "logo": "/images/partners/prototype-structure.png" }]
+    },
+    {
+      "label": "業主／施工單位",
+      "items": [{ "name": "仲夏夜工作坊" }]
+    }
+  ],
   "published": true,
   "titleAlign": "left",
   "coordinates": {

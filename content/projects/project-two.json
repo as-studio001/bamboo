@@ -449,6 +449,24 @@
       "images": []
     }
   ],
+  "credits": [
+    {
+      "label": "建築設計",
+      "items": [{ "name": "承億集團", "logo": "/images/partners/chanyee.png" }]
+    },
+    {
+      "label": "結構設計",
+      "items": [{ "name": "原型結構工程顧問有限公司", "logo": "/images/partners/prototype-structure.png" }]
+    },
+    {
+      "label": "施工單位",
+      "items": [{ "name": "諸野竹木構造專門有限公司", "logo": "/images/partners/jhuyeh.png", "url": "https://jhuyeh.com/about/" }]
+    },
+    {
+      "label": "業主單位",
+      "items": [{ "name": "竹育股份有限公司", "logo": "/images/partners/chuyu.png" }]
+    }
+  ],
   "published": true,
   "coordinates": {
     "lat": 23.677845390683956,

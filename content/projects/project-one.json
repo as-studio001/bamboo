@@ -23,19 +23,19 @@
       "id": "project-one-tvm4krx",
       "tone": "bg-neutral-300",
       "caption": "",
-      "src": "/images/project-one/cover-2026-01a-market.jpg"
+      "src": "/images/project-one/cover-1030-01a.jpg"
     },
     {
       "id": "project-one-x5iz24a",
       "tone": "bg-neutral-300",
       "caption": "",
-      "src": "/images/project-one/cover-2026-01b-yoga.jpg"
+      "src": "/images/project-one/cover-1030-01b.jpg"
     },
     {
       "id": "project-one-ri1hxyf",
       "tone": "bg-neutral-300",
       "caption": "",
-      "src": "/images/project-one/cover-2026-01c-camping.jpg"
+      "src": "/images/project-one/cover-1030-01c.jpg"
     }
   ],
   "chapters": [
@@ -129,21 +129,49 @@
       "text": "竹輕亭以 3M 基準模矩（300cm）為構件邏輯核心：三組 A 字組合竹柱沿長向以 300cm 跨距排列，量體約 7.5 × 6.8m，屋頂高 353cm、簷下淨高 220cm。\n\n構造由下而上依序是 60×150cm 混凝土墩座、組合式懸浮戶外木地板、10cm 孟宗竹組合柱、10cm 孟宗竹橫梁與抗剪組合梁、12cm 孟宗竹縱梁、單元化實木檁條，最上層是預組雙層發泡金屬屋頂板。屋頂沿短向單斜排水，四角以防颱抗拉桿件（土牛）拉住。\n\n平面是交錯的折線形，兩側各配一組組合式竹集成板傢俱，另有組合式捲簾，可依需要遮陽或圍塑空間。",
       "images": [
         {
-          "id": "project-one-deck-sheet-plans-full",
+          "id": "project-one-arch-1030-03b",
           "tone": "bg-neutral-300",
-          "caption": "地坪配置圖、一層平面圖、竹桁架配置圖、屋頂平面圖",
-          "src": "/images/project-one/deck-sheet-plans-full.jpg",
+          "caption": "一層平面圖",
+          "src": "/images/project-one/arch-1030-03b.jpg",
           "kind": "drawing"
         },
         {
-          "id": "project-one-deck-sheet-sections-full",
+          "id": "project-one-arch-1030-03e",
           "tone": "bg-neutral-300",
-          "caption": "正向立面圖、剖面圖",
-          "src": "/images/project-one/deck-sheet-sections-full.jpg",
+          "caption": "正向剖面圖",
+          "src": "/images/project-one/arch-1030-03e.jpg",
           "kind": "drawing"
         }
       ],
       "moreImages": [
+        {
+          "id": "project-one-arch-1030-03a",
+          "tone": "bg-neutral-300",
+          "caption": "地坪配置圖",
+          "src": "/images/project-one/arch-1030-03a.jpg",
+          "kind": "drawing"
+        },
+        {
+          "id": "project-one-arch-1030-03c",
+          "tone": "bg-neutral-300",
+          "caption": "竹桁架配置圖",
+          "src": "/images/project-one/arch-1030-03c.jpg",
+          "kind": "drawing"
+        },
+        {
+          "id": "project-one-arch-1030-03d",
+          "tone": "bg-neutral-300",
+          "caption": "屋頂平面圖",
+          "src": "/images/project-one/arch-1030-03d.jpg",
+          "kind": "drawing"
+        },
+        {
+          "id": "project-one-arch-1030-03f",
+          "tone": "bg-neutral-300",
+          "caption": "側向剖面圖",
+          "src": "/images/project-one/arch-1030-03f.jpg",
+          "kind": "drawing"
+        },
         {
           "id": "project-one-deck-elevation-long",
           "tone": "bg-neutral-300",
@@ -172,82 +200,96 @@
           "src": "/images/project-one/deck-exploded-gray.jpg"
         },
         {
-          "id": "project-one-deck-detail-1",
+          "id": "project-one-detail-1030-04b",
           "tone": "bg-neutral-300",
-          "caption": "縱梁固定鋼板平面詳圖",
-          "src": "/images/project-one/deck-detail-1-clean.jpg",
+          "caption": "竹柱接合詳圖（柱頂正向）",
+          "src": "/images/project-one/detail-1030-04b.jpg",
           "kind": "drawing"
         }
       ],
       "moreImages": [
         {
-          "id": "project-one-deck-detail-2",
+          "id": "project-one-detail-1030-04a",
           "tone": "bg-neutral-300",
-          "caption": "組合柱頂部接合鋼板剖面詳圖",
-          "src": "/images/project-one/deck-detail-2-clean.jpg",
+          "caption": "竹柱接合詳圖（柱頂側向）",
+          "src": "/images/project-one/detail-1030-04a.jpg",
           "kind": "drawing"
         },
         {
-          "id": "project-one-deck-detail-3",
+          "id": "project-one-detail-1030-04c",
           "tone": "bg-neutral-300",
-          "caption": "組合柱頂部接合鋼板平面詳圖",
-          "src": "/images/project-one/deck-detail-3-clean.jpg",
+          "caption": "基礎接合詳圖",
+          "src": "/images/project-one/detail-1030-04c.jpg",
           "kind": "drawing"
         },
         {
-          "id": "project-one-deck-detail-4",
+          "id": "project-one-detail-1030-04d",
           "tone": "bg-neutral-300",
-          "caption": "組合柱頂部接合鋼板剖面詳圖（組合梁鎖固）",
-          "src": "/images/project-one/deck-detail-4-clean.jpg",
+          "caption": "檁條接合詳圖",
+          "src": "/images/project-one/detail-1030-04d.jpg",
           "kind": "drawing"
         },
         {
-          "id": "project-one-deck-detail-5",
+          "id": "project-one-detail-1030-04e",
           "tone": "bg-neutral-300",
-          "caption": "組合梁鎖固接合平面詳圖",
-          "src": "/images/project-one/deck-detail-5-clean2.jpg",
+          "caption": "竹梁接合詳圖（平面）",
+          "src": "/images/project-one/detail-1030-04e.jpg",
           "kind": "drawing"
         },
         {
-          "id": "project-one-deck-components",
+          "id": "project-one-detail-1030-04f",
           "tone": "bg-neutral-300",
-          "caption": "模組構件尺寸數量",
-          "src": "/images/project-one/deck-components.jpg",
+          "caption": "竹梁接合詳圖（剖面）",
+          "src": "/images/project-one/detail-1030-04f.jpg",
           "kind": "drawing"
+        },
+        {
+          "id": "project-one-detail-1030-04g",
+          "tone": "bg-neutral-300",
+          "caption": "組合梁接合詳圖",
+          "src": "/images/project-one/detail-1030-04g.jpg",
+          "kind": "drawing"
+        },
+        {
+          "id": "project-one-detail-1030-04h",
+          "tone": "bg-neutral-300",
+          "caption": "五金接合詳圖",
+          "src": "/images/project-one/detail-1030-04h.jpg",
+          "kind": "drawing"
+        },
+        {
+          "id": "project-one-hw-1030-render-04a",
+          "tone": "bg-neutral-300",
+          "caption": "本案組裝五金：A 字柱頂接合（正向）",
+          "src": "/images/project-one/hw-1030-render-04a.jpg",
+          "kind": "photo"
+        },
+        {
+          "id": "project-one-hw-1030-render-04b",
+          "tone": "bg-neutral-300",
+          "caption": "本案組裝五金：A 字柱頂接合（側向）",
+          "src": "/images/project-one/hw-1030-render-04b.jpg",
+          "kind": "photo"
+        },
+        {
+          "id": "project-one-hw-1030-render-04c",
+          "tone": "bg-neutral-300",
+          "caption": "本案組裝五金：A 字柱頂接合（仰視）",
+          "src": "/images/project-one/hw-1030-render-04c.jpg",
+          "kind": "photo"
+        },
+        {
+          "id": "project-one-hw-1030-render-04d",
+          "tone": "bg-neutral-300",
+          "caption": "本案組裝五金：A 字柱頂接合（透視）",
+          "src": "/images/project-one/hw-1030-render-04d.jpg",
+          "kind": "photo"
         },
         {
           "id": "project-one-deck-hw-market-1",
           "tone": "bg-neutral-300",
           "caption": "市售五金",
-          "src": "/images/project-one/deck-hw-market-1.jpg",
-          "kind": "photo"
-        },
-        {
-          "id": "project-one-deck-hw-market-2",
-          "tone": "bg-neutral-300",
-          "caption": "市售五金",
-          "src": "/images/project-one/deck-hw-market-2.jpg",
-          "kind": "photo"
-        },
-        {
-          "id": "project-one-deck-hw-market-3",
-          "tone": "bg-neutral-300",
-          "caption": "市售五金",
-          "src": "/images/project-one/deck-hw-market-3-white.jpg",
-          "kind": "photo"
-        },
-        {
-          "id": "project-one-deck-hw-custom-1",
-          "tone": "bg-neutral-300",
-          "caption": "本案組裝五金：A 字柱頂接合",
-          "src": "/images/project-one/deck-hw-custom-1.jpg",
-          "kind": "photo"
-        },
-        {
-          "id": "project-one-deck-hw-custom-2",
-          "tone": "bg-neutral-300",
-          "caption": "本案組裝五金：檁條固定",
-          "src": "/images/project-one/deck-hw-custom-2.jpg",
+          "src": "/images/project-one/hw-1030-clamp-sm.jpg",
           "kind": "photo"
         }
       ]

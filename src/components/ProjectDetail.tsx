@@ -1355,8 +1355,14 @@ function ReadMoreGallery({
         // （2026-10-16）電腦版：原圖寬度不到 SMALL_IMAGE_PX 的小圖（例如竹輕亭的五金照片）縮成半欄寬、兩張一排，
         // 不硬放大到整欄（看起來太大，也會因為放大而糊）；一般圖照舊一次一張整欄寬。
         <div className="mt-5 flex flex-wrap gap-3 sm:mt-6 sm:gap-6">
-          {images.map((image) => (
-            <div key={image.id} className={`w-[calc(50%-6px)] ${small.has(image.id) ? "sm:w-[calc(50%-12px)]" : "sm:w-full"}`}>
+          {images.map((image, i) => (
+            <div
+              key={image.id}
+              className={`w-[calc(50%-6px)] ${small.has(image.id) ? "sm:w-[calc(50%-12px)]" : "sm:w-full"} ${
+                // 最後一張小圖自己一排時（前一張不是小圖）置中，不貼左邊
+                small.has(image.id) && i === images.length - 1 && i > 0 && !small.has(images[i - 1].id) ? "sm:mx-auto" : ""
+              }`}
+            >
               <div className="sm:hidden">
                 <ImagePlaceholder image={image} aspect="aspect-[4/3]" />
               </div>

@@ -60,6 +60,10 @@ export function chapterTitle(key: ChapterKey): string {
   return settings.titles?.[key]?.trim() || DEFAULT_TITLES[key];
 }
 
+// （2026-11-02）「作品寫真」還沒有照片、「組裝手冊」還沒有 PDF 時，首頁與案例內頁的虛線佔位框寫這兩行
+// （中文一行、英文一行；佔位框用 whitespace-pre-line 保留換行）
+export const COMING_SOON = "敬請期待\nComing soon";
+
 // 案例內頁左側直書導覽的兩字名稱（2026-10-28）：每個都從上面的四字完整名稱縮短而來，
 // 跟首頁頂部選單的短名（labels，例如「模矩」「構造」）是不同的兩份，不要混用。
 // 完整名稱改了的話，這裡要跟著改。

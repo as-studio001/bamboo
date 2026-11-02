@@ -503,7 +503,10 @@ function Panel({
               className="relative flex min-h-full w-full shrink-0 flex-col justify-end"
             >
               <div className="absolute inset-0">
-                <ImagePlaceholder image={finalImage} fill layoutId={finalImage?.id} />
+                {/* （2026-11-02）欄位只有半個畫面寬、卻幾乎跟畫面一樣高，橫式封面 object-cover 鋪滿時
+                    實際畫出來的寬度約是欄寬的 2 倍；照預設「半寬」挑圖會被放大近 2 倍而糊掉。
+                    電腦版改拿滿版寬度的圖；手機版欄位是直長條，用畫面高度估。 */}
+                <ImagePlaceholder image={finalImage} fill layoutId={finalImage?.id} sizes="(max-width: 640px) 150vh, 100vw" />
               </div>
               {/* （2026-10-13 改，只有電腦版）封面上的案名大標＋地點／年份／類型：
                   - 兩案的文字都靠向中間分隔線——左欄靠右、右欄靠左（side），兩案的案名在畫面中央相對

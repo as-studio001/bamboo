@@ -9,7 +9,7 @@ import { visibleImages } from "@/lib/photoLayout";
 import { usePdfCover } from "@/lib/usePdfCover";
 import { pdfCoverId } from "@/lib/pdfPages";
 import { SHARED_ELEMENT_TRANSITION } from "@/components/theme";
-import { chapterLabel } from "@/lib/chapters";
+import { COMING_SOON } from "@/lib/chapters";
 
 // 首頁雙欄的「圖片＋簡短說明」索引：一張一列、原始比例顯示（直式就直式、橫式就橫式），
 // 不套用統一形狀的裁切遮罩，風格參考 herzogdemeuron.com 的 process 頁面。
@@ -65,8 +65,10 @@ export function PhotoStream({ project }: { project: Project }) {
   //
   // （2026-10-14）只取首頁會出現的章節（團隊介紹、結構設計只在案例內頁），照固定順序（見 projects.ts）。
   const groups = orderedChapters(project, HOME_CHAPTER_KEYS).filter(
-    // （2026-10-19）「成品」一律保留一頁：還沒有照片時顯示「圖片待補」佔位
-    (chapter) => chapter.key !== "site" && (chapter.key === "finished" || visibleImages(chapter.text, chapter.images).length > 0 || chapter.pdf),
+    // （2026-10-19）「成品」一律保留一頁：還沒有照片時顯示佔位；（2026-11-02）「組裝」還沒有 PDF 時也一樣，佔位寫 Coming soon
+    (chapter) =>
+      chapter.key !== "site" &&
+      (chapter.key === "finished" || chapter.key === "assembly" || visibleImages(chapter.text, chapter.images).length > 0 || chapter.pdf),
   );
 
   return (
@@ -84,10 +86,10 @@ export function PhotoStream({ project }: { project: Project }) {
                     isFirst={groupIndex === 0 && i === 0}
                   />
                 ))
-              : chapter.key === "finished" ? (
-                  <PendingItem label={`${chapterLabel("finished")}圖片待補`} isFirst={groupIndex === 0} />
-                ) : chapter.pdf && (
+              : chapter.pdf ? (
                   <AssemblyCoverItem project={project} chapter={chapter} isFirst={groupIndex === 0} />
+                ) : (
+                  <PendingItem label={COMING_SOON} isFirst={groupIndex === 0} />
                 )}
           </div>
         );
@@ -220,7 +222,7 @@ function PendingItem({ label, isFirst }: { label: string; isFirst: boolean }) {
       style={{ "--tpl-r": 4 / 3, "--cap-h": "0px" } as React.CSSProperties}
     >
       <div
-        className="tpl-frame flex aspect-[4/3] w-full items-center justify-center border border-dashed font-serif-tc text-sm tracking-[0.2em]"
+        className="tpl-frame flex aspect-[4/3] w-full items-center justify-center border border-dashed text-center font-serif-tc text-sm leading-loose tracking-[0.2em] whitespace-pre-line"
         style={{ borderColor: "var(--border-subtle)", color: "var(--foreground-muted)" }}
       >
         {label}

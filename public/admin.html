@@ -1417,6 +1417,11 @@ function renderCaseEditor(){
           <div class="field-hint">一行一列、用 | 分欄；第一行是表頭。</div>
         </div>
         <div class="field-block">
+          <label>其他策略與補充說明（顯示在對照表下面）</label>
+          <textarea class="tall" data-goal="more" placeholder="策略二　規格化構件與運輸配置&#10;以一部吊卡載運一組棚架為單位……&#10;&#10;策略三　……">${esc((item.goals || {}).more || "")}</textarea>
+          <div class="field-hint">空白行分段。段落第一行寫「策略二　標題」時，「策略二」會變成小標、後面是標題，下面幾行是說明；其他段落直接顯示成文字。</div>
+        </div>
+        <div class="field-block">
           <label>例圖（建議 4 張，圖說會顯示在圖片下方）</label>
           ${renderPhotoList("goalImages", (item.goals || {}).images)}
         </div>

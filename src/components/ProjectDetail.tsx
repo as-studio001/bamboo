@@ -26,7 +26,7 @@ import { ImagePlaceholder } from "@/components/ImagePlaceholder";
 import { ChapterMap, ChapterVideo } from "@/components/ChapterExtras";
 import { Partners } from "@/components/EventsSection";
 import { AssemblyBook } from "@/components/AssemblyBook";
-import { chapterShortTitle, chapterTitle } from "@/lib/chapters";
+import { COMING_SOON, chapterShortTitle, chapterTitle } from "@/lib/chapters";
 import { PANEL_BG, TEXT_PRIMARY, TEXT_BODY } from "@/components/theme";
 
 // 案例內頁：架構直接照抄 Internal-Pages（as-studio001/Internal-Pages 的 js/render.js）的順序——
@@ -740,6 +740,18 @@ function GoalsSection({ goals, variant }: { goals: ProjectGoals; variant: "page"
     .map((l) => l.split("|").map((c) => c.trim()));
   const [head, ...body] = rows;
   const images = (goals.images ?? []).filter((img) => img.src);
+  // 對照表下面的其他策略（見 projects.ts 的 ProjectGoals.more）
+  const more = (goals.more ?? "")
+    .split(/\n\s*\n/)
+    .map((block) => block.trim())
+    .filter(Boolean)
+    .map((block) => {
+      const [first, ...rest] = block.split("\n");
+      const m = first.match(/^(策略\S+)[\s　]+(.+)$/);
+      return m
+        ? { label: m[1], title: m[2].trim(), text: rest.join("\n").trim() }
+        : { label: "", title: "", text: block };
+    });
 
   return (
     <section
@@ -747,7 +759,8 @@ function GoalsSection({ goals, variant }: { goals: ProjectGoals; variant: "page"
       id="goals"
       className={`${FADE_CLASS} flex flex-col gap-8 pb-10 sm:grid ${variant === "modal" ? "sm:min-h-[calc(100dvh-106px)]" : "sm:min-h-screen"} sm:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] sm:content-center sm:items-start sm:gap-x-12 sm:py-8 lg:gap-x-20`}
     >
-      <div>
+      {/* （2026-11-02）左欄比照其他章節（ChapterFrame）固定在畫面上，右欄內容超過一個畫面就往下捲 */}
+      <div className="sm:sticky sm:top-16 sm:self-start">
         {/* 跟其他章節同一套開頭：大編號「00」＋章節名「核心目標」（ChapterFrame 的 header），左側直書導覽
             也以這個 header 判斷何時出現 */}
         <header>
@@ -827,6 +840,26 @@ function GoalsSection({ goals, variant }: { goals: ProjectGoals; variant: "page"
                 ))}
               </tbody>
             </table>
+          </div>
+        )}
+
+        {more.length > 0 && (
+          <div className="mt-6 space-y-4 sm:mt-8">
+            {more.map((m, i) =>
+              m.label ? (
+                <div key={i}>
+                  <p className="font-serif-tc text-sm" style={muted}>
+                    {m.label}
+                  </p>
+                  <h4 className={`mt-1 font-serif-tc text-base font-bold sm:text-lg ${TEXT_PRIMARY}`}>{m.title}</h4>
+                  {m.text && <p className={`mt-1 whitespace-pre-line ${BODY_TEXT}`}>{m.text}</p>}
+                </div>
+              ) : (
+                <p key={i} className={`whitespace-pre-line ${BODY_TEXT}`}>
+                  {m.text}
+                </p>
+              ),
+            )}
           </div>
         )}
 
@@ -1187,7 +1220,8 @@ function NarrativeSection({
     block.type === "paragraph" ? (
       <p
         key={i}
-        className={`mt-6 max-w-2xl sm:max-w-none ${BODY_TEXT}`}
+        // （2026-11-02）段落裡的單一換行照樣換行（例如「**材料組成**」下面一行一項的清單）
+        className={`mt-6 max-w-2xl whitespace-pre-line sm:max-w-none ${BODY_TEXT}`}
         style={{ order: i }}
       >
         <RichText text={block.text} />
@@ -1273,10 +1307,10 @@ function NarrativeSection({
           {chapter.key === "finished" && shownImages.length === 0 && (
             // （2026-10-19）成品照片還沒上傳時保留一個虛線框，在後台「成品照片」的主要照片上傳就會換上
             <div
-              className="flex aspect-[4/3] w-full items-center justify-center border border-dashed font-serif-tc text-sm tracking-[0.2em]"
+              className="flex aspect-[4/3] w-full items-center justify-center border border-dashed text-center font-serif-tc text-sm leading-loose tracking-[0.2em] whitespace-pre-line"
               style={{ borderColor: "var(--border-subtle)", color: "var(--foreground-muted)" }}
             >
-              {chapterTitle("finished")}待補
+              {COMING_SOON}
             </div>
           )}
           {chapter.moreImages && chapter.moreImages.length > 0 && (
@@ -1430,9 +1464,17 @@ function AssemblySection({
         )
       }
       right={
-        chapter.pdf && (
+        chapter.pdf ? (
           <div className="sm:[&>*]:mt-0">
             <AssemblyBook project={project} pdf={chapter.pdf} accent={accent} />
+          </div>
+        ) : (
+          // （2026-11-02）還沒有 PDF：跟 PDF 預覽同樣直式比例的虛線框，寫 Coming soon
+          <div
+            className="mx-auto mt-6 flex aspect-[1/1.414] w-full max-w-[calc((100dvh-260px)/1.414)] items-center justify-center border border-dashed text-center font-serif-tc text-sm leading-loose tracking-[0.2em] whitespace-pre-line sm:mt-0"
+            style={{ borderColor: "var(--border-subtle)", color: "var(--foreground-muted)" }}
+          >
+            {COMING_SOON}
           </div>
         )
       }

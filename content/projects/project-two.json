@@ -10,34 +10,28 @@
   "titleAlign": "left",
   "coverImages": [
     {
-      "id": "project-two-e2x4mze",
+      "id": "project-two-cover-ext01",
       "tone": "bg-neutral-300",
-      "caption": "",
-      "src": "/images/project-two/Snipaste_2026-10-08_12-00-39.jpg"
+      "caption": "外觀示意圖01",
+      "src": "/images/project-two/室外01_Large.jpeg"
     },
     {
-      "id": "project-two-cover-interior-30",
+      "id": "project-two-cover-ext03",
       "tone": "bg-neutral-300",
-      "caption": "室內示意圖",
-      "src": "/images/project-two/deck-cover-interior-30.jpg"
+      "caption": "外觀示意圖02",
+      "src": "/images/project-two/室外03_Large.jpeg"
     },
     {
-      "id": "project-two-cover-interior-31",
+      "id": "project-two-cover-int01",
       "tone": "bg-neutral-300",
-      "caption": "室內示意圖",
-      "src": "/images/project-two/deck-cover-interior-31.jpg"
+      "caption": "室內示意圖01",
+      "src": "/images/project-two/室內01_Large.jpeg"
     },
     {
-      "id": "project-two-cover-interior-32",
+      "id": "project-two-cover-int06",
       "tone": "bg-neutral-300",
-      "caption": "室內示意圖",
-      "src": "/images/project-two/deck-cover-interior-32.jpg"
-    },
-    {
-      "id": "project-two-cover-interior-33",
-      "tone": "bg-neutral-300",
-      "caption": "室內示意圖",
-      "src": "/images/project-two/deck-cover-interior-33.jpg"
+      "caption": "室內示意圖02",
+      "src": "/images/project-two/室內06_Large.jpeg"
     }
   ],
   "chapters": [
@@ -85,6 +79,12 @@
               "src": "/images/project-two/team-you-zhijie-crop.jpg"
             }
           ]
+        },
+        {
+          "key": "venue",
+          "name": "",
+          "text": "",
+          "images": []
         }
       ]
     },
@@ -96,72 +96,78 @@
         {
           "id": "project-two-render-1",
           "tone": "bg-neutral-300",
-          "caption": "外觀示意圖",
+          "caption": "外觀示意圖01",
           "src": "/images/project-two/室外01_Large.jpeg",
           "kind": "photo"
         },
         {
           "id": "project-two-render-2",
           "tone": "bg-neutral-300",
-          "caption": "外觀示意圖",
+          "caption": "外觀示意圖02",
           "src": "/images/project-two/室外02_Large.jpeg",
           "kind": "photo"
         }
       ],
       "moreImages": [
         {
+          "id": "project-two-render-ext03",
+          "tone": "bg-neutral-300",
+          "caption": "外觀示意圖03",
+          "src": "/images/project-two/室外03_Large.jpeg"
+        },
+        {
           "id": "project-two-render-3",
           "tone": "bg-neutral-300",
-          "caption": "外觀示意圖",
+          "caption": "外觀示意圖04",
           "src": "/images/project-two/室外04_Large.jpeg",
           "kind": "photo"
         },
         {
           "id": "project-two-render-4",
           "tone": "bg-neutral-300",
-          "caption": "外觀示意圖",
+          "caption": "外觀示意圖05",
           "src": "/images/project-two/室外06_Large.jpeg",
           "kind": "photo"
         },
         {
           "id": "project-two-render-5",
           "tone": "bg-neutral-300",
-          "caption": "外觀示意圖",
+          "caption": "外觀示意圖06",
           "src": "/images/project-two/室外07_Large.jpeg",
           "kind": "photo"
         },
         {
           "id": "project-two-render-6",
           "tone": "bg-neutral-300",
-          "caption": "室內示意圖",
+          "caption": "室內示意圖01",
           "src": "/images/project-two/室內01_Large.jpeg",
           "kind": "photo"
         },
         {
           "id": "project-two-render-7",
           "tone": "bg-neutral-300",
-          "caption": "室內示意圖",
+          "caption": "室內示意圖02",
           "src": "/images/project-two/室內02_Large.jpeg",
           "kind": "photo"
         },
         {
           "id": "project-two-render-8",
           "tone": "bg-neutral-300",
-          "caption": "室內示意圖",
+          "caption": "室內示意圖03",
           "src": "/images/project-two/室內03_Large.jpeg",
           "kind": "photo"
         },
         {
           "id": "project-two-render-9",
           "tone": "bg-neutral-300",
-          "caption": "室內示意圖",
+          "caption": "室內示意圖04",
           "src": "/images/project-two/室內04_Large.jpeg",
           "kind": "photo"
         },
         {
           "id": "project-two-render-10",
           "tone": "bg-neutral-300",
-          "caption": "室內示意圖",
+          "caption": "室內示意圖05",
           "src": "/images/project-two/室內05_Large.jpeg",
           "kind": "photo"
         }
@@ -173,76 +179,72 @@
       "text": "一籌以 61cm 為模矩，組成 L2.44 × W3 × H3.57m 的基礎單元。整座小屋由 T、K、L、R 四個獨立機能單元組合而成，總長 976cm。\n\nT（衛浴單元）：乾濕分離淋浴、節水馬桶與一體盥洗台，配置衣物收納與洗衣儲物。K（廚房單元）：開放式 L 字型，不鏽鋼料理台含水槽與嵌入式 IH 爐，配置冰箱、電器櫃與收納。L（起居單元）：多功能核心區，連結廚吧作為會客、閱讀、工作與茶座。R（臥室單元）：以拉門區隔私密區域，拉開可連通起居單元，上方作寢具收納。\n\n單元可依基地與需求選配組合（1T・1K・1L・1R），讓同一套系統適地生長。",
       "images": [
         {
-          "id": "project-two-deck-plan",
+          "id": "project-two-dwg-plan",
           "tone": "bg-neutral-300",
-          "caption": "平面配置圖（T／K／L／R 單元）",
-          "src": "/images/project-two/deck-plan.jpg",
-          "kind": "drawing"
+          "caption": "一層平面圖（1/50）",
+          "src": "/images/project-two/dwg-a1-01-plan.jpg"
         },
         {
-          "id": "project-two-deck-sections",
+          "id": "project-two-dwg-elevations",
           "tone": "bg-neutral-300",
-          "caption": "西向立面圖、入口剖面圖、AA' 剖面圖、東向立面圖",
-          "src": "/images/project-two/deck-sections.jpg",
-          "kind": "drawing"
+          "caption": "立面圖（1/50）",
+          "src": "/images/project-two/dwg-a2-01-elevations.jpg"
         }
       ],
       "moreImages": [
         {
-          "id": "project-two-deck-elevations",
+          "id": "project-two-dwg-section-1",
           "tone": "bg-neutral-300",
-          "caption": "北向、南向立面圖",
-          "src": "/images/project-two/deck-elevations.jpg",
-          "kind": "drawing"
+          "caption": "剖面圖（一）",
+          "src": "/images/project-two/dwg-a2-02-section-1.jpg"
         },
         {
-          "id": "project-two-deck-int-elev-1",
+          "id": "project-two-dwg-section-2",
           "tone": "bg-neutral-300",
-          "caption": "室內立面圖",
-          "src": "/images/project-two/deck-int-elev-1.jpg",
-          "kind": "drawing"
+          "caption": "剖面圖（二）",
+          "src": "/images/project-two/dwg-a2-03-section-2.jpg"
         },
         {
-          "id": "project-two-deck-int-elev-2",
+          "id": "project-two-dwg-section-3",
           "tone": "bg-neutral-300",
-          "caption": "室內立面圖",
-          "src": "/images/project-two/deck-int-elev-2.jpg",
-          "kind": "drawing"
+          "caption": "剖面圖（三）",
+          "src": "/images/project-two/dwg-a2-04-section-3.jpg"
         },
         {
-          "id": "project-two-deck-int-elev-3",
+          "id": "project-two-dwg-section-4",
           "tone": "bg-neutral-300",
-          "caption": "室內立面圖",
-          "src": "/images/project-two/deck-int-elev-3.jpg",
-          "kind": "drawing"
+          "caption": "剖面圖（四）",
+          "src": "/images/project-two/dwg-a2-05-section-4.jpg"
         },
         {
-          "id": "project-two-deck-int-elev-4",
+          "id": "project-two-dwg-section-5",
           "tone": "bg-neutral-300",
-          "caption": "室內立面圖",
-          "src": "/images/project-two/deck-int-elev-4.jpg",
-          "kind": "drawing"
+          "caption": "剖面圖（五）",
+          "src": "/images/project-two/dwg-a2-06-section-5.jpg"
         },
         {
-          "id": "project-two-deck-int-elev-5",
+          "id": "project-two-dwg-section-6",
           "tone": "bg-neutral-300",
-          "caption": "室內立面圖",
-          "src": "/images/project-two/deck-int-elev-5.jpg",
-          "kind": "drawing"
+          "caption": "剖面圖（六）",
+          "src": "/images/project-two/dwg-a2-07-section-6.jpg"
         },
         {
-          "id": "project-two-deck-foundation",
+          "id": "project-two-dwg-doors-windows",
           "tone": "bg-neutral-300",
-          "caption": "基礎平面圖",
-          "src": "/images/project-two/deck-foundation.jpg",
-          "kind": "drawing"
+          "caption": "門窗表",
+          "src": "/images/project-two/dwg-a3-01-doors-windows.jpg"
         },
         {
-          "id": "project-two-deck-roof",
+          "id": "project-two-frame-foundation",
           "tone": "bg-neutral-300",
-          "caption": "屋面配置圖",
-          "src": "/images/project-two/deck-roof.jpg",
-          "kind": "drawing"
+          "caption": "基礎配置圖",
+          "src": "/images/project-two/frame-foundation.jpg"
+        },
+        {
+          "id": "project-two-frame-base",
+          "tone": "bg-neutral-300",
+          "caption": "鋼構底座平面圖",
+          "src": "/images/project-two/frame-base.jpg"
         }
       ]
     },
@@ -252,41 +254,54 @@
       "text": "被動式設計涵蓋水、光、風、聲四大物理要素。\n\n**水與濕**：全屋離地 0.65m，阻絕地面濕氣與地表逕流，也能適應不平整地形；屋頂一字型鋼板維持 16% 洩水坡度；外牆採 36cm 寬版竹集成雨淋板導水；搭配省水標章設備節水。\n\n**光與熱**：屋面反射型鋼板，預留 5–10cm 空氣層，內夾 50mm PS 隔熱板與鋁箔防水氈；牆面 50mm PS 隔熱板外掛雨淋板；減少大面積開口，入口設外伸式遮陽帆布深簷。\n\n**風與涼**：依現地季風配置平面，門窗相對開設並設高窗排熱，配置對流風扇；雨淋板外牆兼顧隱私、透氣並緩衝強風。\n\n**聲與噪**：竹材乾燥後的微孔纖維吸收高頻雜音，竹材的彈性與韌性緩衝腳步聲、設備共振等低頻震動。\n\n室內以 12mm GLB 板作天花與牆面，地板為波龍編織地毯，浴室用竹節玻璃／夾膜玻璃，配不鏽鋼廚具檯面、竹捲簾與原竹管訂製家具。",
       "images": [
         {
-          "id": "project-two-deck-sk-water",
+          "id": "project-two-exploded-axonometric",
           "tone": "bg-neutral-300",
-          "caption": "水與濕｜防潮與排水（甘建築師細部手稿）",
-          "src": "/images/project-two/deck-sk-water-wide.jpg",
-          "kind": "drawing"
+          "caption": "構造拆解圖",
+          "src": "/images/project-two/exploded-axonometric-1102b.jpg"
         },
         {
-          "id": "project-two-deck-sk-heat",
+          "id": "project-two-dwg-wall-detail-1",
           "tone": "bg-neutral-300",
-          "caption": "光與熱｜隔熱與遮陽（甘建築師細部手稿）",
-          "src": "/images/project-two/deck-sk-heat.jpg",
-          "kind": "drawing"
+          "caption": "外牆詳圖（一）：簷口、基礎",
+          "src": "/images/project-two/dwg-a2-08-wall-detail-1.jpg"
         }
       ],
       "moreImages": [
         {
-          "id": "project-two-deck-sk-wind",
+          "id": "project-two-dwg-wall-detail-2",
           "tone": "bg-neutral-300",
-          "caption": "風與涼｜通風與抗風（甘建築師細部手稿）",
-          "src": "/images/project-two/deck-sk-wind.jpg",
-          "kind": "drawing"
+          "caption": "外牆詳圖（二）",
+          "src": "/images/project-two/dwg-a2-09-wall-detail-2.jpg"
         },
         {
-          "id": "project-two-deck-sk-sound",
+          "id": "project-two-dwg-wall-detail-3",
           "tone": "bg-neutral-300",
-          "caption": "聲與噪｜竹纖維吸音結構（甘建築師細部手稿）",
-          "src": "/images/project-two/deck-sk-sound.jpg",
-          "kind": "drawing"
+          "caption": "外牆詳圖（三）",
+          "src": "/images/project-two/dwg-a2-10-wall-detail-3.jpg"
         },
         {
-          "id": "project-two-deck-furniture-1",
+          "id": "project-two-dwg-bath-detail-1",
           "tone": "bg-neutral-300",
-          "caption": "家具示意圖",
-          "src": "/images/project-two/deck-furniture-1.jpg",
-          "kind": "drawing"
+          "caption": "浴廁詳圖（一）",
+          "src": "/images/project-two/dwg-a4-01-bath-detail-1.jpg"
+        },
+        {
+          "id": "project-two-dwg-bath-detail-2",
+          "tone": "bg-neutral-300",
+          "caption": "浴廁詳圖（二）",
+          "src": "/images/project-two/dwg-a4-02-bath-detail-2.jpg"
+        },
+        {
+          "id": "project-two-dwg-bath-detail-3",
+          "tone": "bg-neutral-300",
+          "caption": "浴廁詳圖（三）",
+          "src": "/images/project-two/dwg-a4-03-bath-detail-3.jpg"
+        },
+        {
+          "id": "project-two-frame-a00",
+          "tone": "bg-neutral-300",
+          "caption": "結構構架拆解圖（A00）",
+          "src": "/images/project-two/frame-a00-exploded.jpg"
         }
       ]
     },
@@ -430,17 +445,20 @@
       "key": "assembly",
       "title": "組裝說明書",
       "text": "組裝手冊把一籌的單元組合拆解成可依序執行的步驟：基座定位、鋼構底座、單元吊放、單元接合與外牆收邊，照著圖就能完成組立。",
-      "images": [],
-      "pdf": {
-        "url": "/files/project-two/assembly.pdf",
-        "label": "組裝手冊 PDF（範例檔案，待替換成正式版本）"
-      }
+      "images": []
     },
     {
       "key": "video",
       "title": "影片",
-      "text": "",
-      "images": []
+      "text": "這段組裝動畫把一籌的建造分成七個步驟，順序是「製作 → 組立 → 定位 → 完成」：\n\n01 鋼構底座在工廠預製完成\n02 牆版封上結構合板，屋頂版鋪好冷凍板\n03 四周牆版組裝起來、裝上窗框，竹小屋主體成形\n04 到了現場，把組裝好的竹小屋定位到基礎墩座上\n05 由下往上鋪設竹集成材雨淋板\n06 鋪上鋁箔自黏式防水毯與屋面鋼板\n07 安裝衛浴、布置傢俱，完成室內裝修\n\n大部分構件在工廠先做好，現場只要定位與收尾，一座竹小屋就能落地。",
+      "images": [],
+      "videos": [
+        {
+          "id": "video-p2-assembly",
+          "url": "https://youtu.be/393Kn4cXe7U",
+          "title": ""
+        }
+      ]
     },
     {
       "key": "site",
@@ -452,19 +470,40 @@
   "credits": [
     {
       "label": "建築設計",
-      "items": [{ "name": "承億集團", "logo": "/images/partners/chanyee.png" }]
+      "items": [
+        {
+          "name": "承億集團",
+          "logo": "/images/partners/chanyee.png"
+        }
+      ]
     },
     {
       "label": "結構設計",
-      "items": [{ "name": "原型結構工程顧問有限公司", "logo": "/images/partners/prototype-structure.png" }]
+      "items": [
+        {
+          "name": "原型結構工程顧問有限公司",
+          "logo": "/images/partners/prototype-structure.png"
+        }
+      ]
     },
     {
       "label": "施工單位",
-      "items": [{ "name": "諸野竹木構造專門有限公司", "logo": "/images/partners/jhuyeh.png", "url": "https://jhuyeh.com/about/" }]
+      "items": [
+        {
+          "name": "諸野竹木構造專門有限公司",
+          "logo": "/images/partners/jhuyeh.png",
+          "url": "https://jhuyeh.com/about/"
+        }
+      ]
     },
     {
       "label": "業主單位",
-      "items": [{ "name": "竹育股份有限公司", "logo": "/images/partners/chuyu.png" }]
+      "items": [
+        {
+          "name": "竹育股份有限公司",
+          "logo": "/images/partners/chuyu.png"
+        }
+      ]
     }
   ],
   "published": true,
@@ -493,5 +532,5 @@
       }
     ]
   },
-  "homeCoverId": "project-two-e2x4mze"
+  "homeCoverId": "project-two-cover-ext03"
 }

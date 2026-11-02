@@ -126,13 +126,16 @@ export type ProjectGoals = {
   text?: string;
   tableLabel?: string; // 例如「市場對應原型」
   table?: string; // 一行一列、用 | 分欄，第一行是表頭
+  // （2026-11-02）對照表下面的其他策略與補充說明：空白行分段；段落第一行寫成「策略二　標題」時，
+  // 「策略二」當小標、後面當標題，其餘各行是說明；不是「策略…」開頭的段落直接當一段文字
+  more?: string;
   images?: ProjectImage[]; // 例圖（建議 4 張，圖說顯示在圖片下方）
 };
 
 export function hasGoals(goals?: ProjectGoals): goals is ProjectGoals {
   if (!goals) return false;
-  const { title, positioning, strategyTitle, text, table, images } = goals;
-  return !!(title || positioning || strategyTitle || text || table || images?.some((img) => img.src));
+  const { title, positioning, strategyTitle, text, table, more, images } = goals;
+  return !!(title || positioning || strategyTitle || text || table || more || images?.some((img) => img.src));
 }
 
 export type Project = {

@@ -1399,7 +1399,7 @@ function renderCaseEditor(){
 
       <div class="chapter-section">
         <div class="chapter-section-head"><strong>核心目標</strong><span class="key">案例內頁封面之後的第一個畫面（取代原本的目錄）</span></div>
-        <div class="field-hint" style="margin-top:0; margin-bottom:14px;">一個畫面的篇幅：左邊是標題＋設計定位，右邊是策略、說明、對照表、例圖。留空的欄位不顯示；全部留空就不顯示這個畫面。</div>
+        <div class="field-hint" style="margin-top:0; margin-bottom:14px;">一個畫面的篇幅：左邊是標題＋設計定位，右邊是策略、說明、對照表、例圖（有放手稿時，策略等移到左邊、右邊放手稿）。留空的欄位不顯示；全部留空就不顯示這個畫面。</div>
         <div class="field-block"><label>標題（例如：設計目標與核心策略）</label><input type="text" data-goal="title" value="${esc((item.goals || {}).title || "")}"></div>
         <div class="two-col">
           <div class="field-block"><label>設計定位小標（例如：設計定位）</label><input type="text" data-goal="positioningLabel" value="${esc((item.goals || {}).positioningLabel || "")}"></div>
@@ -1424,6 +1424,11 @@ function renderCaseEditor(){
         <div class="field-block">
           <label>例圖（建議 4 張，圖說會顯示在圖片下方）</label>
           ${renderPhotoList("goalImages", (item.goals || {}).images)}
+        </div>
+        <div class="field-block">
+          <label>手稿（放了之後，策略、說明、對照表會移到左邊，右邊整欄放手稿）</label>
+          <div class="field-hint" style="margin-top:0; margin-bottom:10px;">第一張放大在上面，其餘並排在下面，都完整顯示不裁切。建議 1～3 張，白紙底的淺色會自動融進網頁底色。不放就維持原本「左標題、右策略」的版面。</div>
+          ${renderPhotoList("goalSketches", (item.goals || {}).sketches)}
         </div>
       </div>
 
@@ -1571,6 +1576,7 @@ function renderCaseEditor(){
     });
   });
   wirePhotoList("goalImages", () => (ed.item.goals || {}).images, (next) => { ed.item.goals = Object.assign({}, ed.item.goals, { images: next }); }, ed.slug);
+  wirePhotoList("goalSketches", () => (ed.item.goals || {}).sketches, (next) => { ed.item.goals = Object.assign({}, ed.item.goals, { sketches: next }); }, ed.slug);
   CHAPTER_DEFS.forEach((def, i) => {
     const chapter = ed.item.chapters[i];
     if(def.kind === "team"){

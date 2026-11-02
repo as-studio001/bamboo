@@ -130,12 +130,23 @@ export type ProjectGoals = {
   // 「策略二」當小標、後面當標題，其餘各行是說明；不是「策略…」開頭的段落直接當一段文字
   more?: string;
   images?: ProjectImage[]; // 例圖（建議 4 張，圖說顯示在圖片下方）
+  // （2026-11-02）手稿：有放的話，策略、說明、對照表改排到左欄，右欄整欄放手稿（第一張大圖，其餘並排在下面）
+  sketches?: ProjectImage[];
 };
 
 export function hasGoals(goals?: ProjectGoals): goals is ProjectGoals {
   if (!goals) return false;
-  const { title, positioning, strategyTitle, text, table, more, images } = goals;
-  return !!(title || positioning || strategyTitle || text || table || more || images?.some((img) => img.src));
+  const { title, positioning, strategyTitle, text, table, more, images, sketches } = goals;
+  return !!(
+    title ||
+    positioning ||
+    strategyTitle ||
+    text ||
+    table ||
+    more ||
+    images?.some((img) => img.src) ||
+    sketches?.some((img) => img.src)
+  );
 }
 
 export type Project = {

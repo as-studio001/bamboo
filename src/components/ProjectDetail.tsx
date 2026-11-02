@@ -752,6 +752,112 @@ function GoalsSection({ goals, variant }: { goals: ProjectGoals; variant: "page"
         ? { label: m[1], title: m[2].trim(), text: rest.join("\n").trim() }
         : { label: "", title: "", text: block };
     });
+  // （2026-11-02）有手稿時：策略、說明、對照表搬到左欄，右欄整欄放手稿（見 projects.ts 的 ProjectGoals.sketches）
+  const sketches = (goals.sketches ?? []).filter((img) => img.src);
+  const [mainSketch, ...restSketches] = sketches;
+
+  // 對照表；compact＝放在左欄的策略清單裡（字小一級、列距縮小）
+  const renderTable = (compact: boolean) =>
+    rows.length > 0 && (
+      <div className={compact ? "mt-3" : "mt-6 sm:mt-8"}>
+        {goals.tableLabel && (
+          <p className={`font-serif-tc text-sm font-bold ${compact ? "mb-1" : "mb-2"}`} style={muted}>
+            {goals.tableLabel}
+          </p>
+        )}
+        <table className={`w-full border-collapse font-serif-tc ${compact ? "text-sm" : "text-sm sm:text-base"}`}>
+          {head && (
+            <thead>
+              <tr className="border-y" style={rule}>
+                {head.map((c, i) => (
+                  <th key={i} className={`px-2 ${compact ? "py-1.5" : "py-2"} text-left font-bold first:pl-0`} style={muted}>
+                    {c}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+          )}
+          <tbody>
+            {body.map((r, i) => (
+              <tr key={i} className="border-b last:border-b-0" style={rule}>
+                {r.map((c, j) => (
+                  <td key={j} className={`px-2 ${compact ? "py-1.5" : "py-2"} first:pl-0 ${TEXT_PRIMARY}`}>
+                    {c}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    );
+
+  // 原本的右欄排法（沒有手稿時）
+  const strategies = (
+    <>
+      {goals.strategyLabel && (
+        <p className="font-serif-tc text-sm" style={muted}>
+          {goals.strategyLabel}
+        </p>
+      )}
+      {goals.strategyTitle && (
+        <h4 className={`mt-1 font-serif-tc text-xl font-bold sm:text-2xl ${TEXT_PRIMARY}`}>{goals.strategyTitle}</h4>
+      )}
+      {goals.text && <p className={`mt-4 whitespace-pre-line ${BODY_TEXT}`}>{goals.text}</p>}
+
+      {renderTable(false)}
+
+      {more.length > 0 && (
+        <div className="mt-6 space-y-4 sm:mt-8">
+          {more.map((m, i) =>
+            m.label ? (
+              <div key={i}>
+                <p className="font-serif-tc text-sm" style={muted}>
+                  {m.label}
+                </p>
+                <h4 className={`mt-1 font-serif-tc text-base font-bold sm:text-lg ${TEXT_PRIMARY}`}>{m.title}</h4>
+                {m.text && <p className={`mt-1 whitespace-pre-line ${BODY_TEXT}`}>{m.text}</p>}
+              </div>
+            ) : (
+              <p key={i} className={`whitespace-pre-line ${BODY_TEXT}`}>
+                {m.text}
+              </p>
+            ),
+          )}
+        </div>
+      )}
+    </>
+  );
+
+  // （2026-11-02）有手稿時放在左欄的排法：策略一～四排成同一套清單，左邊一欄是「策略一」小標、右邊是
+  // 標題＋說明（同字級），策略之間細線分隔；對照表收在策略一下面。不是「策略…」開頭的補充段落沒有小標。
+  const strategyList = [
+    { label: goals.strategyLabel ?? "", title: goals.strategyTitle ?? "", text: goals.text ?? "", table: true },
+    ...more.map((m) => ({ ...m, table: false })),
+  ].filter((s) => s.title || s.text || s.table);
+  const compactStrategies = (
+    <ol className="border-t" style={rule}>
+      {strategyList.map((s, i) => (
+        // 畫面較矮（例如 1280×720 的筆電）時列距再收小，整欄才不會超出一個畫面
+        <li
+          key={i}
+          className="grid grid-cols-[3.5rem_minmax(0,1fr)] gap-x-3 border-b py-3.5 [@media(max-height:780px)]:py-2"
+          style={rule}
+        >
+          <p className="pt-[3px] font-serif-tc text-sm" style={muted}>
+            {s.label}
+          </p>
+          <div>
+            {s.title && <h4 className={`font-serif-tc text-lg leading-snug font-bold ${TEXT_PRIMARY}`}>{s.title}</h4>}
+            {s.text && (
+              <p className={`mt-1 font-serif-tc text-[15px] leading-relaxed whitespace-pre-line ${TEXT_BODY}`}>{s.text}</p>
+            )}
+            {s.table && renderTable(true)}
+          </div>
+        </li>
+      ))}
+    </ol>
+  );
 
   return (
     <section
@@ -795,73 +901,65 @@ function GoalsSection({ goals, variant }: { goals: ProjectGoals; variant: "page"
             </ul>
           </div>
         )}
+        {mainSketch && <div className="mt-6 sm:mt-8">{compactStrategies}</div>}
       </div>
 
-      {/* 右欄上緣跟左欄的章節名「核心目標」切齊（同 RIGHT_OFFSET.title），整個畫面才放得進一屏 */}
-      <div className={`min-w-0 ${RIGHT_OFFSET.title}`}>
-        {goals.strategyLabel && (
-          <p className="font-serif-tc text-sm" style={muted}>
-            {goals.strategyLabel}
-          </p>
-        )}
-        {goals.strategyTitle && (
-          <h4 className={`mt-1 font-serif-tc text-xl font-bold sm:text-2xl ${TEXT_PRIMARY}`}>{goals.strategyTitle}</h4>
-        )}
-        {goals.text && <p className={`mt-4 whitespace-pre-line ${BODY_TEXT}`}>{goals.text}</p>}
-
-        {rows.length > 0 && (
-          <div className="mt-6 sm:mt-8">
-            {goals.tableLabel && (
-              <p className="mb-2 font-serif-tc text-sm font-bold" style={muted}>
-                {goals.tableLabel}
-              </p>
-            )}
-            <table className="w-full border-collapse font-serif-tc text-sm sm:text-base">
-              {head && (
-                <thead>
-                  <tr className="border-y" style={rule}>
-                    {head.map((c, i) => (
-                      <th key={i} className="px-2 py-2 text-left font-bold first:pl-0" style={muted}>
-                        {c}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-              )}
-              <tbody>
-                {body.map((r, i) => (
-                  <tr key={i} className="border-b" style={rule}>
-                    {r.map((c, j) => (
-                      <td key={j} className={`px-2 py-2 first:pl-0 ${TEXT_PRIMARY}`}>
-                        {c}
-                      </td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-
-        {more.length > 0 && (
-          <div className="mt-6 space-y-4 sm:mt-8">
-            {more.map((m, i) =>
-              m.label ? (
-                <div key={i}>
-                  <p className="font-serif-tc text-sm" style={muted}>
-                    {m.label}
-                  </p>
-                  <h4 className={`mt-1 font-serif-tc text-base font-bold sm:text-lg ${TEXT_PRIMARY}`}>{m.title}</h4>
-                  {m.text && <p className={`mt-1 whitespace-pre-line ${BODY_TEXT}`}>{m.text}</p>}
+      {/* 手稿：右欄高度＝一個畫面扣掉上下留白，第一張佔上面約 3/5、其餘並排在下面，都完整顯示不裁切；
+          紙張的淺色底用 multiply 融進網頁底色。手機版改成上下排、照原比例。 */}
+      {/* 只有一張手稿：照原比例、寬度鋪滿右欄，高度最多到畫面底（扣掉上方留白與圖說），圖說緊接在圖下 */}
+      {mainSketch && restSketches.length === 0 && (
+        <figure className={`min-w-0 ${RIGHT_OFFSET.title}`}>
+          <Image
+            src={mainSketch.src!}
+            alt={mainSketch.caption || ""}
+            width={2400}
+            height={1544}
+            sizes="(max-width: 640px) 100vw, 60vw"
+            className={`h-auto w-full object-contain object-left-top mix-blend-multiply ${variant === "modal" ? "sm:max-h-[calc(100dvh-260px)]" : "sm:max-h-[calc(100vh-180px)]"}`}
+          />
+          {mainSketch.caption && (
+            <figcaption className="mt-2 font-serif-tc text-xs sm:text-sm" style={muted}>
+              {mainSketch.caption}
+            </figcaption>
+          )}
+        </figure>
+      )}
+      {mainSketch && restSketches.length > 0 && (
+        <div
+          className={`flex min-w-0 flex-col gap-4 ${RIGHT_OFFSET.title} ${variant === "modal" ? "sm:h-[calc(100dvh-140px)]" : "sm:h-[calc(100vh-64px)]"}`}
+        >
+          {[[mainSketch], restSketches].map(
+            (group, gi) =>
+              group.length > 0 && (
+                <div key={gi} className={`flex flex-col gap-4 sm:min-h-0 sm:flex-row ${gi === 0 ? "sm:flex-[3]" : "sm:flex-[2]"}`}>
+                  {group.map((img) => (
+                    <figure key={img.id} className="flex min-w-0 flex-1 flex-col sm:min-h-0">
+                      <div className="relative aspect-[3/2] sm:aspect-auto sm:min-h-0 sm:flex-1">
+                        <Image
+                          src={img.src!}
+                          alt={img.caption || ""}
+                          fill
+                          sizes={gi === 0 ? "(max-width: 640px) 100vw, 60vw" : "(max-width: 640px) 100vw, 30vw"}
+                          className="object-contain object-left-top mix-blend-multiply"
+                        />
+                      </div>
+                      {img.caption && (
+                        <figcaption className="mt-2 font-serif-tc text-xs sm:text-sm" style={muted}>
+                          {img.caption}
+                        </figcaption>
+                      )}
+                    </figure>
+                  ))}
                 </div>
-              ) : (
-                <p key={i} className={`whitespace-pre-line ${BODY_TEXT}`}>
-                  {m.text}
-                </p>
               ),
-            )}
-          </div>
-        )}
+          )}
+        </div>
+      )}
+
+      {/* 右欄上緣跟左欄的章節名「核心目標」切齊（同 RIGHT_OFFSET.title），整個畫面才放得進一屏 */}
+      {!mainSketch && (
+      <div className={`min-w-0 ${RIGHT_OFFSET.title}`}>
+        {strategies}
 
         {/* 只有一張圖（例如一籌的碳排放圖表）：完整顯示不裁切，高度＝畫面扣掉其他內容後剩下的空間（100vh − 600px），整個畫面才放得進一屏 */}
         {images.length === 1 && (
@@ -898,6 +996,7 @@ function GoalsSection({ goals, variant }: { goals: ProjectGoals; variant: "page"
           </div>
         )}
       </div>
+      )}
     </section>
   );
 }

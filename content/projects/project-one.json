@@ -182,17 +182,17 @@
           "kind": "drawing"
         },
         {
-          "id": "project-one-deck-elevation-long",
+          "id": "project-one-elev-1103-front",
           "tone": "bg-neutral-300",
-          "caption": "長向立面圖",
-          "src": "/images/project-one/deck-elevation-long.jpg",
+          "caption": "正向立面圖",
+          "src": "/images/project-one/elev-1103-front.jpg",
           "kind": "drawing"
         },
         {
-          "id": "project-one-deck-elevation-short",
+          "id": "project-one-elev-1103-side",
           "tone": "bg-neutral-300",
-          "caption": "短向立面圖",
-          "src": "/images/project-one/deck-elevation-short.jpg",
+          "caption": "側向立面圖",
+          "src": "/images/project-one/elev-1103-side.jpg",
           "kind": "drawing"
         }
       ]
@@ -451,54 +451,66 @@
       "text": "竹輕亭依照九個步驟完成組立：基礎、地板、A 字竹柱、接合五金、縱梁、抗剪組合梁、木檁條、屋頂到桌面，每一步都由專業帶領，搭配志工與施工單位分工完成。\n\n完成後的竹輕亭是一座開放、通透的棚架——竹柱撐起輕薄的屋頂，木地板架在混凝土基礎上，四周不設牆。它可以是市集的攤位、活動的舞台，也可以只是一處讓人坐下來休息的遮蔭；空間成為什麼，留給使用者決定。",
       "images": [
         {
-          "id": "project-one-ih3amrn",
+          "id": "project-one-finished-1103-01",
           "tone": "bg-neutral-300",
-          "caption": "",
-          "src": "/images/project-one/finished-2026-01-landscape.jpg"
+          "caption": "設計介紹",
+          "src": "/images/project-one/finished-1103-01.jpg"
         },
         {
-          "id": "project-one-pu0k3ij",
+          "id": "project-one-finished-1103-05",
           "tone": "bg-neutral-300",
-          "caption": "",
-          "src": "/images/project-one/finished-2026-02-landscape.jpg"
+          "caption": "立面透視 01",
+          "src": "/images/project-one/finished-1103-05.jpg"
         }
       ],
       "moreImages": [
         {
-          "id": "project-one-e8pkip6",
+          "id": "project-one-finished-1103-03",
           "tone": "bg-neutral-300",
-          "caption": "",
-          "src": "/images/project-one/1793084923153-LINE_ALBUM_常民竹小屋_261021_1.jpg"
+          "caption": "立面透視 02",
+          "src": "/images/project-one/finished-1103-03.jpg"
         },
         {
-          "id": "project-one-hg07yev",
+          "id": "project-one-finished-1103-04",
           "tone": "bg-neutral-300",
-          "caption": "",
-          "src": "/images/project-one/1793084923172-LINE_ALBUM_常民竹小屋_261021_4.jpg"
+          "caption": "立面透視 03",
+          "src": "/images/project-one/finished-1103-04.jpg"
         },
         {
-          "id": "project-one-pd9om3w",
+          "id": "project-one-finished-1103-02",
           "tone": "bg-neutral-300",
-          "caption": "",
-          "src": "/images/project-one/1793084923197-LINE_ALBUM_常民竹小屋_261021_5.jpg"
+          "caption": "立面透視 04",
+          "src": "/images/project-one/finished-1103-02.jpg"
         },
         {
-          "id": "project-one-4bericc",
+          "id": "project-one-finished-1103-06",
           "tone": "bg-neutral-300",
-          "caption": "",
-          "src": "/images/project-one/1793084923216-LINE_ALBUM_常民竹小屋_261021_6.jpg"
+          "caption": "立面透視 05",
+          "src": "/images/project-one/finished-1103-06.jpg"
         },
         {
-          "id": "project-one-uwpdhj3",
+          "id": "project-one-finished-1103-07",
           "tone": "bg-neutral-300",
-          "caption": "",
-          "src": "/images/project-one/1793084923242-LINE_ALBUM_常民竹小屋_261021_7.jpg"
+          "caption": "竹構造",
+          "src": "/images/project-one/finished-1103-07.jpg"
         },
         {
-          "id": "project-one-22smxv5",
+          "id": "project-one-finished-1103-08",
           "tone": "bg-neutral-300",
-          "caption": "",
-          "src": "/images/project-one/1793084923263-LINE_ALBUM_常民竹小屋_261021_10.jpg"
+          "caption": "組合梁接合",
+          "src": "/images/project-one/finished-1103-08.jpg"
+        },
+        {
+          "id": "project-one-finished-1103-09",
+          "tone": "bg-neutral-300",
+          "caption": "五金接合件",
+          "src": "/images/project-one/finished-1103-09.jpg"
+        },
+        {
+          "id": "project-one-finished-1103-10",
+          "tone": "bg-neutral-300",
+          "caption": "完工合影",
+          "src": "/images/project-one/finished-1103-10.jpg"
         }
       ]
     },

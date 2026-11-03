@@ -56,14 +56,14 @@
         },
         {
           "key": "owner",
-          "name": "沈威賦先生｜竹育股份有限公司董事長",
-          "text": "台灣資深竹材與竹構專家。深耕南投竹山，長期致力於維繫台灣原竹供應鏈，並積極推展竹產業的工業化與永續循環。他是台灣現代竹構建築與材料創新背後，不可或缺的重要產業推手。",
+          "name": "財團法人雲林縣利仁教育基金會",
+          "text": "財團法人雲林縣利仁教育基金會，由李綠枝、甘銘源建築師夫婦與一群在農業、醫學、教育及藝術治療領域深耕的人智學工作者籌設，以他們的小兒子甘利仁為名。基金會以雲林為起點，推動華德福教育、特殊需求兒童的療育與健康永續的社區家園，並設立臺灣竹構學苑（T.B.T.I.），推廣竹構築的教育與實踐。",
           "images": [
             {
-              "id": "project-two-shen-weifu",
+              "id": "project-two-team-lizen",
               "tone": "bg-neutral-300",
               "caption": "",
-              "src": "/images/project-two/team-shen-weifu-crop.png"
+              "src": "/images/project-two/team-lizen.jpg"
             }
           ]
         },
@@ -78,7 +78,8 @@
               "caption": "",
               "src": "/images/project-two/team-you-zhijie-crop.jpg"
             }
-          ]
+          ],
+          "title": "細部設計／施工單位"
         },
         {
           "key": "venue",
@@ -487,7 +488,7 @@
       ]
     },
     {
-      "label": "施工單位",
+      "label": "細部設計／施工單位",
       "items": [
         {
           "name": "諸野竹木構造專門有限公司",
@@ -500,8 +501,9 @@
       "label": "業主單位",
       "items": [
         {
-          "name": "竹育股份有限公司",
-          "logo": "/images/partners/chuyu.png"
+          "name": "財團法人雲林縣利仁教育基金會",
+          "logo": "/images/partners/lizen.png",
+          "url": "https://www.lizenfdt.org/"
         }
       ]
     }

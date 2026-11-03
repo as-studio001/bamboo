@@ -1447,6 +1447,7 @@ function renderCaseEditor(){
             return `
           <div class="field-block">
             <div class="label">${esc(u.label)}</div>
+            <input type="text" data-utitle="${u.key}" placeholder="小標（選填，留空＝「${esc(u.label.replace(/（.*$/, ""))}」；例如：細部設計／施工單位）" value="${esc(unit.title || "")}" style="margin-bottom:8px;">
             <input type="text" data-uname="${u.key}" placeholder="名稱（顯示在「${esc(u.label)}」右邊，例如：初樸建築師事務所）" value="${esc(unit.name || "")}" style="margin-bottom:8px;">
             <textarea class="tall" data-ufield="${u.key}" placeholder="${esc(u.label)}的介紹文字">${esc(unit.text || "")}</textarea>
             <div class="label" style="margin-top:14px;">${esc(u.label)}的圖片（顯示在文字右邊）</div>
@@ -1797,6 +1798,9 @@ function collectEditorFields(ed){
     });
     section.querySelectorAll("[data-uname]").forEach(el => {
       teamUnit(chapter, el.dataset.uname).name = el.value.trim();
+    });
+    section.querySelectorAll("[data-utitle]").forEach(el => {
+      teamUnit(chapter, el.dataset.utitle).title = el.value.trim();
     });
     section.querySelectorAll("[data-cfield]").forEach(el => {
       const f = el.dataset.cfield;

@@ -36,7 +36,8 @@ export type ChapterVideoItem = { id: string; url: string; title?: string };
 // builder（施工單位）2026-10-28 起不再顯示、後台也拿掉，舊資料裡的 builder 保留不刪
 export type TeamUnitKey = "designer" | "designer2" | "builder" | "owner" | "venue";
 // name：單位名稱（例如「初樸建築師事務所」），顯示在小標「設計單位」右邊；text 是下面的介紹內文
-export type TeamUnit = { key: TeamUnitKey; name?: string; text?: string; images?: ProjectImage[] };
+// title（2026-11-03）：選填，取代預設的單位小標（例如一籌的諸野寫「細部設計／施工單位」）
+export type TeamUnit = { key: TeamUnitKey; title?: string; name?: string; text?: string; images?: ProjectImage[] };
 // 分組對應首頁公式「A ＋ B ＝ ？」（2026-10-28）：A＝設計單位＋選填的施工單位（designer2，同一欄上下排，
 // 例如一籌的諸野）、B＝業主單位、？＝場地單位（新增）
 export const TEAM_UNITS: { key: TeamUnitKey; title: string; group: "A" | "B" | "?" }[] = [

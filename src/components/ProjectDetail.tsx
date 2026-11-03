@@ -1023,7 +1023,7 @@ function TeamSection({
         const unit = chapter.units?.find((u) => u.key === key);
         return {
           key,
-          title,
+          title: unit?.title?.trim() || title,
           group: group as string,
           name: unit?.name,
           text: unit?.text,
@@ -1054,10 +1054,12 @@ function TeamSection({
         units: shown.filter((u) => u.group === group),
       }))
     : [{ group: "", units: shown }];
-  // 欄寬：有兩個單位、照片在左文字在右的那組加寬（2fr），還沒填內容的組縮窄（0.6fr），其他 1fr
+  // （2026-11-03）欄寬照各組內容的寬度比例分配：照片在左文字在右的兩單位組 560（照片 210＋間距 16＋文字 22em）、
+  // 單一單位 340、還沒填內容的組 240（放得下標題）；組與組之間的「＋」「＝」各佔一欄（3rem～8vw），符號在
+  // 間隔正中間。整排最寬 1440px（見下方 max-w），超寬螢幕上三組不會散得太開、A 組右邊不會空一大塊
   const colTemplate = groups
-    .map((g) => `minmax(0,${g.units.length > 1 ? 2 : g.units.length === 0 ? 0.6 : 1}fr)`)
-    .join(" ");
+    .map((g) => `minmax(0,${g.units.length > 1 ? 560 : g.units.length === 0 ? 240 : 340}fr)`)
+    .join(" minmax(3rem,8vw) ");
   return (
     <ChapterFrame
       id={chapter.key}
@@ -1068,28 +1070,30 @@ function TeamSection({
       wide
       left={
         <div
-          className="mt-8 grid grid-cols-1 gap-x-10 gap-y-6 sm:mt-7 sm:grid-cols-[var(--team-cols)] sm:gap-y-4 lg:gap-x-14"
+          className="mt-8 grid grid-cols-1 gap-y-6 sm:mt-7 sm:max-w-[1440px] sm:grid-cols-[var(--team-cols)] sm:gap-y-6"
           style={{ ["--team-cols" as string]: colTemplate } as React.CSSProperties}
         >
           {groups.map((g, gi) => {
-            const groupStart = gi + 1;
+            // 第 gi 組在第 2gi+1 欄，前面那一欄（第 2gi 欄）是「＋」「＝」
+            const groupStart = gi * 2 + 1;
             const stacked = g.units.length > 1;
             return (
               <Fragment key={g.group || "_"}>
+                {/* A ＋ B ＝ ？：第二組以後，在兩組之間那一欄的正中間放「＋」，？前面放「＝」（跟首頁公式一樣） */}
+                {g.group && gi > 0 && (
+                  <div
+                    aria-hidden
+                    className={`hidden justify-center pb-2 font-serif-tc text-5xl leading-none font-light sm:flex sm:items-end sm:[grid-column:var(--gc)] sm:[grid-row:1] ${TEXT_PRIMARY}`}
+                    style={{ ["--gc" as string]: groupStart - 1 } as React.CSSProperties}
+                  >
+                    {g.group === "?" ? "=" : "+"}
+                  </div>
+                )}
                 {g.group && (
                   <div
-                    className="relative mt-4 flex items-baseline gap-3 border-b pb-2 sm:mt-0 sm:[grid-column:var(--gc)] sm:[grid-row:1]"
+                    className="mt-4 flex items-baseline gap-3 border-b pb-2 sm:mt-0 sm:[grid-column:var(--gc)] sm:[grid-row:1]"
                     style={{ borderColor: "var(--border-subtle)", ["--gc" as string]: groupStart } as React.CSSProperties}
                   >
-                    {/* A ＋ B ＝ ？：第二組以後，在兩組之間的空隙正中間放「＋」，？前面放「＝」（跟首頁公式一樣） */}
-                    {groupStart > 1 && (
-                      <span
-                        aria-hidden
-                        className={`absolute right-full bottom-2 hidden translate-x-1/2 font-serif-tc text-5xl leading-none font-light sm:block sm:mr-5 lg:mr-7 ${TEXT_PRIMARY}`}
-                      >
-                        {g.group === "?" ? "=" : "+"}
-                      </span>
-                    )}
                     {/* 「？」用竹棕色，跟首頁公式一樣 */}
                     <span
                       className={`font-serif-tc text-4xl leading-none font-bold sm:text-6xl ${TEXT_PRIMARY}`}

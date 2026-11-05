@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Noto_Serif_TC, Noto_Sans_TC } from "next/font/google";
 import "./globals.css";
+import { OrientationHint } from "@/components/OrientationHint";
 
 const notoSerifTC = Noto_Serif_TC({
   variable: "--font-serif-tc",
@@ -32,6 +33,7 @@ export default function RootLayout({ children, modal }: LayoutProps<"/">) {
       <body className="min-h-full flex flex-col bg-[var(--background)] text-[var(--foreground)]">
         {children}
         {modal}
+        <OrientationHint />
       </body>
     </html>
   );

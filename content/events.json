@@ -5,5 +5,105 @@
       "id": "events-poster-2026-lectures",
       "src": "/images/events/poster-2026-lectures-1030.jpg"
     }
+  ],
+  "venue": "斗六糖廠竹創基地・洞洞館",
+  "venueAddress": "雲林縣斗六市糖廠 55 號",
+  "signupUrl": "https://docs.google.com/forms/d/e/1FAIpQLSdUDhIxkuyJThslEuMtBD6vVIXsQeF2SVbzUNa3j5ouoby5eA/viewform",
+  "lectures": [
+    {
+      "id": "lecture-1",
+      "tab": "場次一",
+      "label": "LECTURE 01",
+      "date": "11/07",
+      "weekday": "SAT",
+      "time": "14:00–16:00",
+      "theme": "記憶與工法",
+      "title": "常民建築的竹構智慧與在地結合",
+      "text": "從風土、就地取材與傳統竹構工法出發，回望竹建築的韌性。\n串連大藏建築、原型結構及雲林農博至島嶼構竹的實踐。",
+      "speakers": [
+        {
+          "name": "甘銘源 建築師",
+          "role": "大藏聯合建築師事務所 主持建築師"
+        },
+        {
+          "name": "李綠枝 建築師",
+          "role": "大藏聯合建築師事務所 主持建築師"
+        },
+        {
+          "name": "林雅茵 建築師",
+          "role": "林雅茵建築師事務所 負責人"
+        },
+        {
+          "name": "陳冠帆 結構技師",
+          "role": "原型結構工程顧問有限公司 負責人"
+        }
+      ],
+      "hosts": [
+        {
+          "name": "羅嘉惠 老師",
+          "role": "國立雲林科技大學 專任助理教授"
+        }
+      ],
+      "poster": "/images/events/lecture-1105-01.jpg",
+      "slides": []
+    },
+    {
+      "id": "lecture-2",
+      "tab": "場次二",
+      "label": "LECTURE 02",
+      "date": "11/21",
+      "weekday": "SAT",
+      "time": "14:00–16:00",
+      "theme": "當代與實踐 1",
+      "title": "讓漆彈遊戲成為自然構竹的一種新場景",
+      "text": "順應竹材特性，探討可快速組裝與拆解的竹構設計。\n從竹構工坊、涼亭到模矩化設計的實作與調整。",
+      "speakers": [
+        {
+          "name": "余偉智 先生",
+          "role": "仲夏夜竹工作坊 負責人"
+        },
+        {
+          "name": "葉育鑫 建築師",
+          "role": "初樸建築師事務所 主持建築師"
+        }
+      ],
+      "hosts": [
+        {
+          "name": "陳冠帆 結構技師",
+          "role": "原型結構工程顧問有限公司 負責人"
+        }
+      ],
+      "poster": "/images/events/lecture-1105-02.jpg",
+      "slides": []
+    },
+    {
+      "id": "lecture-3",
+      "tab": "場次三",
+      "label": "LECTURE 03",
+      "date": "11/29",
+      "weekday": "SUN",
+      "time": "14:00–16:00",
+      "theme": "當代與實踐 2",
+      "title": "竹子也能成為工業化材料嗎？竹小屋模矩示範屋",
+      "text": "探討低碳民宿、可移動模組化與被動式竹建築。\n從竹集成材應用到重新定義自然居住的可能。",
+      "speakers": [
+        {
+          "name": "黃韋維 藝術長",
+          "role": "承億集團文旅品牌與文化實踐者"
+        },
+        {
+          "name": "游智傑 建築師",
+          "role": "諸野竹木構專門有限公司 負責人"
+        }
+      ],
+      "hosts": [
+        {
+          "name": "陳冠帆 結構技師",
+          "role": "原型結構工程顧問有限公司 負責人"
+        }
+      ],
+      "poster": "/images/events/lecture-1105-03.jpg",
+      "slides": []
+    }
   ]
 }

@@ -130,7 +130,7 @@ function Screen({
   return (
     <section
       id={id}
-      className={`paper ${image ? "paper-dark" : ""} relative flex min-h-[100dvh] w-full shrink-0 snap-start flex-col overflow-hidden px-6 pt-16 text-[var(--foreground)] sm:h-[100dvh] sm:min-h-0 sm:px-16 sm:pt-[6vh] lg:px-24`}
+      className={`paper ${image ? "paper-dark" : ""} relative flex min-h-[100dvh] w-full shrink-0 snap-start flex-col overflow-hidden px-6 pt-16 text-[var(--foreground)] sm:h-[100dvh] sm:min-h-0 sm:px-16 sm:pt-[6vh] lg:px-24 short:h-auto short:min-h-[100dvh] short:pt-8 short:pb-8`}
     >
       {image && (
         <>
@@ -407,6 +407,8 @@ function SystemScreen({
   // （2026-10-28）只有最上面三個標題有浮現動畫，下面的內容一開始就在、不做進場動畫
   return (
     <>
+      {/* 上方留白：按鈕貼底後文字會全部往上靠，用這塊把文字往下推，最多 6vh；畫面矮沒有多餘高度時自動歸零 */}
+      <div aria-hidden className="hidden sm:block sm:max-h-[6vh] sm:flex-1" />
       {points.length > 0 && <PointsRotator points={points} />}
 
       {reasons.length > 0 && (
@@ -449,18 +451,19 @@ function SystemScreen({
             {terms.map((t, i) => (
               <Fragment key={i}>
                 {i > 0 && (
-                  <span className="row-start-1 text-3xl sm:text-[min(3.75rem,6.5vh)]" style={MUTED}>
+                  <span className="row-start-1 text-3xl sm:text-[min(4.5rem,8vh)]" style={MUTED}>
                     {i === terms.length - 1 ? "=" : "+"}
                   </span>
                 )}
                 <span
-                  className="row-start-1 text-center text-5xl leading-none font-semibold sm:text-[min(7.5rem,13vh)]"
+                  className="row-start-1 text-center text-6xl leading-none font-semibold sm:text-[min(10rem,17vh)]"
                   style={{ gridColumn: i * 2 + 1 }}
                 >
-                  <Accented text={t.symbol} />
+                  {/* 半形 ? 在這套襯線字裡是細長彎鉤，跟 A、B 不搭，顯示時換成全形 ？（2026-11-05） */}
+                  <Accented text={t.symbol.replace("?", "？")} />
                 </span>
                 <span
-                  className="row-start-2 mt-1 text-center text-[11px] whitespace-nowrap sm:mt-[1vh] sm:text-[min(1.75rem,3.2vh)]"
+                  className="row-start-2 mt-1 text-center text-[11px] whitespace-nowrap sm:mt-[1vh] sm:text-[min(1.125rem,2.2vh)]"
                   style={{ gridColumn: i * 2 + 1, ...MUTED }}
                 >
                   {t.title}
@@ -472,7 +475,7 @@ function SystemScreen({
       </div>
         {(closing?.title || closing?.emphasis) && (
           <div className="mt-6 sm:mt-[3.5vh]">
-            <p className="font-serif-tc text-xl leading-[1.4] font-semibold sm:text-4xl">
+            <p className="font-serif-tc text-lg leading-[1.4] font-semibold sm:text-2xl">
               {/* 兩段各自不斷行，放不下時從逗號後換行 */}
               <span className="inline-block">{closing.title}</span>
               {closing.emphasis && (
@@ -485,10 +488,11 @@ function SystemScreen({
         )}
 
       {data.cta && (
-        <div className="mt-10 flex justify-center sm:mt-[3vh]">
+        // mt-auto：吃掉這一屏多出來的高度，按鈕貼近頁尾細線，上面的內容往上靠
+        <div className="mt-10 flex justify-center sm:mt-auto sm:pt-[1vh] sm:pb-7">
           <button
             onClick={scrollToExhibition}
-            className="group inline-flex items-center gap-2 border px-7 py-3 font-serif-tc text-base font-semibold transition-colors hover:text-[#f7f3ec] sm:text-xl"
+            className="group inline-flex items-center gap-2 border px-5 py-2 font-serif-tc text-sm font-semibold transition-colors hover:text-[#f7f3ec] sm:text-base"
             style={{ borderColor: ACCENT, color: ACCENT }}
             onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = ACCENT)}
             onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "")}

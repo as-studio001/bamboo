@@ -7,10 +7,12 @@ export function BackHomeButton() {
   return (
     <Link
       href="/"
-      className="fixed top-6 right-6 z-50 flex items-center gap-1.5 rounded-full bg-white/90 px-3.5 py-1.5 font-serif-tc text-xs font-bold tracking-wide text-[#3f3c38] shadow-sm backdrop-blur transition-colors hover:bg-white hover:text-black sm:top-[46px] sm:right-[50px] sm:text-sm"
+      className="fixed top-6 right-6 z-50 flex items-center gap-1.5 rounded-full bg-white/90 px-3.5 py-1.5 font-serif-tc text-xs font-bold tracking-wide text-[#3f3c38] shadow-sm backdrop-blur transition-colors hover:bg-white hover:text-black sm:top-[46px] sm:right-[50px] sm:text-sm short:top-2 short:right-[50px] short:px-2.5"
+      aria-label="回首頁"
     >
       <span aria-hidden="true">←</span>
-      回首頁
+      {/* 手機橫放時只留箭頭，不蓋到內容標題 */}
+      <span className="short:hidden">回首頁</span>
     </Link>
   );
 }

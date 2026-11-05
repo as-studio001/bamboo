@@ -10,10 +10,35 @@ export type EventPoster = {
   caption?: string;
 };
 
+export type EventPerson = { name: string; role?: string };
+export type EventSlide = { title: string; url: string };
+
+// （2026-11-05）單場講座：首頁活動畫面往右滑的場次頁（見 EventsSection.tsx 的 LecturePanel）。
+// 文字照邀請函；slides 是講者簡報（標題＋檔案網址），還沒有時前台顯示「將陸續提供」。
+export type EventLecture = {
+  id: string;
+  tab: string; // 上方分頁的短名，例如「場次一」
+  label?: string; // 例如「LECTURE 01」
+  date: string;
+  weekday?: string;
+  time?: string;
+  theme?: string; // 例如「記憶與工法」
+  title: string;
+  text?: string;
+  speakers?: EventPerson[];
+  hosts?: EventPerson[];
+  poster?: string;
+  slides?: EventSlide[];
+};
+
 // 標題（「活動」這兩個字）跟章節名稱放在一起管理，見 lib/chapters.ts 的 chapterLabel("events")。
 export type ExhibitionEvents = {
   text?: string; // 段落文字，用 \n\n 分段；文字跟海報都留空時前台顯示「活動資訊即將公布」
   posters?: EventPoster[];
+  venue?: string; // 講座地點（各場次共用）
+  venueAddress?: string;
+  signupUrl?: string; // 報名表單（各場次共用）
+  lectures?: EventLecture[];
 };
 
 export const exhibitionEvents: ExhibitionEvents = eventsData as ExhibitionEvents;

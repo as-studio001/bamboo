@@ -36,7 +36,7 @@ export function AssemblyBook({ project, pdf, accent }: { project: Project; pdf: 
         // （2026-10-28）預覽框改成直式，跟 PDF 本身的 A 規格直式（1:1.414）同比例——原本是固定高度的
         // 橫向框，直式封面縮在中間、左右空一大塊。電腦版高度不超過畫面（扣掉上下留白），框加一條細邊
         // 讓白底的封面頁跟頁面背景分得開
-        className="group relative mx-auto block aspect-[1/1.414] w-full max-w-[calc((100dvh-260px)/1.414)] scroll-mt-4 overflow-hidden border text-left"
+        className="group relative mx-auto block aspect-[1/1.414] w-full max-w-[max(240px,calc((100dvh-260px)/1.414))] scroll-mt-4 overflow-hidden border text-left"
         style={{ borderColor: "var(--border-subtle)" }}
       >
         {coverSrc && (

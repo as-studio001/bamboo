@@ -493,7 +493,7 @@ function useChapterSnap(rootRef: React.RefObject<HTMLDivElement | null>, variant
   useEffect(() => {
     const root = rootRef.current;
     if (!root) return;
-    const desktop = window.matchMedia("(min-width: 640px)");
+    const desktop = window.matchMedia("(min-width: 640px) and (min-height: 501px)");
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
     const scroller = variant === "modal" ? root.closest<HTMLElement>(".overflow-y-auto") : null;
     const target: ScrollTarget = scroller ?? window;
@@ -623,10 +623,10 @@ const BODY_TEXT = `text-sm leading-relaxed sm:font-serif-tc sm:text-base sm:lead
 const RIGHT_OFFSET = {
   // ＋8px：對齊內文「字」的上緣，不是段落框的上緣——內文行高 1.95（31.2px）比字大，第一行的字實際在框頂
   // 往下約 8px（行距多出來的 4.1px＋字型本身字身框上方 4px，2026-10-14 用 canvas 量的）
-  text: "sm:pt-[132px] lg:pt-[144px]",
-  unit: "sm:pt-[140px] lg:pt-[152px]",
+  text: "sm:pt-[132px] lg:pt-[144px] short:pt-0",
+  unit: "sm:pt-[140px] lg:pt-[152px] short:pt-0",
   // （2026-10-16）＋6px：對齊章節名稱「字」的上緣（24px 字、32px 行高，字頂在框頂往下約 5.5px，canvas 量的）
-  title: "sm:pt-[74px] lg:pt-[86px]",
+  title: "sm:pt-[74px] lg:pt-[86px] short:pt-0",
 } as const;
 // （2026-10-16）預設改成對齊章節名稱的字上緣（原本預設對齊第一段內文），圖片比較早出現在畫面上；
 // 團隊介紹（rows 模式）不受影響，圖片照舊對齊各單位小標。
@@ -658,20 +658,20 @@ function ChapterFrame({
   wide?: boolean;
 }) {
   const fadeRef = useFadeInView<HTMLElement>();
-  const sectionClass = `${FADE_CLASS} flex scroll-mt-10 flex-col ${first ? "" : "border-t pt-10"} sm:grid sm:min-h-screen sm:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] sm:items-start sm:gap-x-12 sm:border-0 sm:pt-16 sm:pb-20 lg:gap-x-20`; // （2026-10-16）上下內距 112→64／80px，章節整體抬高，從首頁開的浮起視窗（比畫面矮 106px）也放得下
+  const sectionClass = `${FADE_CLASS} flex scroll-mt-10 flex-col ${first ? "" : "border-t pt-10"} sm:grid sm:min-h-screen sm:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] sm:items-start sm:gap-x-12 sm:border-0 sm:pt-16 sm:pb-20 lg:gap-x-20 short:min-h-0 short:pt-6 short:pb-8`; // （2026-10-16）上下內距 112→64／80px，章節整體抬高，從首頁開的浮起視窗（比畫面矮 106px）也放得下
   const sectionStyle = first
     ? undefined
     : { borderColor: "var(--border-subtle)" };
   const header = (
     <header style={{ order: -1 }} className="sm:col-start-1">
       <p
-        className="hidden font-serif-tc text-5xl leading-none font-light tabular-nums sm:block sm:h-12 lg:h-[60px] lg:text-6xl"
+        className="hidden font-serif-tc text-5xl leading-none font-light tabular-nums sm:block sm:h-12 lg:h-[60px] lg:text-6xl short:h-7 short:text-3xl"
         style={{ color: "var(--foreground-muted)" }}
       >
         {number}
       </p>
       <h3
-        className={`font-serif-tc text-lg font-bold tracking-wide uppercase sm:mt-5 sm:text-2xl sm:leading-8 ${TEXT_PRIMARY}`}
+        className={`font-serif-tc text-lg font-bold tracking-wide uppercase sm:mt-5 sm:text-2xl sm:leading-8 short:mt-1 short:text-lg short:leading-6 ${TEXT_PRIMARY}`}
       >
         {title}
       </h3>
@@ -710,7 +710,7 @@ function ChapterFrame({
     // （原本還加了捲動吸附到章節開頭，會跟滑鼠滾輪搶捲動、造成卡頓，已拿掉。）
     // 右欄上緣跟左欄的哪個東西切齊見上面的 RIGHT_OFFSET。
     <section ref={fadeRef} id={id} className={sectionClass} style={sectionStyle}>
-      <div className={`contents sm:block sm:self-start ${sticky ? "sm:sticky sm:top-16" : ""}`}>
+      <div className={`contents sm:block sm:self-start ${sticky ? "sm:sticky sm:top-16 short:static" : ""}`}>
         {header}
         {left}
       </div>
@@ -863,30 +863,30 @@ function GoalsSection({ goals, variant }: { goals: ProjectGoals; variant: "page"
     <section
       ref={fadeRef}
       id="goals"
-      className={`${FADE_CLASS} flex flex-col gap-8 pb-10 sm:grid ${variant === "modal" ? "sm:min-h-[calc(100dvh-106px)]" : "sm:min-h-screen"} sm:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] sm:content-center sm:items-start sm:gap-x-12 sm:py-8 lg:gap-x-20`}
+      className={`${FADE_CLASS} flex flex-col gap-8 pb-10 sm:grid ${variant === "modal" ? "sm:min-h-[calc(100dvh-106px)]" : "sm:min-h-screen"} sm:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] sm:content-center sm:items-start sm:gap-x-12 sm:py-8 lg:gap-x-20 short:min-h-0 short:py-5`}
     >
       {/* （2026-11-02）左欄比照其他章節（ChapterFrame）固定在畫面上，右欄內容超過一個畫面就往下捲 */}
-      <div className="sm:sticky sm:top-16 sm:self-start">
+      <div className="sm:sticky sm:top-16 sm:self-start short:static">
         {/* 跟其他章節同一套開頭：大編號「00」＋章節名「核心目標」（ChapterFrame 的 header），左側直書導覽
             也以這個 header 判斷何時出現 */}
         <header>
           <p
-            className="hidden font-serif-tc text-5xl leading-none font-light tabular-nums sm:block sm:h-12 lg:h-[60px] lg:text-6xl"
+            className="hidden font-serif-tc text-5xl leading-none font-light tabular-nums sm:block sm:h-12 lg:h-[60px] lg:text-6xl short:h-7 short:text-3xl"
             style={muted}
           >
             00
           </p>
-          <h3 className={`font-serif-tc text-lg font-bold tracking-wide sm:mt-5 sm:text-2xl sm:leading-8 ${TEXT_PRIMARY}`}>
+          <h3 className={`font-serif-tc text-lg font-bold tracking-wide sm:mt-5 sm:text-2xl sm:leading-8 short:mt-1 short:text-lg short:leading-6 ${TEXT_PRIMARY}`}>
             {GOALS_TITLE}
           </h3>
         </header>
         {goals.title && (
-          <p className={`mt-6 font-serif-tc text-2xl leading-[1.4] font-bold sm:mt-8 sm:text-3xl ${TEXT_PRIMARY}`}>
+          <p className={`mt-6 font-serif-tc text-2xl leading-[1.4] font-bold sm:mt-8 sm:text-3xl short:mt-3 short:text-xl ${TEXT_PRIMARY}`}>
             {goals.title}
           </p>
         )}
         {positioning.length > 0 && (
-          <div className="mt-8 sm:mt-12">
+          <div className="mt-8 sm:mt-12 short:mt-4">
             {goals.positioningLabel && (
               <p className="font-serif-tc text-sm font-bold" style={muted}>
                 {goals.positioningLabel}
@@ -894,7 +894,7 @@ function GoalsSection({ goals, variant }: { goals: ProjectGoals; variant: "page"
             )}
             <ul className="mt-3 border-t" style={rule}>
               {positioning.map((p, i) => (
-                <li key={i} className={`border-b py-3 font-serif-tc text-lg sm:text-xl ${TEXT_PRIMARY}`} style={rule}>
+                <li key={i} className={`border-b py-3 font-serif-tc text-lg sm:text-xl short:py-1.5 short:text-base ${TEXT_PRIMARY}`} style={rule}>
                   {p}
                 </li>
               ))}
@@ -970,7 +970,7 @@ function GoalsSection({ goals, variant }: { goals: ProjectGoals; variant: "page"
               width={1600}
               height={800}
               sizes="(max-width: 640px) 100vw, 55vw"
-              className={`h-auto w-full object-contain object-left sm:w-auto ${variant === "modal" ? "sm:max-h-[calc(100dvh-706px)]" : "sm:max-h-[calc(100vh-600px)]"}`}
+              className={`h-auto w-full object-contain object-left sm:w-auto ${variant === "modal" ? "sm:max-h-[calc(100dvh-706px)]" : "sm:max-h-[calc(100vh-600px)]"} short:max-h-none short:w-full`}
             />
             {images[0].caption && (
               <figcaption className="mt-2 font-serif-tc text-xs sm:text-sm" style={muted}>
@@ -1070,7 +1070,7 @@ function TeamSection({
       wide
       left={
         <div
-          className="mt-8 grid grid-cols-1 gap-y-6 sm:mt-7 sm:max-w-[1440px] sm:grid-cols-[var(--team-cols)] sm:gap-y-6"
+          className="mt-8 grid grid-cols-1 gap-y-6 short:mt-3 short:gap-y-3 sm:mt-7 sm:max-w-[1440px] sm:grid-cols-[var(--team-cols)] sm:gap-y-6"
           style={{ ["--team-cols" as string]: colTemplate } as React.CSSProperties}
         >
           {groups.map((g, gi) => {
@@ -1083,7 +1083,7 @@ function TeamSection({
                 {g.group && gi > 0 && (
                   <div
                     aria-hidden
-                    className={`hidden justify-center pb-2 font-serif-tc text-5xl leading-none font-light sm:flex sm:items-end sm:[grid-column:var(--gc)] sm:[grid-row:1] ${TEXT_PRIMARY}`}
+                    className={`hidden justify-center pb-2 font-serif-tc text-5xl leading-none font-light short:text-3xl sm:flex sm:items-end sm:[grid-column:var(--gc)] sm:[grid-row:1] ${TEXT_PRIMARY}`}
                     style={{ ["--gc" as string]: groupStart - 1 } as React.CSSProperties}
                   >
                     {g.group === "?" ? "=" : "+"}
@@ -1096,12 +1096,12 @@ function TeamSection({
                   >
                     {/* 「？」用竹棕色，跟首頁公式一樣 */}
                     <span
-                      className={`font-serif-tc text-4xl leading-none font-bold sm:text-6xl ${TEXT_PRIMARY}`}
+                      className={`font-serif-tc text-4xl leading-none font-bold sm:text-6xl short:text-3xl ${TEXT_PRIMARY}`}
                       style={g.group === "?" ? { color: "#b4541f" } : undefined}
                     >
-                      {g.group}
+                      {g.group === "?" ? "？" : g.group}
                     </span>
-                    <span className={`font-serif-tc text-base font-semibold sm:text-xl ${TEXT_PRIMARY}`}>
+                    <span className={`font-serif-tc text-base font-semibold sm:text-xl short:text-sm ${TEXT_PRIMARY}`}>
                       {groupTitle(g.group)}
                     </span>
                   </div>
@@ -1191,7 +1191,7 @@ function VideoSection({
       right={
         // （2026-10-16）影片寬度上限：讓 16:9 的高度放得進一個畫面（浮起視窗比畫面矮，再多扣一些），
         // 矮螢幕上自動縮小、不被切到
-        <div style={{ maxWidth: `calc((100dvh - ${variant === "modal" ? 380 : 274}px) * 16 / 9)` }}>
+        <div style={{ maxWidth: `max(520px, calc((100dvh - ${variant === "modal" ? 380 : 274}px) * 16 / 9))` }}>
           {videos.length > 0 ? (
             videos.map((v, i) => (
               <div key={v.id} className={i > 0 ? "mt-8" : "mt-8 sm:mt-0"}>
@@ -1574,7 +1574,7 @@ function AssemblySection({
         ) : (
           // （2026-11-02）還沒有 PDF：跟 PDF 預覽同樣直式比例的虛線框，寫 Coming soon
           <div
-            className="mx-auto mt-6 flex aspect-[1/1.414] w-full max-w-[calc((100dvh-260px)/1.414)] items-center justify-center border border-dashed text-center font-serif-tc text-sm leading-loose tracking-[0.2em] whitespace-pre-line sm:mt-0"
+            className="mx-auto mt-6 flex aspect-[1/1.414] w-full max-w-[max(240px,calc((100dvh-260px)/1.414))] items-center justify-center border border-dashed text-center font-serif-tc text-sm leading-loose tracking-[0.2em] whitespace-pre-line sm:mt-0"
             style={{ borderColor: "var(--border-subtle)", color: "var(--foreground-muted)" }}
           >
             {COMING_SOON}
@@ -1617,7 +1617,7 @@ function DiagramSection({
   const paragraphs = (chapter.text ?? "").split("\n\n").filter((p) => p.trim());
   // （2026-10-19）四組力圖一個畫面放得下：軸力／剪力／彎矩當欄位標題只寫一次（每張圖不再各自放圖說），
   // 圖片高度依畫面高度自動縮放（扣掉章節上方留白、欄位標題、四組組名與間距；浮起視窗再多扣 106px）
-  const imgMaxH = `calc((100dvh - ${variant === "modal" ? 500 : 394}px) / ${Math.max(groups.length, 1)})`;
+  const imgMaxH = `max(200px, calc((100dvh - ${variant === "modal" ? 500 : 394}px) / ${Math.max(groups.length, 1)}))`;
   return (
     <ChapterFrame
       id={chapter.key}

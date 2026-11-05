@@ -504,7 +504,8 @@
       "items": [
         {
           "name": "華春營造有限公司",
-          "logo": "/images/partners/huachun.png"
+          "logo": "/images/partners/huachun.png",
+          "url": "https://www.spring1987.com/Home/"
         }
       ]
     },

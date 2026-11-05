@@ -29,6 +29,7 @@ export function PartnerCatalog({
     return () => window.removeEventListener("keydown", onKey);
   }, [open]);
 
+  const [noteHead, ...noteBody] = (catalog.note ?? "").split("\n").filter((l) => l.trim());
   const pages = Array.from({ length: catalog.count }, (_, i) => `${catalog.dir}/p${String(i + 1).padStart(2, "0")}.jpg`);
   const button = `border px-3 py-1.5 font-serif-tc text-xs font-bold whitespace-nowrap transition-opacity hover:opacity-60 sm:px-4 sm:py-2 sm:text-sm ${TEXT_PRIMARY}`;
 
@@ -56,6 +57,16 @@ export function PartnerCatalog({
                   </button>
                 </div>
               </div>
+              {noteHead && (
+                <div className="border-b px-4 py-2.5 font-serif-tc text-sm leading-relaxed sm:px-6" style={{ borderColor: "var(--border-subtle)" }}>
+                  <p className={`font-bold ${TEXT_PRIMARY}`}>{noteHead}</p>
+                  {noteBody.map((line) => (
+                    <p key={line} style={{ color: "var(--foreground-muted)" }}>
+                      {line}
+                    </p>
+                  ))}
+                </div>
+              )}
               <div className="min-h-0 flex-1 space-y-3 overflow-y-auto overscroll-contain bg-neutral-100 p-3 sm:p-6">
                 {pages.map((src, i) => (
                   // eslint-disable-next-line @next/next/no-img-element

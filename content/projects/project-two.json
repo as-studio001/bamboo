@@ -570,7 +570,8 @@
           "catalog": {
             "title": "環景建築 產品型錄",
             "dir": "/images/partners/greenbuilder-catalog",
-            "count": 32
+            "count": 32,
+            "note": "環景建築股份有限公司\n本案採用 GB-305 隱藏扣合式鋼板"
           }
         }
       ]
@@ -581,7 +582,13 @@
         {
           "name": "喬和工程有限公司（德國 AURO 台灣總代理）",
           "logo": "/images/partners/auro.svg",
-          "url": "https://auro.com.tw/auro/tw"
+          "url": "https://auro.com.tw/auro/tw",
+          "catalog": {
+            "title": "AURO No.560 水性染彩漆",
+            "dir": "/images/partners/auro-catalog",
+            "count": 12,
+            "note": "喬和工程有限公司（德國 AURO 台灣總代理）\n本案採用 AURO No.560 水性染彩漆"
+          }
         }
       ]
     }

@@ -2,6 +2,9 @@
 // 首頁雙欄、案例內頁共用同一套視覺語言。（深色模式已於 2026-10-13 取消，變數只剩淺色一組。）
 export const PANEL_BG = "bg-[var(--panel-bg)]";
 export const TEXT_PRIMARY = "text-[var(--panel-text)]";
+// 單位 LOGO 滑鼠移上去的小提示（放在 LOGO 下方，手機沒有滑鼠不顯示；外層要有 group relative）
+export const LOGO_HINT =
+  "pointer-events-none absolute top-full left-1/2 z-10 mt-1 -translate-x-1/2 rounded bg-neutral-800 px-2 py-1 font-serif-tc text-xs whitespace-nowrap text-white opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100";
 export const TEXT_BODY = "text-[var(--panel-text-muted)]";
 export const TEXT_PAD = ""; // 拿掉左右內距，讓文字方塊跟滿版照片的邊緣對齊
 

@@ -738,7 +738,7 @@ function Participants({ text }: { text?: string }) {
       <dl className="mt-3 font-serif-tc text-sm leading-relaxed sm:grid sm:grid-cols-[4.5rem_minmax(0,1fr)] sm:gap-x-4 sm:gap-y-1.5 sm:text-[15px]">
         {rows.map(([role, names], i) => (
           <Fragment key={i}>
-            <dt className="text-xs sm:text-[15px]" style={muted}>
+            <dt className="text-xs leading-relaxed sm:text-[15px] sm:leading-relaxed" style={muted}>
               {role}
             </dt>
             <dd className={`mb-2 sm:mb-0 ${TEXT_PRIMARY}`}>{names}</dd>

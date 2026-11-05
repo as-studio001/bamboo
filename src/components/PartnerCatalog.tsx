@@ -3,7 +3,7 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import type { PartnerCatalog as Catalog } from "@/lib/partners";
-import { TEXT_PRIMARY } from "@/components/theme";
+import { LOGO_HINT, TEXT_PRIMARY } from "@/components/theme";
 
 // 單位 LOGO 列裡有型錄的單位（2026-11-05）：點 LOGO 跳出視窗，型錄一頁一張圖往下捲，上方有「前往官網」
 // 與「關閉」。視窗掛到 body，不受 LOGO 列所在區塊的捲動與層級影響；Esc 或點視窗外也能關閉。
@@ -37,9 +37,7 @@ export function PartnerCatalog({
       <button type="button" aria-label={`${name}：${catalog.title}`} onClick={() => setOpen(true)} className="group relative block cursor-pointer transition-opacity hover:opacity-70">
         {children}
         {/* 滑鼠移到 LOGO 上的小提示（手機沒有滑鼠，不顯示） */}
-        <span className="pointer-events-none absolute top-full left-1/2 z-10 mt-1 -translate-x-1/2 rounded bg-neutral-800 px-2 py-1 font-serif-tc text-xs whitespace-nowrap text-white opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100">
-          點我看型錄
-        </span>
+        <span className={LOGO_HINT}>點我看型錄</span>
       </button>
       {open &&
         createPortal(

@@ -2,7 +2,7 @@ import { exhibitionEvents, type EventLecture, type EventPerson, type EventPoster
 import { chapterLabel } from "@/lib/chapters";
 import { EventsSlider } from "@/components/EventsSlider";
 import { PartnerCatalog } from "@/components/PartnerCatalog";
-import { TEXT_PRIMARY } from "@/components/theme";
+import { LOGO_HINT, TEXT_PRIMARY } from "@/components/theme";
 import { partnerGroups, type PartnerGroup } from "@/lib/partners";
 
 // 「活動」區塊：整個展覽共用一份內容（content/events.json，見 lib/events.ts），兩種擺法——
@@ -222,7 +222,7 @@ export function Partners({ className = "mt-12 sm:mt-10", groups = partnerGroups 
                 {g.items.map((p) => {
                   const inner = p.logo ? (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={p.logo} alt={p.name} title={p.name} className="block h-9 w-auto max-w-[220px] object-contain sm:h-10" />
+                    <img src={p.logo} alt={p.name} title={p.url || p.catalog ? undefined : p.name} className="block h-9 w-auto max-w-[220px] object-contain sm:h-10" />
                   ) : (
                     // 還沒有 LOGO 的單位用名稱文字（2026-10-28 放大一級，跟旁邊 LOGO 的份量比較接近）
                     <span className={`block font-serif-tc text-lg font-bold leading-10 sm:text-xl ${TEXT_PRIMARY}`}>{p.name}</span>
@@ -234,8 +234,9 @@ export function Partners({ className = "mt-12 sm:mt-10", groups = partnerGroups 
                           {inner}
                         </PartnerCatalog>
                       ) : p.url ? (
-                        <a href={p.url} target="_blank" rel="noopener noreferrer" aria-label={p.name} className="block transition-opacity hover:opacity-70">
+                        <a href={p.url} target="_blank" rel="noopener noreferrer" aria-label={p.name} className="group relative block transition-opacity hover:opacity-70">
                           {inner}
+                          <span className={LOGO_HINT}>點我看網頁</span>
                         </a>
                       ) : (
                         inner

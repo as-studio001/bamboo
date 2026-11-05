@@ -470,20 +470,12 @@
   ],
   "credits": [
     {
-      "label": "建築設計",
+      "label": "業主單位",
       "items": [
         {
-          "name": "承億集團",
-          "logo": "/images/partners/chanyee.png"
-        }
-      ]
-    },
-    {
-      "label": "結構設計",
-      "items": [
-        {
-          "name": "原型結構工程顧問有限公司",
-          "logo": "/images/partners/prototype-structure.png"
+          "name": "財團法人雲林縣利仁教育基金會",
+          "logo": "/images/partners/lizen.png",
+          "url": "https://www.lizenfdt.org/"
         }
       ]
     },
@@ -498,12 +490,41 @@
       ]
     },
     {
-      "label": "業主單位",
+      "label": "結構設計",
       "items": [
         {
-          "name": "財團法人雲林縣利仁教育基金會",
-          "logo": "/images/partners/lizen.png",
-          "url": "https://www.lizenfdt.org/"
+          "name": "原型結構工程顧問有限公司",
+          "logo": "/images/partners/prototype-structure.png",
+          "url": "https://www.mashup.com.tw/as%20studio/?page=product"
+        }
+      ]
+    },
+    {
+      "label": "主要贊助",
+      "items": [
+        {
+          "name": "華春營造有限公司",
+          "logo": "/images/partners/huachun.png"
+        }
+      ]
+    },
+    {
+      "label": "屋面板贊助",
+      "items": [
+        {
+          "name": "環景建築股份有限公司",
+          "logo": "/images/partners/greenbuilder.png",
+          "url": "https://www.greenbuilder.com.tw/"
+        }
+      ]
+    },
+    {
+      "label": "水性漆贊助",
+      "items": [
+        {
+          "name": "喬和工程有限公司（德國 AURO 台灣總代理）",
+          "logo": "/images/partners/auro.svg",
+          "url": "https://auro.com.tw/auro/tw"
         }
       ]
     }

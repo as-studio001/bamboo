@@ -70,15 +70,16 @@ export function Partners({ className = "mt-12 sm:mt-10", groups = partnerGroups 
   if (!groups.some((g) => g.items.length)) return null;
   return (
     <footer className={`border-t pt-6 ${className}`} style={{ borderColor: "var(--border-subtle)" }}>
-      <div className="flex flex-wrap gap-x-14 gap-y-6 lg:gap-x-20">
+      {/* （2026-11-05）整列置中，每組的小標與 LOGO 也各自置中 */}
+      <div className="flex flex-wrap justify-center gap-x-14 gap-y-6 lg:gap-x-20">
         {groups
           .filter((g) => g.items.length)
           .map((g) => (
             <div key={g.label}>
-              <p className="font-serif-tc text-xs font-bold tracking-wide" style={{ color: "var(--foreground-muted)" }}>
+              <p className="text-center font-serif-tc text-xs font-bold tracking-wide" style={{ color: "var(--foreground-muted)" }}>
                 {g.label}
               </p>
-              <ul className="mt-3 flex flex-wrap items-center gap-x-8 gap-y-3">
+              <ul className="mt-3 flex flex-wrap items-center justify-center gap-x-8 gap-y-3">
                 {g.items.map((p) => {
                   const inner = p.logo ? (
                     // eslint-disable-next-line @next/next/no-img-element

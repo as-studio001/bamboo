@@ -181,6 +181,7 @@ export function ProjectDetail({
           />
           {/* （2026-10-20）頁面最尾端：單位 LOGO 列（EventsSection.tsx 的 Partners）；
               （2026-10-28）改成這一案自己的單位（建築設計／結構設計／施工單位／業主單位／其他廠商） */}
+          <Participants text={project.participants} />
           <Partners className="mt-4 sm:mt-0" groups={project.credits ?? []} />
         </div>
       </div>
@@ -723,6 +724,29 @@ function ChapterFrame({
   );
 }
 
+// 參與人員（2026-11-05）：頁尾單位 LOGO 列上方的一份名單，左邊工項、右邊名字，資料見 projects.ts 的 participants
+function Participants({ text }: { text?: string }) {
+  const rows = (text ?? "")
+    .split("\n")
+    .filter((l) => l.trim())
+    .map((l) => l.split("｜").map((c) => c.trim()));
+  if (rows.length === 0) return null;
+  const muted = { color: "var(--foreground-muted)" };
+  return (
+    <div className="mt-10 mb-8 sm:mb-10">
+      <h3 className={`font-serif-tc text-base font-bold tracking-wide sm:text-lg ${TEXT_PRIMARY}`}>參與人員</h3>
+      <dl className="mt-3 grid grid-cols-[4.5rem_minmax(0,1fr)] gap-x-4 gap-y-1.5 font-serif-tc text-sm leading-relaxed sm:text-[15px]">
+        {rows.map(([role, names], i) => (
+          <Fragment key={i}>
+            <dt style={muted}>{role}</dt>
+            <dd className={TEXT_PRIMARY}>{names}</dd>
+          </Fragment>
+        ))}
+      </dl>
+    </div>
+  );
+}
+
 // 核心目標（2026-10-15，取代原本的目錄頁；同日從「案例目標」改名、編號 00、加進封面底部章節列與左側直書導覽）：
 // 封面之後、第一章之前，一個畫面的篇幅，跟章節同一套左右兩欄。
 // 左欄：標題（例如「設計目標與核心策略」）＋設計定位（一行一項，細線分隔）；右欄：策略小標＋策略標題＋
@@ -837,6 +861,22 @@ function GoalsSection({ goals, variant }: { goals: ProjectGoals; variant: "page"
   ].filter((s) => s.title || s.text || s.table);
   const compactStrategies = (
     <ol className="border-t" style={rule}>
+      {/* （2026-11-05）設計定位／目標使用也收進同一套清單（一籌），項目排兩欄，左欄才放得進一個畫面 */}
+      {positioning.length > 0 && (
+        <li
+          className="grid grid-cols-[3.5rem_minmax(0,1fr)] gap-x-3 border-b py-3.5 [@media(max-height:780px)]:py-2"
+          style={rule}
+        >
+          <p className="pt-[3px] font-serif-tc text-sm" style={muted}>
+            {goals.positioningLabel}
+          </p>
+          <ul className={`grid grid-cols-2 gap-x-4 gap-y-1 font-serif-tc text-base font-bold ${TEXT_PRIMARY}`}>
+            {positioning.map((p, i) => (
+              <li key={i}>{p}</li>
+            ))}
+          </ul>
+        </li>
+      )}
       {strategyList.map((s, i) => (
         // 畫面較矮（例如 1280×720 的筆電）時列距再收小，整欄才不會超出一個畫面
         <li
@@ -885,7 +925,7 @@ function GoalsSection({ goals, variant }: { goals: ProjectGoals; variant: "page"
             {goals.title}
           </p>
         )}
-        {positioning.length > 0 && (
+        {positioning.length > 0 && !mainSketch && (
           <div className="mt-8 sm:mt-12 short:mt-4">
             {goals.positioningLabel && (
               <p className="font-serif-tc text-sm font-bold" style={muted}>
@@ -908,17 +948,21 @@ function GoalsSection({ goals, variant }: { goals: ProjectGoals; variant: "page"
           紙張的淺色底用 multiply 融進網頁底色。手機版改成上下排、照原比例。 */}
       {/* 只有一張手稿：照原比例、寬度鋪滿右欄，高度最多到畫面底（扣掉上方留白與圖說），圖說緊接在圖下 */}
       {mainSketch && restSketches.length === 0 && (
-        <figure className={`min-w-0 ${RIGHT_OFFSET.title}`}>
+        <figure
+          className={`min-w-0 sm:mt-[var(--sketch-offset)] ${RIGHT_OFFSET.title}`}
+          style={{ ["--sketch-offset" as string]: `${goals.sketchOffset ?? 0}px` } as React.CSSProperties}
+        >
           <Image
             src={mainSketch.src!}
             alt={mainSketch.caption || ""}
             width={2400}
             height={1544}
             sizes="(max-width: 640px) 100vw, 60vw"
-            className={`h-auto w-full object-contain object-left-top mix-blend-multiply ${variant === "modal" ? "sm:max-h-[calc(100dvh-260px)]" : "sm:max-h-[calc(100vh-180px)]"}`}
+            // 直式手稿（ratio 小於 1）在右欄置中，圖說跟著置中；橫式手稿本來就鋪滿欄寬
+            className={`h-auto w-full object-contain ${(mainSketch.ratio ?? 1) < 1 ? "object-top" : "object-left-top"} mix-blend-multiply ${variant === "modal" ? "sm:max-h-[calc(100dvh-260px)]" : "sm:max-h-[calc(100vh-180px)]"}`}
           />
           {mainSketch.caption && (
-            <figcaption className="mt-2 font-serif-tc text-xs sm:text-sm" style={muted}>
+            <figcaption className={`mt-2 font-serif-tc text-xs sm:text-sm ${(mainSketch.ratio ?? 1) < 1 ? "text-center" : ""}`} style={muted}>
               {mainSketch.caption}
             </figcaption>
           )}

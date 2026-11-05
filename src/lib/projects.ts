@@ -133,6 +133,7 @@ export type ProjectGoals = {
   images?: ProjectImage[]; // 例圖（建議 4 張，圖說顯示在圖片下方）
   // （2026-11-02）手稿：有放的話，策略、說明、對照表改排到左欄，右欄整欄放手稿（第一張大圖，其餘並排在下面）
   sketches?: ProjectImage[];
+  sketchOffset?: number; // 單張手稿在右欄往下移的距離（px，電腦版）
 };
 
 export function hasGoals(goals?: ProjectGoals): goals is ProjectGoals {
@@ -174,6 +175,8 @@ export type Project = {
   // （2026-10-28）案例內頁最尾端的單位 LOGO 列：這一案的建築設計／結構設計／施工單位／業主單位／其他廠商，
   // 取代原本整個展覽共用的那一列（首頁最下面那一列不變）。沒有項目的分類不顯示
   credits?: PartnerGroup[];
+  // （2026-11-05）參與人員：一行一項「工項｜名單」，顯示在頁尾單位 LOGO 列上方；沒填就不顯示
+  participants?: string;
   published: boolean;
 };
 

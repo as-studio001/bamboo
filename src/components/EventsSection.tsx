@@ -150,7 +150,7 @@ function LecturePanel({ lecture: l, posterHeight }: { lecture: EventLecture; pos
               <p className="font-serif-tc text-sm leading-relaxed sm:text-[15px]">
                 <span className={`font-bold ${TEXT_PRIMARY}`}>{venue}</span>
                 {venueAddress && (
-                  <span className="ml-2 text-xs sm:text-sm" style={muted}>
+                  <span className="block text-xs sm:ml-2 sm:inline sm:text-sm" style={muted}>
                     {venueAddress}
                   </span>
                 )}

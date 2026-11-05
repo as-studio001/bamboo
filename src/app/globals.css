@@ -27,6 +27,13 @@ body {
   font-family: var(--font-sans-tc), "Noto Sans TC", sans-serif;
 }
 
+/* （2026-11-05）手機版：段落最後一行盡量不留單獨一個字 */
+@media (max-width: 639px) {
+  h1, h2, h3, h4, p, li, dd, td, figcaption {
+    text-wrap: pretty;
+  }
+}
+
 .font-serif-tc {
   font-family: var(--font-serif-tc), "Noto Serif TC", serif;
 }

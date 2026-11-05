@@ -21,7 +21,8 @@ export function AdminAccessLink() {
       href="/admin"
       aria-label="後台管理"
       title="後台管理"
-      className="fixed bottom-5 left-5 z-[110] flex h-9 w-9 items-center justify-center rounded-full opacity-40 shadow-md transition-opacity hover:opacity-100 sm:bottom-1 sm:left-8 sm:h-[22px] sm:w-[22px] sm:shadow-none sm:[&>svg]:h-3 sm:[&>svg]:w-3"
+      // （2026-11-05）手機版縮小、靠左下白邊，不蓋到頁尾文字
+      className="fixed bottom-2 left-0.5 z-[110] flex h-6 w-6 items-center justify-center rounded-full opacity-40 shadow-md transition-opacity hover:opacity-100 [&>svg]:h-3.5 [&>svg]:w-3.5 sm:bottom-1 sm:left-8 sm:h-[22px] sm:w-[22px] sm:shadow-none sm:[&>svg]:h-3 sm:[&>svg]:w-3"
       style={{ backgroundColor: "var(--panel-text)", color: "var(--panel-bg)" }}
     >
       <GearIcon />

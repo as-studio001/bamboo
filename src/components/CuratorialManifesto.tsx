@@ -331,7 +331,8 @@ function IntroScreen({
           </p>
         )}
         {data.title && (
-          <h1 className="mt-5 font-serif-tc text-4xl leading-[1.2] font-semibold sm:mt-6 sm:text-6xl sm:whitespace-nowrap lg:text-7xl">
+          // 手機版字級跟著畫面寬度縮放，大標固定一行，不會有單字掉到第二行
+          <h1 className="mt-5 font-serif-tc text-[length:min(2.25rem,8.2vw)] leading-[1.2] font-semibold whitespace-nowrap sm:mt-6 sm:text-6xl lg:text-7xl">
             <BambooAccent text={data.title} />
           </h1>
         )}

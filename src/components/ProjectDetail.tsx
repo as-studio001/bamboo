@@ -735,11 +735,13 @@ function Participants({ text }: { text?: string }) {
   return (
     <div className="mt-10 mb-8 sm:mb-10">
       <h3 className={`font-serif-tc text-base font-bold tracking-wide sm:text-lg ${TEXT_PRIMARY}`}>參與人員</h3>
-      <dl className="mt-3 grid grid-cols-[4.5rem_minmax(0,1fr)] gap-x-4 gap-y-1.5 font-serif-tc text-sm leading-relaxed sm:text-[15px]">
+      <dl className="mt-3 font-serif-tc text-sm leading-relaxed sm:grid sm:grid-cols-[4.5rem_minmax(0,1fr)] sm:gap-x-4 sm:gap-y-1.5 sm:text-[15px]">
         {rows.map(([role, names], i) => (
           <Fragment key={i}>
-            <dt style={muted}>{role}</dt>
-            <dd className={TEXT_PRIMARY}>{names}</dd>
+            <dt className="text-xs sm:text-[15px]" style={muted}>
+              {role}
+            </dt>
+            <dd className={`mb-2 sm:mb-0 ${TEXT_PRIMARY}`}>{names}</dd>
           </Fragment>
         ))}
       </dl>
@@ -864,13 +866,13 @@ function GoalsSection({ goals, variant }: { goals: ProjectGoals; variant: "page"
       {/* （2026-11-05）設計定位／目標使用也收進同一套清單（一籌），項目排兩欄，左欄才放得進一個畫面 */}
       {positioning.length > 0 && (
         <li
-          className="grid grid-cols-[3.5rem_minmax(0,1fr)] gap-x-3 border-b py-3.5 [@media(max-height:780px)]:py-2"
+          className="border-b py-3.5 sm:grid sm:grid-cols-[3.5rem_minmax(0,1fr)] sm:gap-x-3 [@media(max-height:780px)]:py-2"
           style={rule}
         >
-          <p className="pt-[3px] font-serif-tc text-sm" style={muted}>
+          <p className="mb-1 font-serif-tc text-sm sm:mb-0 sm:pt-[3px]" style={muted}>
             {goals.positioningLabel}
           </p>
-          <ul className={`grid grid-cols-2 gap-x-4 gap-y-1 font-serif-tc text-base font-bold ${TEXT_PRIMARY}`}>
+          <ul className={`space-y-1 font-serif-tc text-base font-bold sm:grid sm:grid-cols-2 sm:gap-x-4 sm:gap-y-1 sm:space-y-0 ${TEXT_PRIMARY}`}>
             {positioning.map((p, i) => (
               <li key={i}>{p}</li>
             ))}
@@ -881,10 +883,10 @@ function GoalsSection({ goals, variant }: { goals: ProjectGoals; variant: "page"
         // 畫面較矮（例如 1280×720 的筆電）時列距再收小，整欄才不會超出一個畫面
         <li
           key={i}
-          className="grid grid-cols-[3.5rem_minmax(0,1fr)] gap-x-3 border-b py-3.5 [@media(max-height:780px)]:py-2"
+          className="border-b py-3.5 sm:grid sm:grid-cols-[3.5rem_minmax(0,1fr)] sm:gap-x-3 [@media(max-height:780px)]:py-2"
           style={rule}
         >
-          <p className="pt-[3px] font-serif-tc text-sm" style={muted}>
+          <p className="mb-1 font-serif-tc text-sm sm:mb-0 sm:pt-[3px]" style={muted}>
             {s.label}
           </p>
           <div>
@@ -1158,9 +1160,10 @@ function TeamSection({
                   const images = (unit.images ?? []).filter((img) => img.src);
                   return (
                     // 同一組有兩個單位（stacked）時，每個單位改成照片在左、文字在右，兩個單位一個畫面放得下
-                    <div key={unit.key} className={`min-w-0 ${stacked ? "flex items-start gap-4" : ""}`}>
+                    // （2026-11-05）只有電腦版左右排；手機版欄寬不夠，照片在上、文字在下
+                    <div key={unit.key} className={`min-w-0 ${stacked ? "sm:flex sm:items-start sm:gap-4" : ""}`}>
                       {images.length > 0 && (
-                        <div className={stacked ? "flex shrink-0 flex-col gap-3" : "mb-3 flex gap-3"}>
+                        <div className={stacked ? "mb-3 flex gap-3 sm:mb-0 sm:shrink-0 sm:flex-col" : "mb-3 flex gap-3"}>
                           {images.map((img) => (
                             <Image
                               key={img.id}

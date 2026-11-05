@@ -735,10 +735,11 @@ function Participants({ text }: { text?: string }) {
   return (
     <div className="mt-10 mb-8 sm:mb-10">
       <h3 className={`font-serif-tc text-base font-bold tracking-wide sm:text-lg ${TEXT_PRIMARY}`}>參與人員</h3>
-      <dl className="mt-3 font-serif-tc text-sm leading-relaxed sm:grid sm:grid-cols-[4.5rem_minmax(0,1fr)] sm:gap-x-4 sm:gap-y-1.5 sm:text-[15px]">
+      <dl className="mt-3 font-serif-tc text-sm leading-relaxed sm:grid sm:grid-cols-[max-content_minmax(0,1fr)] sm:gap-x-4 sm:gap-y-1.5 sm:text-[15px]">
         {rows.map(([role, names], i) => (
           <Fragment key={i}>
-            <dt className="text-xs leading-relaxed sm:text-[15px] sm:leading-relaxed" style={muted}>
+            {/* 欄寬跟著文字（max-content）：字級固定 15px，瀏覽器字級設定較小時 rem 欄寬會變窄、工項被折行（2026-11-05） */}
+            <dt className="text-xs leading-relaxed sm:text-[15px] sm:leading-relaxed sm:whitespace-nowrap" style={muted}>
               {role}
             </dt>
             <dd className={`mb-2 sm:mb-0 ${TEXT_PRIMARY}`}>{names}</dd>

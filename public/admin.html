@@ -1156,7 +1156,7 @@ function renderEventsEditor(){
       <div class="field-block">
         <label>${esc(l.tab || "")}講者簡報（${esc(l.title || "")}）</label>
         <textarea data-lecture-slides="${i}" placeholder="簡報標題 | 檔案網址（例如 https://…/slides.pdf）">${esc((l.slides || []).map(s => `${s.title} | ${s.url}`).join("\n"))}</textarea>
-        <div class="field-hint">一行一份，標題跟網址用 | 分開。留空時前台顯示「講者簡報將陸續提供」。</div>
+        <div class="field-hint">一行一份，標題跟網址用 | 分開。留空時前台不顯示「簡報」這一列。</div>
       </div>`).join("")}
 
       <div class="save-bar">

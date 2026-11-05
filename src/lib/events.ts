@@ -14,7 +14,7 @@ export type EventPerson = { name: string; role?: string };
 export type EventSlide = { title: string; url: string };
 
 // （2026-11-05）單場講座：首頁活動畫面往右滑的場次頁（見 EventsSection.tsx 的 LecturePanel）。
-// 文字照邀請函；slides 是講者簡報（標題＋檔案網址），還沒有時前台顯示「將陸續提供」。
+// 文字照邀請函；slides 是講者簡報（標題＋檔案網址），還沒有時前台不顯示這一列。
 export type EventLecture = {
   id: string;
   tab: string; // 上方分頁的短名，例如「場次一」

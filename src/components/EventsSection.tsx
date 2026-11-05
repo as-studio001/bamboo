@@ -157,11 +157,12 @@ function LecturePanel({ lecture: l, posterHeight }: { lecture: EventLecture; pos
               </p>
             </div>
           )}
-          <div className={row}>
-            <p className={label} style={muted}>
-              簡報
-            </p>
-            {slides.length ? (
+          {/* （2026-11-05）還沒有講者簡報時整列不顯示，後台填了才出現 */}
+          {slides.length > 0 && (
+            <div className={row}>
+              <p className={label} style={muted}>
+                簡報
+              </p>
               <ul className="space-y-1">
                 {slides.map((s) => (
                   <li key={s.url} className="font-serif-tc text-sm leading-relaxed sm:text-[15px]">
@@ -171,12 +172,8 @@ function LecturePanel({ lecture: l, posterHeight }: { lecture: EventLecture; pos
                   </li>
                 ))}
               </ul>
-            ) : (
-              <p className="pt-0.5 font-serif-tc text-sm" style={muted}>
-                講者簡報將陸續提供
-              </p>
-            )}
-          </div>
+            </div>
+          )}
         </div>
 
         {signupUrl && (

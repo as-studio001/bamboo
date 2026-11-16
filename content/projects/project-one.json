@@ -458,13 +458,13 @@
           "id": "project-one-finished-1103-01",
           "tone": "bg-neutral-300",
           "caption": "設計介紹",
-          "src": "/images/project-one/finished-1103-01.jpg"
+          "src": "/images/project-one/finished-1103-01-crop.jpg"
         },
         {
           "id": "project-one-finished-1103-05",
           "tone": "bg-neutral-300",
           "caption": "立面透視 01",
-          "src": "/images/project-one/finished-1103-05.jpg"
+          "src": "/images/project-one/finished-1103-05-crop.jpg"
         }
       ],
       "moreImages": [
@@ -472,49 +472,49 @@
           "id": "project-one-finished-1103-03",
           "tone": "bg-neutral-300",
           "caption": "立面透視 02",
-          "src": "/images/project-one/finished-1103-03.jpg"
+          "src": "/images/project-one/finished-1103-03-crop.jpg"
         },
         {
           "id": "project-one-finished-1103-04",
           "tone": "bg-neutral-300",
           "caption": "立面透視 03",
-          "src": "/images/project-one/finished-1103-04.jpg"
+          "src": "/images/project-one/finished-1103-04-crop.jpg"
         },
         {
           "id": "project-one-finished-1103-02",
           "tone": "bg-neutral-300",
           "caption": "立面透視 04",
-          "src": "/images/project-one/finished-1103-02.jpg"
+          "src": "/images/project-one/finished-1103-02-crop.jpg"
         },
         {
           "id": "project-one-finished-1103-06",
           "tone": "bg-neutral-300",
           "caption": "立面透視 05",
-          "src": "/images/project-one/finished-1103-06.jpg"
+          "src": "/images/project-one/finished-1103-06-crop.jpg"
         },
         {
           "id": "project-one-finished-1103-07",
           "tone": "bg-neutral-300",
           "caption": "竹構造",
-          "src": "/images/project-one/finished-1103-07.jpg"
+          "src": "/images/project-one/finished-1103-07-crop.jpg"
         },
         {
           "id": "project-one-finished-1103-08",
           "tone": "bg-neutral-300",
           "caption": "組合梁接合",
-          "src": "/images/project-one/finished-1103-08.jpg"
+          "src": "/images/project-one/finished-1103-08-crop.jpg"
         },
         {
           "id": "project-one-finished-1103-09",
           "tone": "bg-neutral-300",
           "caption": "五金接合件",
-          "src": "/images/project-one/finished-1103-09.jpg"
+          "src": "/images/project-one/finished-1103-09-crop.jpg"
         },
         {
           "id": "project-one-finished-1103-10",
           "tone": "bg-neutral-300",
           "caption": "完工合影",
-          "src": "/images/project-one/finished-1103-10.jpg"
+          "src": "/images/project-one/finished-1103-10-crop.jpg"
         }
       ]
     },

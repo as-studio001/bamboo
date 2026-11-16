@@ -478,8 +478,23 @@
     {
       "key": "finished",
       "title": "成品照片",
-      "text": "",
-      "images": []
+      "text": "一籌落腳在斗六糖廠的老牆邊。白天，竹集成材雨淋板的外牆安靜地站在綠蔭裡；入夜之後，室內的燈光從玻璃門透出來，木平台與階梯把人引向門口，像一盞放進糖廠舊景裡的燈。\n\n走進屋內，牆面與天花都是 GLB 集成竹板，溫暖的竹色包覆整個空間。開放式廚房、吧台、起居與以拉門區隔的榻榻米空間依序串連，竹格柵拉門可開可闔，調整空間的開放程度；竹材與鐵件訂製的桌椅、層架，讓煮食、喝茶、閱讀、工作與休息，都能在這 10 坪之內自在發生。",
+      "images": [
+        { "id": "project-two-finished-1116-9953", "tone": "bg-neutral-300", "caption": "", "src": "/images/project-two/finished-1116-dsc9953.jpg" },
+        { "id": "project-two-finished-1116-0009", "tone": "bg-neutral-300", "caption": "", "src": "/images/project-two/finished-1116-dsc0009.jpg" }
+      ],
+      "moreImages": [
+        { "id": "project-two-finished-1116-0013", "tone": "bg-neutral-300", "caption": "", "src": "/images/project-two/finished-1116-dsc0013.jpg" },
+        { "id": "project-two-finished-1116-0022", "tone": "bg-neutral-300", "caption": "", "src": "/images/project-two/finished-1116-dsc0022.jpg" },
+        { "id": "project-two-finished-1116-0019", "tone": "bg-neutral-300", "caption": "", "src": "/images/project-two/finished-1116-dsc0019.jpg" },
+        { "id": "project-two-finished-1116-9955", "tone": "bg-neutral-300", "caption": "", "src": "/images/project-two/finished-1116-dsc9955.jpg" },
+        { "id": "project-two-finished-1116-9921", "tone": "bg-neutral-300", "caption": "", "src": "/images/project-two/finished-1116-dsc9921.jpg" },
+        { "id": "project-two-finished-1116-0032", "tone": "bg-neutral-300", "caption": "", "src": "/images/project-two/finished-1116-dsc0032.jpg" },
+        { "id": "project-two-finished-1116-9941", "tone": "bg-neutral-300", "caption": "", "src": "/images/project-two/finished-1116-dsc9941.jpg" },
+        { "id": "project-two-finished-1116-9975", "tone": "bg-neutral-300", "caption": "", "src": "/images/project-two/finished-1116-dsc9975.jpg" },
+        { "id": "project-two-finished-1116-9979", "tone": "bg-neutral-300", "caption": "", "src": "/images/project-two/finished-1116-dsc9979.jpg" },
+        { "id": "project-two-finished-1116-9986", "tone": "bg-neutral-300", "caption": "", "src": "/images/project-two/finished-1116-dsc9986.jpg" }
+      ]
     },
     {
       "key": "assembly",
